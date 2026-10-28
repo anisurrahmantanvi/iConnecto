@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { MessageCircle, RefreshCw, Sparkles, Users } from 'lucide-react'
+import { MessageCircle, Search, Sparkles, SquarePlus, Users } from 'lucide-react'
 import { useAuth } from '@/app/AuthProvider'
 import { useBadges } from '@/app/BadgesProvider'
 import { PostFeed } from '@/components/feed/PostFeed'
-import { Button, IconButton } from '@/components/ui/Button'
+import { Button } from '@/components/ui/Button'
 import { GlassPanel } from '@/components/ui/GlassPanel'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Tabs } from '@/components/ui/Tabs'
@@ -18,7 +18,7 @@ export default function HomePage() {
   const { profile } = useAuth()
   const badges = useBadges()
   const [tab, setTab] = useState<Tab>('following')
-  const [refreshKey, setRefreshKey] = useState(0)
+  const [refreshKey] = useState(0)
   const [nudgeHidden, setNudgeHidden] = useState(onboardingDismissed)
 
   const showNudge = !!profile && !profile.avatar_url && !profile.bio && !nudgeHidden
@@ -29,10 +29,8 @@ export default function HomePage() {
         title="iConnecto"
         actions={
           <div className="row">
-            <IconButton label="Refresh feed" onClick={() => setRefreshKey((k) => k + 1)}>
-              <RefreshCw size={20} />
-            </IconButton>
-            <Link to="/communities" className="icon-btn" aria-label="Communities"><Users size={22} /></Link>
+            <Link to="/create" className="icon-btn" aria-label="Create a post"><SquarePlus size={24} /></Link>
+            <Link to="/discover" className="icon-btn" aria-label="Search"><Search size={22} /></Link>
             <Link
               to="/messages"
               className="icon-btn"

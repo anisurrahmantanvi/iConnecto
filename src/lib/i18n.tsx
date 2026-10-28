@@ -11,7 +11,7 @@ const KEY = 'iconnecto-lang'
 
 const en = {
   'nav.home': 'Home',
-  'nav.discover': 'Discover',
+  'nav.discover': 'Explore',
   'nav.create': 'Create',
   'nav.notifications': 'Alerts',
   'nav.profile': 'Profile',

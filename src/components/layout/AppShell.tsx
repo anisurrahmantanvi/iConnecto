@@ -73,8 +73,8 @@ export function AppShell() {
       {!immersive ? (
         <nav className="glass bottom-nav" aria-label="Main navigation">
           <NavItem to="/" icon={Home} label={t('nav.home')} end />
+          <NavItem to="/communities" icon={Users} label={t('nav.communities')} />
           <NavItem to="/discover" icon={Compass} label={t('nav.discover')} />
-          <NavItem to="/create" icon={Plus} label={t('nav.create')} create />
           <NavItem to="/notifications" icon={Bell} label={t('nav.notifications')} badge={badges.unreadNotifications} />
           <NavItem to={`/u/${username}`} icon={User} label={t('nav.profile')} />
         </nav>
