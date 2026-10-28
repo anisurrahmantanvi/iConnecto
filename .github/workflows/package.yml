@@ -1,0 +1,28 @@
+name: Package build (zip)
+on:
+  workflow_dispatch:
+    inputs:
+      supabase_url:
+        description: Supabase project URL
+        required: true
+      publishable_key:
+        description: Supabase publishable key (never a secret/service-role key)
+        required: true
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+      - run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ inputs.supabase_url }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ inputs.publishable_key }}
+      - run: cd dist && zip -qr ../iconnecto-dist.zip .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: iconnecto-dist
+          path: iconnecto-dist.zip
