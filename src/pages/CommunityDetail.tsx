@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { appUrl } from '@/lib/base'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Check, Copy, Flag, Lock, LogOut, Pencil, Plus, UserPlus, Users } from 'lucide-react'
 import { useMe } from '@/app/AuthProvider'
@@ -69,7 +70,7 @@ export default function CommunityDetailPage() {
 
   const copyLink = async () => {
     try {
-      await navigator.clipboard.writeText(`${window.location.origin}/c/${slug}`)
+      await navigator.clipboard.writeText(appUrl(`/c/${slug}`))
       toast.show('Community link copied')
     } catch {
       toast.error('Could not copy the link.')

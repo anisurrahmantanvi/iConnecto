@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { appUrl } from '@/lib/base'
 import type { Session, User } from '@supabase/supabase-js'
 import { supabase, errorMessage } from '@/lib/supabase'
 import { loadOrCreateMyProfile } from '@/services/profiles'
@@ -31,7 +32,7 @@ interface AuthApi {
 
 const AuthContext = createContext<AuthApi | null>(null)
 
-const callbackUrl = () => `${window.location.origin}/auth/callback`
+const callbackUrl = () => appUrl('/auth/callback')
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)

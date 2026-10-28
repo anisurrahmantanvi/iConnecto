@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { appUrl } from '@/lib/base'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Ban, Copy, Flag, Pencil, Phone, Settings, UserX, Video } from 'lucide-react'
 import { useMe } from '@/app/AuthProvider'
@@ -72,7 +73,7 @@ export default function ProfilePage() {
 
   const copyLink = async () => {
     try {
-      await navigator.clipboard.writeText(`${window.location.origin}/u/${username}`)
+      await navigator.clipboard.writeText(appUrl(`/u/${username}`))
       toast.show('Profile link copied')
     } catch {
       toast.error('Could not copy the link.')

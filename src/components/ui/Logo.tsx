@@ -1,3 +1,4 @@
+import { publicUrl } from '@/lib/base'
 interface LogoProps {
   /** Rendered width/height in CSS pixels. */
   size?: number
@@ -12,7 +13,7 @@ interface LogoProps {
  */
 export function Logo({ size = 40, decorative = false, className = '' }: LogoProps) {
   // The 96px asset stays crisp up to ~48 CSS px on 2x screens; larger sizes use the 192px asset.
-  const src = size <= 48 ? '/icons/icon-96.png' : '/icons/icon-192.png'
+  const src = publicUrl(size <= 48 ? 'icons/icon-96.png' : 'icons/icon-192.png')
   return (
     <img
       src={src}

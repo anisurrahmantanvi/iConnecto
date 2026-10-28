@@ -1,10 +1,11 @@
 import { supabase } from '@/lib/supabase'
+import { appUrl } from '@/lib/base'
 import { removeImages, type Bucket } from './storage'
 
 export async function updateEmail(email: string): Promise<void> {
   const { error } = await supabase.auth.updateUser(
     { email: email.trim() },
-    { emailRedirectTo: `${window.location.origin}/auth/callback` },
+    { emailRedirectTo: appUrl('/auth/callback') },
   )
   if (error) throw new Error(error.message)
 }

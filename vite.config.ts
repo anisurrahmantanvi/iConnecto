@@ -3,6 +3,8 @@ import react from '@vitejs/plugin-react'
 import { fileURLToPath, URL } from 'node:url'
 
 export default defineConfig({
+  // `VITE_BASE=/iconnecto/` for GitHub Pages project sites; `/` everywhere else.
+  base: process.env.VITE_BASE || '/',
   plugins: [react()],
   // Keep function names so crash reports show which component failed (adds only a few KB).
   esbuild: { keepNames: true },

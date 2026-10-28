@@ -1,4 +1,5 @@
 import { memo, useCallback, useRef, useState } from 'react'
+import { appUrl } from '@/lib/base'
 import { Link, useNavigate } from 'react-router-dom'
 import { Bookmark, Copy, Flag, Heart, MessageCircle, Pencil, Share2, Trash2 } from 'lucide-react'
 import type { PostView } from '@/types/db'
@@ -82,7 +83,7 @@ export const PostCard = memo(function PostCard({ post, onChange, onDeleted, canM
     [post, me.id, onChange, toast],
   )
 
-  const link = `${window.location.origin}/p/${post.id}`
+  const link = appUrl(`/p/${post.id}`)
 
   const share = async () => {
     try {

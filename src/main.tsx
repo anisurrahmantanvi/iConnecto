@@ -8,6 +8,7 @@ import { ThemeProvider } from './app/ThemeProvider'
 import { I18nProvider } from './lib/i18n'
 import { ToastProvider } from './components/ui/Toast'
 import { registerServiceWorker } from './lib/pwa'
+import { ROUTER_BASENAME } from './lib/base'
 
 const rootEl = document.getElementById('root')
 if (!rootEl) throw new Error('Missing #root element in index.html')
@@ -18,7 +19,7 @@ createRoot(rootEl).render(
       <ThemeProvider>
         <I18nProvider>
           <ToastProvider>
-            <BrowserRouter>
+            <BrowserRouter basename={ROUTER_BASENAME}>
               <App />
             </BrowserRouter>
           </ToastProvider>

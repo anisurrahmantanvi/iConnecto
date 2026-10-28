@@ -12,6 +12,8 @@
  *     data must never be stored by a worker.
  *   - It does not implement push notifications.
  */
+// Works at the site root and under a sub-path such as /iconnecto/ (GitHub Pages).
+const BASE = new URL(self.registration.scope).pathname
 const SHELL = 'ic-shell-v1'
 const ASSETS = 'ic-assets-v1'
 const EMOJI = 'ic-emoji-v1'
@@ -21,7 +23,7 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches
       .open(SHELL)
-      .then((cache) => cache.addAll(['/', '/favicon.ico', '/icons/icon-192.png', '/manifest.webmanifest']))
+      .then((cache) => cache.addAll([BASE, BASE + 'favicon.ico', BASE + 'icons/icon-192.png', BASE + 'manifest.webmanifest']))
       .then(() => self.skipWaiting()),
   )
 })
@@ -60,16 +62,16 @@ self.addEventListener('fetch', (event) => {
         .then((response) => {
           if (response.ok) {
             const copy = response.clone()
-            caches.open(SHELL).then((cache) => cache.put('/', copy))
+            caches.open(SHELL).then((cache) => cache.put(BASE, copy))
           }
           return response
         })
-        .catch(() => caches.match('/')),
+        .catch(() => caches.match(BASE)),
     )
     return
   }
 
-  if (url.origin === self.location.origin && url.pathname.startsWith('/assets/')) {
+  if (url.origin === self.location.origin && url.pathname.startsWith(BASE + 'assets/')) {
     event.respondWith(cacheFirst(request, ASSETS))
     return
   }
