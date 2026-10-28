@@ -47,7 +47,13 @@ jobs:
           npx capacitor-assets generate --android --iconBackgroundColor '#ffffff' || echo "icon generation failed, default icon kept"
           npx cap sync android
       - name: Build debug APK
-        run: cd android && ./gradlew assembleDebug --no-daemon
+        run: |
+          cd android
+          if ! ./gradlew assembleDebug --no-daemon --stacktrace > ../gradle.log 2>&1; then
+            msg=$(grep -E "error:|What went wrong|Caused by|FAILURE|Could not|not found|Unsupported|Execution failed" -A3 ../gradle.log | head -40 | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+            echo "::error title=Gradle failed::$msg"
+            exit 1
+          fi
       - uses: actions/upload-artifact@v4
         with:
           name: iconnecto-apk
