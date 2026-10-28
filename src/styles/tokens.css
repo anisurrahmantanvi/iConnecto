@@ -1,0 +1,112 @@
+/* iConnecto design tokens — Liquid Glass inspired (original design, no Apple assets). */
+:root {
+  color-scheme: light;
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Segoe UI', Roboto,
+    'Noto Sans', 'Noto Sans Bengali', 'Hind Siliguri', system-ui, sans-serif;
+
+  --bg: #eef1f8;
+  --bg-orb-1: rgba(110, 168, 255, 0.55);
+  --bg-orb-2: rgba(180, 130, 255, 0.4);
+  --bg-orb-3: rgba(255, 160, 190, 0.32);
+
+  --text: #11131a;
+  --text-muted: #5b6275;
+  --text-faint: #8a91a3;
+
+  --accent: #3b7bff;
+  --accent-2: #8b5cf6;
+  --accent-contrast: #ffffff;
+  --danger: #e5484d;
+  --success: #1f9d61;
+  --like: #ef4565;
+
+  --glass: rgba(255, 255, 255, 0.62);
+  --glass-strong: rgba(255, 255, 255, 0.8);
+  --glass-solid: #f7f9fe;
+  --glass-border: rgba(255, 255, 255, 0.7);
+  --glass-edge: rgba(20, 30, 60, 0.08);
+  --glass-highlight: rgba(255, 255, 255, 0.9);
+  --field: rgba(255, 255, 255, 0.7);
+  --hover: rgba(20, 30, 60, 0.06);
+
+  --shadow-sm: 0 1px 2px rgba(20, 30, 60, 0.06), 0 4px 12px rgba(20, 30, 60, 0.06);
+  --shadow-md: 0 8px 30px rgba(20, 30, 60, 0.12);
+  --shadow-lg: 0 20px 60px rgba(20, 30, 60, 0.2);
+
+  --blur: 22px;
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 22px;
+  --r-xl: 30px;
+  --r-pill: 999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  --nav-h: 64px;
+  --sidebar-w: 248px;
+  --col-w: 640px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0b0d14;
+  --bg-orb-1: rgba(70, 120, 255, 0.35);
+  --bg-orb-2: rgba(140, 90, 255, 0.3);
+  --bg-orb-3: rgba(255, 90, 140, 0.18);
+  --text: #f2f4fa;
+  --text-muted: #a4abbd;
+  --text-faint: #747c90;
+  --accent: #6ea0ff;
+  --accent-2: #a98bff;
+  --accent-contrast: #0b0d14;
+  --danger: #ff6b70;
+  --success: #3ccf8e;
+  --like: #ff5c7c;
+  --glass: rgba(28, 32, 46, 0.58);
+  --glass-strong: rgba(34, 39, 56, 0.82);
+  --glass-solid: #171b28;
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-edge: rgba(0, 0, 0, 0.4);
+  --glass-highlight: rgba(255, 255, 255, 0.16);
+  --field: rgba(255, 255, 255, 0.07);
+  --hover: rgba(255, 255, 255, 0.08);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']):not([data-theme='dark']) {
+    color-scheme: dark;
+    --bg: #0b0d14;
+    --bg-orb-1: rgba(70, 120, 255, 0.35);
+    --bg-orb-2: rgba(140, 90, 255, 0.3);
+    --bg-orb-3: rgba(255, 90, 140, 0.18);
+    --text: #f2f4fa;
+    --text-muted: #a4abbd;
+    --text-faint: #747c90;
+    --accent: #6ea0ff;
+    --accent-2: #a98bff;
+    --accent-contrast: #0b0d14;
+    --danger: #ff6b70;
+    --success: #3ccf8e;
+    --like: #ff5c7c;
+    --glass: rgba(28, 32, 46, 0.58);
+    --glass-strong: rgba(34, 39, 56, 0.82);
+    --glass-solid: #171b28;
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-edge: rgba(0, 0, 0, 0.4);
+    --glass-highlight: rgba(255, 255, 255, 0.16);
+    --field: rgba(255, 255, 255, 0.07);
+    --hover: rgba(255, 255, 255, 0.08);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.45);
+    --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.6);
+  }
+}
