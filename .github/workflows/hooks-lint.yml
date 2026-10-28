@@ -1,6 +1,8 @@
 name: Hooks lint
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -9,15 +11,21 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm install --no-audit --no-fund
-      - run: npm install --no-save --no-audit --no-fund eslint@8 eslint-plugin-react-hooks@4 @typescript-eslint/parser@7
+      - run: npm install --no-save --no-audit --no-fund eslint@9 eslint-plugin-react-hooks@5 @typescript-eslint/parser@8 typescript@5.6
       - name: Check the Rules of Hooks
         run: |
-          cat > /tmp/eslintrc.json <<'JSON'
-          {"root":true,"parser":"@typescript-eslint/parser","parserOptions":{"ecmaVersion":2022,"sourceType":"module","ecmaFeatures":{"jsx":true}},
-           "plugins":["react-hooks"],"rules":{"react-hooks/rules-of-hooks":"error"}}
-          JSON
-          npx eslint --no-eslintrc -c /tmp/eslintrc.json --ext .ts,.tsx src -f unix > /tmp/lint.txt || true
-          cat /tmp/lint.txt | tail -30
-          msg=$(grep -E "rules-of-hooks|React Hook" /tmp/lint.txt | head -15 | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
-          if [ -n "$msg" ]; then echo "::error title=Hook order problems::$msg"; exit 1; else echo "::notice title=Hooks lint::no violations"; fi
+          cat > eslint.hooks.config.mjs <<'JS'
+          import tsParser from '@typescript-eslint/parser'
+          import hooks from 'eslint-plugin-react-hooks'
+          export default [{
+            files: ['src/**/*.{ts,tsx}'],
+            languageOptions: { parser: tsParser, parserOptions: { ecmaFeatures: { jsx: true } } },
+            plugins: { 'react-hooks': hooks },
+            rules: { 'react-hooks/rules-of-hooks': 'error' },
+          }]
+          JS
+          npx eslint -c eslint.hooks.config.mjs src --format json > /tmp/lint.json || true
+          node -e "
+          const r=JSON.parse(require('fs').readFileSync('/tmp/lint.json','utf8'));let n=0;
+          for(const f of r)for(const m of f.messages){n++;console.log('::error file='+f.filePath.replace(process.cwd()+'/','')+',line='+m.line+',title=Hooks rule::'+m.message)}
+          console.log('hook violations: '+n)"
