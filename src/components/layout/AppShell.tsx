@@ -39,7 +39,10 @@ export function AppShell() {
   const badges = useBadges()
   const online = useOnline()
   // Conversations and calls need the full screen on a phone, so the tab bar is hidden there.
-  const immersive = !!useMatch('/messages/:chatId') || !!useMatch('/call/:callId')
+  // Both hooks must run on every render (`||` would skip the second one and break React's hook order).
+  const inChat = useMatch('/messages/:chatId')
+  const inCall = useMatch('/call/:callId')
+  const immersive = !!inChat || !!inCall
   const username = profile?.username ?? ''
 
   return (
