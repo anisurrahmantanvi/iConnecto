@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { MessageCircle, Pencil } from 'lucide-react'
+import { LogOut, MessageCircle, Pencil } from 'lucide-react'
 import type { Profile } from '@/types/db'
 import { Avatar } from '@/components/ui/Avatar'
 import { Button } from '@/components/ui/Button'
@@ -16,9 +16,11 @@ interface ProfileHeaderProps {
   onMessage: () => void
   messaging: boolean
   menu: MenuItem[]
+  /** Own profile only: shows a visible Log out button. */
+  onLogout?: () => void
 }
 
-export function ProfileHeader({ profile, isMe, following, onFollowingChange, onMessage, messaging, menu }: ProfileHeaderProps) {
+export function ProfileHeader({ profile, isMe, following, onFollowingChange, onMessage, messaging, menu, onLogout }: ProfileHeaderProps) {
   const base = `/u/${profile.username}`
   return (
     <section className="glass profile-head" aria-label="Profile">
@@ -37,7 +39,10 @@ export function ProfileHeader({ profile, isMe, following, onFollowingChange, onM
 
       <div className="row profile-actions">
         {isMe ? (
-          <Link to="/settings/profile" className="btn btn--glass"><Pencil size={16} aria-hidden /> Edit profile</Link>
+          <>
+            <Link to="/settings/profile" className="btn btn--glass"><Pencil size={16} aria-hidden /> Edit profile</Link>
+            {onLogout ? <Button variant="glass" icon={<LogOut size={16} />} onClick={onLogout}>Log out</Button> : null}
+          </>
         ) : (
           <>
             <FollowButton targetId={profile.id} following={following} onChange={onFollowingChange} size="md" />

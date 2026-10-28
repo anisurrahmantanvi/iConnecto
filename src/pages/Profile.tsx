@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { appUrl } from '@/lib/base'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { Ban, Copy, Flag, Pencil, Phone, Settings, UserX, Video } from 'lucide-react'
-import { useMe } from '@/app/AuthProvider'
+import { Ban, Copy, Flag, LogOut, Pencil, Phone, Settings, UserX, Video } from 'lucide-react'
+import { useAuth, useMe } from '@/app/AuthProvider'
 import { PostFeed } from '@/components/feed/PostFeed'
 import { ProfileHeader } from '@/components/profile/ProfileHeader'
 import type { MenuItem } from '@/components/ui/ActionMenu'
@@ -23,6 +23,15 @@ export default function ProfilePage() {
   const me = useMe()
   const navigate = useNavigate()
   const toast = useToast()
+  const { signOut } = useAuth()
+  const logOut = async () => {
+    try {
+      await signOut()
+      navigate('/login', { replace: true })
+    } catch (e) {
+      toast.error(errorMessage(e))
+    }
+  }
 
   const { data: profile, setData: setProfile, loading, error, reload } = useAsync(() => getProfileByUsername(username), [username])
   const isMe = profile?.id === me.id
@@ -97,6 +106,7 @@ export default function ProfilePage() {
           { label: 'Edit profile', icon: <Pencil size={18} />, onSelect: () => navigate('/settings/profile') },
           { label: 'Copy profile link', icon: <Copy size={18} />, onSelect: () => void copyLink() },
           { label: 'Settings', icon: <Settings size={18} />, onSelect: () => navigate('/settings') },
+          { label: 'Log out', icon: <LogOut size={18} />, onSelect: () => void logOut() },
         ]
       : [
           { label: 'Voice call', icon: <Phone size={18} />, hidden: blocked, onSelect: () => navigate(`/call/new?to=${profile.id}&type=audio`) },
@@ -158,6 +168,7 @@ export default function ProfilePage() {
           onMessage={() => void message()}
           messaging={messaging}
           menu={menu}
+          onLogout={isMe ? () => void logOut() : undefined}
         />
 
         {blocked ? (
