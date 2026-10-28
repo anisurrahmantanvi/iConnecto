@@ -21,6 +21,23 @@
         if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t
       } catch (e) {}
     </script>
+    <script>
+      // Last-resort safety net: if the app crashes before React can show anything, never leave a blank page.
+      (function () {
+        function show(msg) {
+          var r = document.getElementById('root')
+          if (!r || r.childNodes.length) return
+          r.innerHTML =
+            '<div style="font-family:system-ui,sans-serif;padding:24px;max-width:520px;margin:0 auto;line-height:1.5">' +
+            '<h2>iConnecto could not start</h2><p>Please reload the page. If it keeps happening, send this text to the developer:</p>' +
+            '<pre style="white-space:pre-wrap;background:#00000012;padding:12px;border-radius:12px;font-size:12px"></pre></div>'
+          r.querySelector('pre').textContent = msg
+        }
+        window.addEventListener('error', function (e) { setTimeout(function () { show(String(e.message || e.error)) }, 1500) })
+        window.addEventListener('unhandledrejection', function (e) { setTimeout(function () { show(String(e.reason)) }, 1500) })
+        setTimeout(function () { show('The app did not render within 8 seconds (no error was reported).') }, 8000)
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

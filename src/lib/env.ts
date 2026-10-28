@@ -3,8 +3,24 @@
 const meta: Record<string, string | undefined> =
   (import.meta as unknown as { env?: Record<string, string | undefined> }).env ?? {}
 
-const url = (meta.VITE_SUPABASE_URL ?? '').trim()
-const key = (meta.VITE_SUPABASE_PUBLISHABLE_KEY ?? '').trim()
+// Tolerate common copy-paste slips: wrapping quotes, stray spaces, a missing https://, a trailing slash or /rest/v1.
+const clean = (v: string | undefined) => (v ?? '').trim().replace(/^['"`]+|['"`]+$/g, '').trim()
+function normalizeUrl(raw: string): string {
+  if (!raw) return ''
+  let u = raw
+  if (!/^https?:\/\//i.test(u)) u = 'https://' + u
+  return u.replace(/\/+$/, '').replace(/\/(rest|auth)\/v1$/i, '')
+}
+const url = normalizeUrl(clean(meta.VITE_SUPABASE_URL))
+const key = clean(meta.VITE_SUPABASE_PUBLISHABLE_KEY)
+
+export const urlIsValid: boolean = (() => {
+  try {
+    return !!url && !!new URL(url).hostname
+  } catch {
+    return false
+  }
+})()
 
 export const env = {
   supabaseUrl: url,
@@ -17,6 +33,7 @@ export const env = {
 export const missingEnv: string[] = [
   ...(url ? [] : ['VITE_SUPABASE_URL']),
   ...(key ? [] : ['VITE_SUPABASE_PUBLISHABLE_KEY']),
+  ...(url && !urlIsValid ? ['VITE_SUPABASE_URL (not a valid URL)'] : []),
 ]
 
 // A service-role key must never reach the browser. Refuse to boot if one was pasted by mistake.

@@ -1,9 +1,9 @@
 import { createClient } from '@supabase/supabase-js'
-import { env } from './env'
+import { env, urlIsValid } from './env'
 
 // Only the publishable key is used here. Authorization is enforced by RLS in the database.
 export const supabase = createClient(
-  env.supabaseUrl || 'http://localhost:54321',
+  urlIsValid ? env.supabaseUrl : 'http://localhost:54321',
   env.supabaseKey || 'missing-key',
   {
     auth: {

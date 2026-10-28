@@ -14,10 +14,14 @@ jobs:
       - run: npm install --no-audit --no-fund
       - run: npm install --no-save --no-audit --no-fund playwright
       - run: npx playwright install --with-deps chromium
-      - name: Build (placeholder Supabase values)
-        run: npm run build
-        env:
-          VITE_SUPABASE_URL: https://example.supabase.co
-          VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_placeholder
-      - name: Open the app in a phone-sized browser
-        run: node scripts/smoke.mjs
+      - name: Build several env variants
+        run: |
+          VITE_SUPABASE_URL=https://example.supabase.co VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_placeholder npx vite build --outDir dist-ok
+          VITE_SUPABASE_URL='"example.supabase.co/"' VITE_SUPABASE_PUBLISHABLE_KEY='"sb_publishable_placeholder"' npx vite build --outDir dist-quoted
+          VITE_SUPABASE_URL='not a url ::' VITE_SUPABASE_PUBLISHABLE_KEY=x npx vite build --outDir dist-garbage
+          NEXT_PUBLIC_SUPABASE_URL=https://example.supabase.co npx vite build --outDir dist-missing
+      - name: Open each variant in a phone-sized browser
+        run: |
+          set +e; rc=0
+          for d in dist-ok dist-quoted dist-garbage dist-missing; do node scripts/smoke.mjs $d $d || rc=1; done
+          exit $rc

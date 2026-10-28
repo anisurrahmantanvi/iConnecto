@@ -8,7 +8,9 @@ const base = `http://localhost:${PORT}`
 const esc = (s) => String(s).replace(/%/g, '%25').replace(/\r/g, '').replace(/\n/g, '%0A').slice(0, 1800)
 const note = (level, title, msg) => console.log(`::${level} title=${title}::${esc(msg)}`)
 
-const server = spawn('npx', ['vite', 'preview', '--port', String(PORT), '--strictPort'], { stdio: 'ignore' })
+const DIR = process.argv[2] || 'dist'
+const LABEL = process.argv[3] || DIR
+const server = spawn('npx', ['vite', 'preview', '--outDir', DIR, '--port', String(PORT), '--strictPort'], { stdio: 'ignore' })
 const problems = []
 const events = []
 let browser
@@ -38,18 +40,18 @@ try {
       rootLen: document.getElementById('root')?.innerHTML.length ?? -1,
       text: document.body.innerText.replace(/\s+/g, ' ').slice(0, 300),
     }))
-    note('notice', `Page ${path}`, `ended at ${info.url}; root html length ${info.rootLen}; text: ${info.text || '(empty)'}`)
+    note('notice', `[${LABEL}] Page ${path}`, `ended at ${info.url}; root html length ${info.rootLen}; text: ${info.text || '(empty)'}`)
     if (info.rootLen < 50) problems.push(`BLANK PAGE on ${path}: #root is empty`)
   }
 } catch (e) {
   problems.push(`script: ${e.message}`)
 } finally {
-  if (events.length) note('warning', 'Network and console events', events.slice(0, 15).join('\n'))
+  if (events.length) note('warning', `[${LABEL}] events`, events.slice(0, 15).join('\n'))
   if (problems.length) {
-    note('error', 'Problems found', problems.slice(0, 10).join('\n'))
+    note('error', `[${LABEL}] Problems found`, problems.slice(0, 10).join('\n'))
     process.exitCode = 1
   } else {
-    note('notice', 'Smoke test', 'Page rendered with no console errors.')
+    note('notice', `[${LABEL}] Smoke test`, 'Page rendered with no console errors.')
   }
   await browser?.close()
   server.kill()
