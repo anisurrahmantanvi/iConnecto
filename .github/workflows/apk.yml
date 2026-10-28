@@ -45,6 +45,7 @@ jobs:
           PY
           mkdir -p assets && cp design/logo-source.png assets/icon-only.png && cp design/logo-source.png assets/icon-foreground.png
           npx capacitor-assets generate --android --iconBackgroundColor '#ffffff' || echo "icon generation failed, default icon kept"
+          grep -rl '@mipmap/ic_launcher_background' android/app/src/main/res | xargs -r sed -i 's#@mipmap/ic_launcher_background#@color/ic_launcher_background#g'
           npx cap sync android
       - name: Build debug APK
         run: |
