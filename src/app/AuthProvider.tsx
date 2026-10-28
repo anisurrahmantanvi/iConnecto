@@ -26,6 +26,8 @@ interface AuthApi {
   requestPasswordReset: (email: string) => Promise<void>
   updatePassword: (password: string) => Promise<void>
   resendVerification: (email: string) => Promise<void>
+  /** Confirm a new account with the code from the email (type 'signup'), or start a reset with the recovery code. */
+  verifyEmailCode: (email: string, code: string, purpose: 'signup' | 'recovery') => Promise<void>
   retryProfile: () => void
   setProfile: (p: Profile) => void
 }
@@ -124,6 +126,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw new Error(error.message)
   }, [])
 
+  const verifyEmailCode = useCallback<AuthApi['verifyEmailCode']>(async (email, code, purpose) => {
+    const { error } = await supabase.auth.verifyOtp({ email: email.trim(), token: code.replace(/\s+/g, ''), type: purpose })
+    if (error) throw new Error(/expired|invalid/i.test(error.message) ? 'That code is wrong or has expired. Check it or request a new one.' : error.message)
+  }, [])
+
   const retryProfile = useCallback(() => setRetryTick((t) => t + 1), [])
 
   const value = useMemo<AuthApi>(
@@ -140,10 +147,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       requestPasswordReset,
       updatePassword,
       resendVerification,
+      verifyEmailCode,
       retryProfile,
       setProfile,
     }),
-    [session, profile, initializing, userId, profileError, recovering, signUp, signIn, signOut, requestPasswordReset, updatePassword, resendVerification, retryProfile],
+    [session, profile, initializing, userId, profileError, recovering, signUp, signIn, signOut, requestPasswordReset, updatePassword, resendVerification, verifyEmailCode, retryProfile],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

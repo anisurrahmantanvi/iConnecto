@@ -1,6 +1,6 @@
-import { useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
-import { MailCheck } from 'lucide-react'
+import { useEffect, useState, type FormEvent } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { CodeForm } from '@/components/auth/CodeForm'
 import { useAuth } from '@/app/AuthProvider'
 import { AuthLayout } from '@/components/auth/AuthLayout'
 import { Button } from '@/components/ui/Button'
@@ -9,7 +9,9 @@ import { ErrorBanner } from '@/components/ui/Feedback'
 import { errorMessage } from '@/lib/supabase'
 
 export default function ForgotPasswordPage() {
-  const { requestPasswordReset } = useAuth()
+  const { requestPasswordReset, verifyEmailCode } = useAuth()
+  const navigate = useNavigate()
+  const [cooldown, setCooldown] = useState(0)
   const [email, setEmail] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -23,6 +25,7 @@ export default function ForgotPasswordPage() {
     try {
       await requestPasswordReset(email)
       setSent(true)
+      setCooldown(30)
     } catch (err) {
       setError(errorMessage(err))
     } finally {
@@ -30,14 +33,30 @@ export default function ForgotPasswordPage() {
     }
   }
 
+  useEffect(() => {
+    if (cooldown <= 0) return
+    const id = window.setTimeout(() => setCooldown((c) => c - 1), 1000)
+    return () => window.clearTimeout(id)
+  }, [cooldown])
+
   if (sent) {
     return (
-      <AuthLayout title="Check your email" footer={<Link to="/login">Back to log in</Link>}>
-        <div className="col" style={{ alignItems: 'center', textAlign: 'center' }}>
-          <MailCheck size={40} color="var(--accent)" aria-hidden />
-          {/* The wording is identical whether or not the address has an account, so it cannot be used to probe for accounts. */}
-          <p className="muted">If an account exists for that address, a reset link is on its way. It can take a minute to arrive.</p>
-        </div>
+      <AuthLayout title="Enter your code" footer={<Link to="/login">Back to log in</Link>}>
+        <CodeForm
+          email={email.trim()}
+          // The wording is identical whether or not the address has an account, so it cannot be used to probe for accounts.
+          intro="If an account exists, we sent a reset code to"
+          submitLabel="Continue"
+          onVerify={async (code) => {
+            await verifyEmailCode(email, code, 'recovery')
+            navigate('/reset-password', { replace: true })
+          }}
+          onResend={async () => {
+            await requestPasswordReset(email)
+            setCooldown(30)
+          }}
+          cooldown={cooldown}
+        />
       </AuthLayout>
     )
   }
@@ -45,7 +64,7 @@ export default function ForgotPasswordPage() {
   return (
     <AuthLayout
       title="Reset your password"
-      subtitle="We'll email you a link to choose a new one."
+      subtitle="We'll email you a code to choose a new one."
       footer={<Link to="/login">Back to log in</Link>}
     >
       <form className="col" onSubmit={(e) => void submit(e)} noValidate>
@@ -60,7 +79,7 @@ export default function ForgotPasswordPage() {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-        <Button type="submit" variant="primary" block loading={busy}>Send reset link</Button>
+        <Button type="submit" variant="primary" block loading={busy}>Send reset code</Button>
       </form>
     </AuthLayout>
   )

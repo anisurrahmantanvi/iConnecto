@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { MailCheck } from 'lucide-react'
+import { CodeForm } from '@/components/auth/CodeForm'
 import { useAuth } from '@/app/AuthProvider'
 import { AuthLayout } from '@/components/auth/AuthLayout'
 import { Button } from '@/components/ui/Button'
@@ -17,7 +17,7 @@ type Availability = 'idle' | 'checking' | 'ok' | 'taken' | 'invalid' | 'error'
 
 export default function SignupPage() {
   const { t } = useT()
-  const { signUp, resendVerification } = useAuth()
+  const { signUp, resendVerification, verifyEmailCode } = useAuth()
   const toast = useToast()
   const [displayName, setDisplayName] = useState('')
   const [username, setUsername] = useState('')
@@ -95,7 +95,7 @@ export default function SignupPage() {
     try {
       await resendVerification(sentTo)
       setCooldown(30)
-      toast.show('Verification email sent again')
+      toast.show('A new code was sent')
     } catch (err) {
       toast.error(errorMessage(err))
     }
@@ -103,17 +103,15 @@ export default function SignupPage() {
 
   if (sentTo) {
     return (
-      <AuthLayout title="Check your email" footer={<Link to="/login">Back to log in</Link>}>
-        <div className="col" style={{ alignItems: 'center', textAlign: 'center' }}>
-          <MailCheck size={40} color="var(--accent)" aria-hidden />
-          <p className="muted">
-            We sent a verification link to <strong>{sentTo}</strong>. Open it on this device to finish creating your account.
-          </p>
-          <Button variant="glass" disabled={cooldown > 0} onClick={() => void resend()}>
-            {cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend email'}
-          </Button>
-          <p className="small faint">No email? Check your spam folder, or make sure the address is spelled correctly.</p>
-        </div>
+      <AuthLayout title="Enter your code" footer={<Link to="/login">Back to log in</Link>}>
+        <CodeForm
+          email={sentTo}
+          intro="We sent a verification code to"
+          submitLabel="Confirm and continue"
+          onVerify={(code) => verifyEmailCode(sentTo, code, 'signup')}
+          onResend={resend}
+          cooldown={cooldown}
+        />
       </AuthLayout>
     )
   }
