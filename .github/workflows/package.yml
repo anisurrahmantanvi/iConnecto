@@ -8,6 +8,8 @@ on:
       publishable_key:
         description: Supabase publishable key (never a secret/service-role key)
         required: true
+permissions:
+  contents: write
 jobs:
   package:
     runs-on: ubuntu-latest
@@ -26,3 +28,10 @@ jobs:
         with:
           name: iconnecto-dist
           path: iconnecto-dist.zip
+      - name: Publish the zip on a separate branch
+        run: |
+          mkdir /tmp/pub && cp iconnecto-dist.zip /tmp/pub/ && cd /tmp/pub
+          git init -q -b built-dist
+          git config user.name github-actions && git config user.email actions@github.com
+          git add . && git commit -q -m "Build output"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" built-dist
