@@ -26,6 +26,16 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, State> {
           <button type="button" className="btn btn--primary" onClick={() => window.location.reload()}>
             Reload
           </button>
+          <details className="small faint" style={{ marginTop: 12 }} open>
+            <summary>Technical details (send this to the developer)</summary>
+            <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontSize: 11, userSelect: 'text' }}>
+              {String(this.state.error.message || this.state.error)}
+              {'\n'}
+              {(this.state.error.stack || '').split('\n').slice(0, 6).join('\n')}
+              {'\n'}
+              {navigator.userAgent}
+            </pre>
+          </details>
         </div>
       </div>
     )
