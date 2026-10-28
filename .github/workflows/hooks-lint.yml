@@ -1,0 +1,23 @@
+name: Hooks lint
+on:
+  workflow_dispatch:
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+      - run: npm install --no-save --no-audit --no-fund eslint@8 eslint-plugin-react-hooks@4 @typescript-eslint/parser@7
+      - name: Check the Rules of Hooks
+        run: |
+          cat > /tmp/eslintrc.json <<'JSON'
+          {"root":true,"parser":"@typescript-eslint/parser","parserOptions":{"ecmaVersion":2022,"sourceType":"module","ecmaFeatures":{"jsx":true}},
+           "plugins":["react-hooks"],"rules":{"react-hooks/rules-of-hooks":"error"}}
+          JSON
+          npx eslint --no-eslintrc -c /tmp/eslintrc.json --ext .ts,.tsx src -f unix > /tmp/lint.txt || true
+          cat /tmp/lint.txt | tail -30
+          msg=$(grep -E "rules-of-hooks|React Hook" /tmp/lint.txt | head -15 | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+          if [ -n "$msg" ]; then echo "::error title=Hook order problems::$msg"; exit 1; else echo "::notice title=Hooks lint::no violations"; fi
