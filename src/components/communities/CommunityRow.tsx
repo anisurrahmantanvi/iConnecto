@@ -18,7 +18,7 @@ export function CommunityRow({ community }: { community: Community }) {
           {compactNumber(community.member_count)} {community.member_count === 1 ? 'member' : 'members'}
         </span>
         {community.description ? (
-          <span className="small muted community-desc"><RichText text={community.description} /></span>
+          <span className="small muted community-desc"><RichText text={community.description} plain /></span>
         ) : null}
       </div>
     </Link>

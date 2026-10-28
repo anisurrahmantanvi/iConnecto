@@ -2,6 +2,7 @@ import { Component, type ErrorInfo, type ReactNode } from 'react'
 
 interface State {
   error: Error | null
+  stack?: string
 }
 
 /** Last line of defence: a render crash shows a recoverable screen instead of a blank page. */
@@ -14,6 +15,7 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, State> {
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.error('iConnecto crashed while rendering:', error, info.componentStack)
+    this.setState({ stack: (info.componentStack || '').split('\n').slice(0, 8).join('\n') })
   }
 
   render() {
@@ -32,6 +34,10 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, State> {
               {String(this.state.error.message || this.state.error)}
               {'\n'}
               {(this.state.error.stack || '').split('\n').slice(0, 6).join('\n')}
+              {'\n'}
+              {this.state.stack}
+              {'\n'}
+              {location.pathname}
               {'\n'}
               {navigator.userAgent}
             </pre>

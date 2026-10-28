@@ -71,7 +71,7 @@ export default function InboxPage() {
                   </div>
                   <div className="row">
                     <span className="small muted chat-preview grow">
-                      {c.last_message_preview ? <RichText text={c.last_message_preview} /> : 'Say hello 👋'}
+                      {c.last_message_preview ? <RichText text={c.last_message_preview} plain /> : 'Say hello 👋'}
                     </span>
                     {c.unread_count > 0 ? (
                       <span className="count-pill" aria-hidden>{c.unread_count > 99 ? '99+' : c.unread_count}</span>
