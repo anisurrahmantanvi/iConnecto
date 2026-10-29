@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import { check, PAGE_SIZE, PROFILE_FULL, PROFILE_LITE } from '@/lib/api'
 import { escapeLike, sanitizeSearch } from '@/lib/format'
-import type { Page, Profile, ProfileLite } from '@/types/db'
+import type { Page, Profile, ProfileAbout, ProfileLite } from '@/types/db'
 import { removeImages, uploadImage } from './storage'
 
 export async function getProfileById(id: string): Promise<Profile | null> {
@@ -70,6 +70,19 @@ export async function changeCover(userId: string, file: File | null, previousUrl
     void removeImages('covers', [url])
     throw e
   }
+}
+
+const ABOUT_COLS = 'work, education, location, relationship_status'
+
+/** Work / education / location / relationship status. Kept out of the main profile query on purpose. */
+export async function getProfileAbout(userId: string): Promise<ProfileAbout | null> {
+  const res = await supabase.from('profiles').select(ABOUT_COLS).eq('id', userId).maybeSingle()
+  return check(res) as ProfileAbout | null
+}
+
+export async function updateMyAbout(userId: string, about: ProfileAbout): Promise<ProfileAbout> {
+  const res = await supabase.from('profiles').update(about).eq('id', userId).select(ABOUT_COLS).single()
+  return check(res) as ProfileAbout
 }
 
 export async function searchProfiles(query: string, cursor: string | null): Promise<Page<ProfileLite>> {

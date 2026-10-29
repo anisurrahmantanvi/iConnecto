@@ -106,7 +106,7 @@
 
 /* ---------- Form controls ---------- */
 .field { display: flex; flex-direction: column; gap: 6px; }
-.field label { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+.field label, .field .field-label { font-size: 13px; font-weight: 600; color: var(--text-muted); }
 .input,
 .textarea {
   width: 100%;

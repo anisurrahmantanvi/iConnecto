@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Ban, Bookmark, Copy, Flag, LogOut, Menu, Pencil, Phone, Settings, ShieldCheck, Users, UserX, Video } from 'lucide-react'
 import { useAuth, useMe } from '@/app/AuthProvider'
 import { PostFeed } from '@/components/feed/PostFeed'
+import { ProfileAbout } from '@/components/profile/ProfileAbout'
 import { ProfileHeader } from '@/components/profile/ProfileHeader'
 import { ActionMenu, type MenuItem } from '@/components/ui/ActionMenu'
 import { Button } from '@/components/ui/Button'
@@ -16,7 +17,7 @@ import { errorMessage } from '@/lib/supabase'
 import { getOrCreateDm } from '@/services/chat'
 import { isFollowing } from '@/services/follows'
 import { blockUser, isBlockedByMe, unblockUser } from '@/services/moderation'
-import { getProfileByUsername } from '@/services/profiles'
+import { getProfileAbout, getProfileByUsername } from '@/services/profiles'
 
 export default function ProfilePage() {
   const { username = '' } = useParams()
@@ -35,6 +36,8 @@ export default function ProfilePage() {
 
   const { data: profile, setData: setProfile, loading, error, reload } = useAsync(() => getProfileByUsername(username), [username])
   const isMe = profile?.id === me.id
+  // Optional details; if they cannot be loaded the About card still shows the joining date.
+  const { data: about } = useAsync(() => (profile ? getProfileAbout(profile.id).catch(() => null) : Promise.resolve(null)), [profile?.id])
 
   const [following, setFollowing] = useState(false)
   const [blocked, setBlocked] = useState(false)
@@ -178,6 +181,8 @@ export default function ProfilePage() {
           menu={isMe ? [] : menu}
           onLogout={isMe ? () => void logOut() : undefined}
         />
+
+        <ProfileAbout about={about} joinedAt={profile.created_at} />
 
         {blocked ? (
           <div className="glass card col" role="status">

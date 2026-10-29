@@ -14,11 +14,13 @@ import { useDebounce } from '@/hooks/common'
 import { insertAtCaret, restoreCaret } from '@/hooks/ui'
 import { isDuplicate } from '@/lib/api'
 import { errorMessage } from '@/lib/supabase'
-import { isUsernameAvailable, updateMyProfile, type ProfilePatch } from '@/services/profiles'
+import { getProfileAbout, isUsernameAvailable, updateMyAbout, updateMyProfile, type ProfilePatch } from '@/services/profiles'
+import type { ProfileAbout, RelationshipStatus } from '@/types/db'
 
 const USERNAME_RE = /^[A-Za-z0-9_]{3,20}$/
 const MAX_BIO = 300
 const MAX_NAME = 50
+const MAX_ABOUT = 80
 
 type Availability = 'idle' | 'checking' | 'ok' | 'taken' | 'error'
 
@@ -34,6 +36,29 @@ export default function EditProfilePage() {
   const [bio, setBio] = useState(me.bio ?? '')
   const [availability, setAvailability] = useState<Availability>('idle')
   const [busy, setBusy] = useState(false)
+
+  // "About" details are loaded separately; if the columns are not available yet the section is simply hidden.
+  const [aboutSaved, setAboutSaved] = useState<ProfileAbout | null>(null)
+  const [work, setWork] = useState('')
+  const [education, setEducation] = useState('')
+  const [place, setPlace] = useState('')
+  const [status, setStatus] = useState<RelationshipStatus | null>(null)
+  useEffect(() => {
+    let cancelled = false
+    getProfileAbout(me.id)
+      .then((a) => {
+        if (cancelled || !a) return
+        setAboutSaved(a)
+        setWork(a.work ?? '')
+        setEducation(a.education ?? '')
+        setPlace(a.location ?? '')
+        setStatus(a.relationship_status)
+      })
+      .catch(() => undefined)
+    return () => {
+      cancelled = true
+    }
+  }, [me.id])
   const [error, setError] = useState<string | null>(null)
 
   const debounced = useDebounce(username, 400)
@@ -64,8 +89,14 @@ export default function EditProfilePage() {
         : null
   const usernameOk = settled && !unchangedUsername && availability === 'ok' ? 'Username is available' : null
 
+  const aboutDirty =
+    !!aboutSaved &&
+    (work.trim() !== (aboutSaved.work ?? '') ||
+      education.trim() !== (aboutSaved.education ?? '') ||
+      place.trim() !== (aboutSaved.location ?? '') ||
+      status !== aboutSaved.relationship_status)
   const dirty =
-    username !== me.username || displayName.trim() !== (me.display_name ?? '') || bio.trim() !== (me.bio ?? '')
+    username !== me.username || displayName.trim() !== (me.display_name ?? '') || bio.trim() !== (me.bio ?? '') || aboutDirty
 
   const submit = async (e: FormEvent) => {
     e.preventDefault()
@@ -81,7 +112,15 @@ export default function EditProfilePage() {
     setBusy(true)
     setError(null)
     try {
-      const updated = await updateMyProfile(me.id, patch)
+      const updated = Object.keys(patch).length ? await updateMyProfile(me.id, patch) : me
+      if (aboutDirty) {
+        await updateMyAbout(me.id, {
+          work: work.trim() || null,
+          education: education.trim() || null,
+          location: place.trim() || null,
+          relationship_status: status,
+        })
+      }
       setProfile(updated)
       toast.show('Profile updated')
       navigate(`/u/${updated.username}`, { replace: true })
@@ -149,6 +188,25 @@ export default function EditProfilePage() {
             </div>
           </div>
         </GlassPanel>
+
+        {aboutSaved ? (
+          <GlassPanel padded className="col">
+            <h2 className="section-title" style={{ margin: 0 }}>About</h2>
+            <TextField label="Work" value={work} maxLength={MAX_ABOUT} disabled={busy} placeholder="e.g. Designer at a company" onChange={(e) => setWork(e.target.value)} />
+            <TextField label="Education" value={education} maxLength={MAX_ABOUT} disabled={busy} placeholder="e.g. Dhaka University" onChange={(e) => setEducation(e.target.value)} />
+            <TextField label="Location" value={place} maxLength={MAX_ABOUT} disabled={busy} placeholder="e.g. Dhaka, Bangladesh" onChange={(e) => setPlace(e.target.value)} />
+            <div className="field">
+              <span className="field-label" id="rel-label">Relationship status</span>
+              <div role="group" aria-labelledby="rel-label" className="chip-row">
+                {([[null, 'Not set'], ['single', 'Single'], ['married', 'Married']] as const).map(([value, label]) => (
+                  <button key={label} type="button" className="chip" aria-pressed={status === value} disabled={busy} onClick={() => setStatus(value)}>
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </GlassPanel>
+        ) : null}
 
         <div className="form-actions">
           <Button variant="ghost" onClick={() => navigate(-1)} disabled={busy}>Cancel</Button>

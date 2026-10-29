@@ -192,3 +192,9 @@ a.list-row--link { text-decoration: none; }
 @media (prefers-reduced-motion: reduce) {
   .popover, .incoming-call { animation: none; }
 }
+
+/* ---------- Profile About ---------- */
+.about-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.about-row { display: flex; align-items: center; gap: 12px; }
+.about-row__icon { width: 38px; height: 38px; flex: none; border-radius: 50%; display: grid; place-items: center; background: var(--glass-strong); border: 1px solid var(--glass-edge); color: var(--text-muted); }
+.about-row__text { display: flex; flex-direction: column; min-width: 0; overflow-wrap: anywhere; }

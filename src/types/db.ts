@@ -11,6 +11,16 @@ export interface Profile {
   created_at: string
 }
 
+export type RelationshipStatus = 'single' | 'married'
+
+/** Optional "About" details, loaded separately from the main profile row. */
+export interface ProfileAbout {
+  work: string | null
+  education: string | null
+  location: string | null
+  relationship_status: RelationshipStatus | null
+}
+
 export type ProfileLite = Pick<Profile, 'id' | 'username' | 'display_name' | 'avatar_url'>
 
 export interface Post {
