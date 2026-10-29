@@ -36,6 +36,7 @@ jobs:
           {"appId":"com.iconnecto.app","appName":"iConnecto","webDir":"dist","server":{"url":"${{ inputs.site_url }}","androidScheme":"https"}}
           JSON
           npx cap add android
+          cp mobile/MainActivity.java android/app/src/main/java/com/iconnecto/app/MainActivity.java
           python3 - <<'PY'
           p='android/app/src/main/AndroidManifest.xml'
           s=open(p).read()

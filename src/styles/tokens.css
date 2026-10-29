@@ -1,6 +1,9 @@
 /* iConnecto design tokens — Liquid Glass inspired (original design, no Apple assets). */
 :root {
   color-scheme: light;
+  /* Room for the camera notch / status bar and the gesture bar. --sat and --sab are set by the Android app. */
+  --safe-top: max(env(safe-area-inset-top, 0px), var(--sat, 0px));
+  --safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--sab, 0px));
   --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Segoe UI', Roboto,
     'Noto Sans', 'Noto Sans Bengali', 'Hind Siliguri', system-ui, sans-serif;
 
