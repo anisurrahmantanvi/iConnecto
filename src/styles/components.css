@@ -417,7 +417,8 @@ img.emoji {
 .profile-id { min-width: 0; }
 .profile-id h1 { font-size: 32px; font-weight: 800; line-height: 1.05; overflow-wrap: anywhere; }
 /* Plain border on purpose: a coloured ring is reserved for "has a story" later. */
-.profile-ring { flex: none; border-radius: 50%; } /* no ring: the gradient ring is reserved for Stories later */
+.profile-ring { flex: none; border-radius: 50%; }
+.profile-ring .avatar { border: 0; } /* no ring: the gradient ring is reserved for Stories later */
 .profile-ring .avatar { box-shadow: 0 0 0 4px var(--glass-solid), var(--shadow-sm); }
 .profile-head > .profile-bio, .profile-head > .stats, .profile-head > .profile-actions { position: relative; }
 .stats { display: flex; justify-content: flex-start; gap: var(--space-5); }

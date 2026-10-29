@@ -12,7 +12,7 @@ export interface MenuItem {
 }
 
 /** A "more" button that opens a small glass menu. Closes on outside click, Escape and after choosing an item. */
-export function ActionMenu({ items, label = 'More actions' }: { items: MenuItem[]; label?: string }) {
+export function ActionMenu({ items, label = 'More actions', icon }: { items: MenuItem[]; label?: string; icon?: ReactNode }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   const close = useCallback(() => setOpen(false), [])
@@ -37,7 +37,7 @@ export function ActionMenu({ items, label = 'More actions' }: { items: MenuItem[
   return (
     <div className="popover-anchor" ref={ref} onKeyDown={onKeyDown}>
       <IconButton label={label} small aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
-        <MoreHorizontal size={20} />
+        {icon ?? <MoreHorizontal size={20} />}
       </IconButton>
       {open ? (
         <div className="glass glass--strong menu popover popover--bottom popover--end" role="menu">

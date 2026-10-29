@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
 import { appUrl } from '@/lib/base'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { Ban, Copy, Flag, LogOut, Pencil, Phone, Settings, UserX, Video } from 'lucide-react'
+import { Ban, Bookmark, Copy, Flag, LogOut, Menu, Pencil, Phone, Settings, ShieldCheck, Users, UserX, Video } from 'lucide-react'
 import { useAuth, useMe } from '@/app/AuthProvider'
 import { PostFeed } from '@/components/feed/PostFeed'
 import { ProfileHeader } from '@/components/profile/ProfileHeader'
-import type { MenuItem } from '@/components/ui/ActionMenu'
+import { ActionMenu, type MenuItem } from '@/components/ui/ActionMenu'
 import { Button } from '@/components/ui/Button'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { EmptyState, ErrorState, ListSkeleton, Skeleton } from '@/components/ui/Feedback'
@@ -105,7 +105,11 @@ export default function ProfilePage() {
       ? [
           { label: 'Edit profile', icon: <Pencil size={18} />, onSelect: () => navigate('/settings/profile') },
           { label: 'Copy profile link', icon: <Copy size={18} />, onSelect: () => void copyLink() },
+          { label: 'Saved posts', icon: <Bookmark size={18} />, onSelect: () => navigate('/saved') },
+          { label: 'Communities', icon: <Users size={18} />, onSelect: () => navigate('/communities') },
           { label: 'Settings', icon: <Settings size={18} />, onSelect: () => navigate('/settings') },
+          { label: 'Privacy and security', icon: <ShieldCheck size={18} />, onSelect: () => navigate('/settings/privacy') },
+          { label: 'Blocked accounts', icon: <UserX size={18} />, onSelect: () => navigate('/settings/blocked') },
           { label: 'Log out', icon: <LogOut size={18} />, onSelect: () => void logOut() },
         ]
       : [
@@ -158,7 +162,11 @@ export default function ProfilePage() {
 
   return (
     <>
-      <PageHeader title={`@${profile.username}`} back={isMe ? undefined : true} />
+      <PageHeader
+        title={`@${profile.username}`}
+        back={isMe ? undefined : true}
+        actions={isMe ? <span className="page-header__actions"><ActionMenu items={menu} label="Menu" icon={<Menu size={24} />} /></span> : undefined}
+      />
       <div className="stack">
         <ProfileHeader
           profile={profile}
@@ -167,7 +175,7 @@ export default function ProfilePage() {
           onFollowingChange={onFollowingChange}
           onMessage={() => void message()}
           messaging={messaging}
-          menu={menu}
+          menu={isMe ? [] : menu}
           onLogout={isMe ? () => void logOut() : undefined}
         />
 
