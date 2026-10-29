@@ -34,6 +34,7 @@ export interface ProfilePatch {
   display_name?: string | null
   bio?: string | null
   avatar_url?: string | null
+  cover_url?: string | null
 }
 
 export async function updateMyProfile(userId: string, patch: ProfilePatch): Promise<Profile> {
@@ -49,6 +50,24 @@ export async function changeAvatar(userId: string, file: File, previousUrl: stri
     return profile
   } catch (e) {
     void removeImages('avatars', [url])
+    throw e
+  }
+}
+
+/** Uploads a new cover photo (or removes it when `file` is null) and deletes the old file. */
+export async function changeCover(userId: string, file: File | null, previousUrl: string | null): Promise<Profile> {
+  if (!file) {
+    const profile = await updateMyProfile(userId, { cover_url: null })
+    if (previousUrl) void removeImages('covers', [previousUrl])
+    return profile
+  }
+  const url = await uploadImage('covers', userId, file)
+  try {
+    const profile = await updateMyProfile(userId, { cover_url: url })
+    if (previousUrl) void removeImages('covers', [previousUrl])
+    return profile
+  } catch (e) {
+    void removeImages('covers', [url])
     throw e
   }
 }

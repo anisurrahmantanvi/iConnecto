@@ -82,6 +82,20 @@ a.list-row--link { text-decoration: none; }
 /* ---------- Profile ---------- */
 .profile-bio { max-width: 46ch; color: var(--text); }
 .profile-actions { flex-wrap: wrap; justify-content: center; }
+.cover-edit { position: relative; }
+.cover-edit__btn {
+  position: relative; display: block; width: 100%; height: 120px; padding: 0; border: 1px dashed var(--glass-edge); border-radius: var(--r-md);
+  overflow: hidden; background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 30%, transparent), color-mix(in srgb, var(--accent-2) 30%, transparent));
+}
+.cover-edit__btn img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.cover-edit__hint {
+  position: absolute; left: 10px; bottom: 10px; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px;
+  background: var(--accent); color: var(--accent-contrast); font-size: 13px; font-weight: 600; box-shadow: var(--shadow-sm);
+}
+.cover-edit__remove {
+  position: absolute; right: 10px; top: 10px; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; border: 0;
+  background: rgba(0, 0, 0, 0.55); color: #fff;
+}
 .avatar-edit { display: grid; place-items: center; }
 .avatar-edit__btn { position: relative; background: none; border: 0; padding: 0; border-radius: 50%; }
 .avatar-edit__badge {

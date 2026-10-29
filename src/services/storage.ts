@@ -1,12 +1,13 @@
 import { supabase } from '@/lib/supabase'
 import { compressImage, extensionFor, validateImage } from '@/lib/image'
 
-export type Bucket = 'avatars' | 'post-media' | 'community-images'
+export type Bucket = 'avatars' | 'post-media' | 'community-images' | 'covers'
 
 const LIMITS: Record<Bucket, { maxBytes: number; maxDim: number }> = {
   avatars: { maxBytes: 2 * 1024 * 1024, maxDim: 512 },
   'post-media': { maxBytes: 5 * 1024 * 1024, maxDim: 1600 },
   'community-images': { maxBytes: 2 * 1024 * 1024, maxDim: 800 },
+  covers: { maxBytes: 3 * 1024 * 1024, maxDim: 1600 },
 }
 
 function randomName(ext: string): string {

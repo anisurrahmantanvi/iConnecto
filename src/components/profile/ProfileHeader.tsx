@@ -23,7 +23,10 @@ interface ProfileHeaderProps {
 export function ProfileHeader({ profile, isMe, following, onFollowingChange, onMessage, messaging, menu, onLogout }: ProfileHeaderProps) {
   const base = `/u/${profile.username}`
   return (
-    <section className="glass profile-head" aria-label="Profile">
+    <section className="glass profile-head profile-head--cover" aria-label="Profile">
+      <div className="profile-cover" aria-hidden>
+        {profile.cover_url ? <img src={profile.cover_url} alt="" decoding="async" /> : null}
+      </div>
       <Avatar src={profile.avatar_url} name={profile.display_name ?? profile.username} size="xl" />
       <div>
         <h1>{profile.display_name || profile.username}</h1>

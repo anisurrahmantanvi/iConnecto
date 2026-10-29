@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth, useMe } from '@/app/AuthProvider'
 import { AvatarUploader } from '@/components/profile/AvatarUploader'
+import { CoverUploader } from '@/components/profile/CoverUploader'
 import { Button } from '@/components/ui/Button'
 import { EmojiButton } from '@/components/ui/EmojiButton'
 import { TextAreaField, TextField } from '@/components/ui/Field'
@@ -97,6 +98,7 @@ export default function EditProfilePage() {
         <GlassPanel padded className="col">
           {error ? <ErrorBanner>{error}</ErrorBanner> : null}
 
+          <CoverUploader profile={me} onUpdated={setProfile} />
           <AvatarUploader profile={me} onUpdated={setProfile} />
 
           <TextField
