@@ -27,10 +27,14 @@ export function ProfileHeader({ profile, isMe, following, onFollowingChange, onM
       <div className="profile-cover" aria-hidden>
         {profile.cover_url ? <img src={profile.cover_url} alt="" decoding="async" /> : null}
       </div>
-      <Avatar src={profile.avatar_url} name={profile.display_name ?? profile.username} size="xl" />
-      <div>
-        <h1>{profile.display_name || profile.username}</h1>
-        <div className="muted">@{profile.username}</div>
+      <div className="profile-top">
+        <div className="profile-id">
+          <h1>{profile.display_name || profile.username}</h1>
+          <div className="muted">@{profile.username}</div>
+        </div>
+        <span className="profile-ring">
+          <Avatar src={profile.avatar_url} name={profile.display_name ?? profile.username} size="xl" />
+        </span>
       </div>
       {profile.bio ? <p className="profile-bio"><RichText text={profile.bio} /></p> : null}
 
