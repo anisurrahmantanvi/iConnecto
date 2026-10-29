@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom'
 import { MessageCircle, Pencil, Plus } from 'lucide-react'
 import type { Profile } from '@/types/db'
-import { Avatar } from '@/components/ui/Avatar'
+import { PresenceAvatar } from '@/components/ui/PresenceAvatar'
 import { Button } from '@/components/ui/Button'
 import { ActionMenu, type MenuItem } from '@/components/ui/ActionMenu'
 import { RichText } from '@/components/ui/Emoji'
+import { usePresence } from '@/hooks/presence'
 import { compactNumber } from '@/lib/format'
+import { describePresence } from '@/lib/presence'
 import { FollowButton } from './FollowButton'
 
 interface ProfileHeaderProps {
@@ -22,6 +24,8 @@ interface ProfileHeaderProps {
 
 export function ProfileHeader({ profile, isMe, following, onFollowingChange, onMessage, messaging, menu, onAddStory }: ProfileHeaderProps) {
   const base = `/u/${profile.username}`
+  const presenceMap = usePresence(isMe ? [] : [profile.id])
+  const presence = isMe ? null : describePresence(presenceMap.get(profile.id))
   return (
     <section className="glass profile-head profile-head--cover" aria-label="Profile">
       <div className="profile-cover" aria-hidden>
@@ -31,9 +35,15 @@ export function ProfileHeader({ profile, isMe, following, onFollowingChange, onM
         <div className="profile-id">
           <h1>{profile.display_name || profile.username}</h1>
           <div className="muted">@{profile.username}</div>
+          {presence ? (
+            <div className={`small presence-line ${presence.online ? 'presence-line--online' : 'muted'}`}>
+              {presence.online ? <span className="presence-pip" aria-hidden /> : null}
+              {presence.label}
+            </div>
+          ) : null}
         </div>
         <span className="profile-ring">
-          <Avatar src={profile.avatar_url} name={profile.display_name ?? profile.username} size="xl" />
+          <PresenceAvatar online={!!presence?.online} src={profile.avatar_url} name={profile.display_name ?? profile.username} size="xl" />
         </span>
       </div>
       {profile.bio ? <p className="profile-bio"><RichText text={profile.bio} /></p> : null}

@@ -405,7 +405,7 @@ img.emoji {
 .reaction[aria-pressed='true'] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); }
 
 /* ---------- Profile ---------- */
-.profile-head { position: relative; padding: var(--space-4); text-align: left; display: flex; flex-direction: column; align-items: stretch; gap: 12px; }
+.profile-head { position: relative; z-index: 2; padding: var(--space-4); text-align: left; display: flex; flex-direction: column; align-items: stretch; gap: 12px; }
 /* Cover photo sits behind the top of the card and fades into the card colour, so the name below stays readable. */
 .profile-cover {
   position: absolute; inset: 0 0 auto 0; height: 230px; pointer-events: none; overflow: hidden; border-radius: var(--r-lg) var(--r-lg) 0 0;
