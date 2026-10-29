@@ -179,7 +179,7 @@ export default function ProfilePage() {
           onMessage={() => void message()}
           messaging={messaging}
           menu={isMe ? [] : menu}
-          onLogout={isMe ? () => void logOut() : undefined}
+          onAddStory={isMe ? () => toast.show('Stories are coming soon') : undefined}
         />
 
         <ProfileAbout about={about} joinedAt={profile.created_at} />
