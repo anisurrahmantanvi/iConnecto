@@ -223,3 +223,9 @@ a.list-row--link { text-decoration: none; }
 .privacy-option[aria-checked='true'] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
 .privacy-option__text { display: flex; flex-direction: column; min-width: 0; flex: 1; }
 .privacy-option__check { color: var(--accent); }
+
+/* ---------- Online status ---------- */
+.presence-wrap { position: relative; display: inline-flex; flex: none; }
+.presence-dot { position: absolute; right: 0; bottom: 0; width: 14px; height: 14px; border-radius: 50%; background: #22c55e; border: 2px solid var(--glass-solid); }
+.presence-line { display: inline-flex; align-items: center; gap: 6px; }
+.presence-line--online { color: #16a34a; font-weight: 600; }

@@ -80,3 +80,14 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(cacheFirst(request, EMOJI))
   }
 })
+
+// Tapping a system notification brings the app to the front (or opens it).
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close()
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
+      const open = list.find((c) => c.url.startsWith(self.location.origin + BASE))
+      return open ? open.focus() : self.clients.openWindow(BASE)
+    }),
+  )
+})

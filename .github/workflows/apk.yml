@@ -29,7 +29,7 @@ jobs:
           VITE_SUPABASE_URL: ${{ inputs.supabase_url }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ inputs.publishable_key }}
       - name: Add Capacitor (build-time only, package.json untouched)
-        run: npm install --no-save --no-audit --no-fund @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/assets@3
+        run: npm install --no-save --no-audit --no-fund @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/assets@3 @capacitor/local-notifications@6
       - name: Create the Android project
         run: |
           cat > capacitor.config.json <<JSON
@@ -40,7 +40,7 @@ jobs:
           python3 - <<'PY'
           p='android/app/src/main/AndroidManifest.xml'
           s=open(p).read()
-          perms=''.join('<uses-permission android:name="android.permission.%s" />\n'%x for x in ['CAMERA','RECORD_AUDIO','MODIFY_AUDIO_SETTINGS'])
+          perms=''.join('<uses-permission android:name="android.permission.%s" />\n'%x for x in ['CAMERA','RECORD_AUDIO','MODIFY_AUDIO_SETTINGS','POST_NOTIFICATIONS'])
           s=s.replace('</manifest>',perms+'</manifest>')
           open(p,'w').write(s)
           PY

@@ -5,7 +5,7 @@ import type { Message } from '@/types/db'
 import { useMe } from '@/app/AuthProvider'
 import { useBadges } from '@/app/BadgesProvider'
 import { ActionMenu, type MenuItem } from '@/components/ui/ActionMenu'
-import { Avatar } from '@/components/ui/Avatar'
+import { PresenceAvatar } from '@/components/ui/PresenceAvatar'
 import { Button, IconButton } from '@/components/ui/Button'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { RichText } from '@/components/ui/Emoji'
@@ -13,6 +13,8 @@ import { EmojiButton } from '@/components/ui/EmojiButton'
 import { EmptyState, ErrorState, Spinner } from '@/components/ui/Feedback'
 import { useToast } from '@/components/ui/Toast'
 import { usePaged, useAsync } from '@/hooks/common'
+import { usePresence } from '@/hooks/presence'
+import { describePresence } from '@/lib/presence'
 import { insertAtCaret, restoreCaret, useAutosize } from '@/hooks/ui'
 import { clockTime } from '@/lib/format'
 import { errorMessage } from '@/lib/supabase'
@@ -54,6 +56,9 @@ export default function ChatPage() {
 
   const peerState = useAsync(() => getChatPeer(chatId), [chatId])
   const peer = peerState.data
+  const peerIds = peer ? [peer.other_id] : []
+  const presenceMap = usePresence(peerIds)
+  const presence = peer ? describePresence(presenceMap.get(peer.other_id)) : null
 
   const fetchPage = useCallback((cursor: string | null) => fetchMessages(chatId, cursor), [chatId])
   const { items, loading, loadingMore, error, hasMore, loadMore, reload, setItems } = usePaged<Message>(fetchPage, !!peer)
@@ -204,10 +209,12 @@ export default function ChatPage() {
       <header className="chat-header">
         <IconButton label="Back to messages" onClick={() => navigate('/messages')}><ArrowLeft size={22} /></IconButton>
         <Link to={`/u/${peer.other_username}`} className="row grow chat-header__who" aria-label={`Open ${name}'s profile`}>
-          <Avatar src={peer.other_avatar_url} name={name} />
+          <PresenceAvatar online={!!presence?.online} src={peer.other_avatar_url} name={name} />
           <span style={{ minWidth: 0 }}>
             <strong className="truncate" style={{ display: 'block' }}>{name}</strong>
-            <span className="small muted truncate" style={{ display: 'block' }}>@{peer.other_username}</span>
+            <span className={`small truncate presence-line ${presence?.online ? 'presence-line--online' : 'muted'}`} style={{ display: 'flex' }}>
+              {presence ? presence.label : `@${peer.other_username}`}
+            </span>
           </span>
         </Link>
         <IconButton label="Voice call" onClick={() => navigate(`/call/new?to=${peer.other_id}&type=audio`)}><Phone size={20} /></IconButton>

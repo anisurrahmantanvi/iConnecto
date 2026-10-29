@@ -3,12 +3,14 @@ import { Link } from 'react-router-dom'
 import { MessageCircle, Plus } from 'lucide-react'
 import { useMe } from '@/app/AuthProvider'
 import { NewChatDialog } from '@/components/chat/NewChatDialog'
-import { Avatar } from '@/components/ui/Avatar'
+import { PresenceAvatar } from '@/components/ui/PresenceAvatar'
 import { Button, IconButton } from '@/components/ui/Button'
 import { RichText } from '@/components/ui/Emoji'
 import { EmptyState, ErrorState, ListSkeleton } from '@/components/ui/Feedback'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { useAsync } from '@/hooks/common'
+import { usePresence } from '@/hooks/presence'
+import { describePresence } from '@/lib/presence'
 import { timeAgo } from '@/lib/format'
 import { listChats, subscribeAnyMessage } from '@/services/chat'
 
@@ -16,6 +18,7 @@ export default function InboxPage() {
   const me = useMe()
   const { data, loading, error, reload } = useAsync(listChats, [])
   const [composing, setComposing] = useState(false)
+  const presenceMap = usePresence((data ?? []).map((c) => c.other_id))
   const timer = useRef<number | null>(null)
 
   // Refresh when a message arrives. Bursts are coalesced so a busy chat doesn't cause a query per message.
@@ -63,7 +66,7 @@ export default function InboxPage() {
                 className={`list-row list-row--link ${c.unread_count > 0 ? 'list-row--unread' : ''}`}
                 aria-label={`${name}${c.unread_count ? `, ${c.unread_count} unread` : ''}`}
               >
-                <Avatar src={c.other_avatar_url} name={name} size="lg" />
+                <PresenceAvatar online={!!describePresence(presenceMap.get(c.other_id))?.online} src={c.other_avatar_url} name={name} size="lg" />
                 <div className="grow" style={{ minWidth: 0 }}>
                   <div className="row">
                     <strong className="truncate grow">{name}</strong>

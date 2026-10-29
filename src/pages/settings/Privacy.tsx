@@ -1,7 +1,7 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { BellOff, ChevronRight, Eye, Lock, MonitorSmartphone, UserX } from 'lucide-react'
-import { useAuth } from '@/app/AuthProvider'
+import { useAuth, useMe } from '@/app/AuthProvider'
 import { Button } from '@/components/ui/Button'
 import { TextField } from '@/components/ui/Field'
 import { ErrorBanner } from '@/components/ui/Feedback'
@@ -10,10 +10,26 @@ import { PageHeader } from '@/components/ui/PageHeader'
 import { useToast } from '@/components/ui/Toast'
 import { errorMessage } from '@/lib/supabase'
 import { signOutOtherDevices } from '@/services/account'
+import { getMyShowActivity, setMyShowActivity } from '@/services/presence'
 
 export default function PrivacyPage() {
   const { updatePassword } = useAuth()
   const toast = useToast()
+  const me = useMe()
+  const [showActivity, setShowActivity] = useState<boolean | null>(null)
+  useEffect(() => {
+    void getMyShowActivity(me.id).then(setShowActivity)
+  }, [me.id])
+  const changeActivity = async (on: boolean) => {
+    const before = showActivity
+    setShowActivity(on)
+    try {
+      await setMyShowActivity(me.id, on)
+    } catch (err) {
+      setShowActivity(before)
+      toast.error(errorMessage(err))
+    }
+  }
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [pwBusy, setPwBusy] = useState(false)
@@ -72,6 +88,22 @@ export default function PrivacyPage() {
           </div>
           <p className="small faint">Private (approve-to-follow) accounts are not available yet.</p>
         </GlassPanel>
+
+        {showActivity !== null ? (
+          <>
+            <h2 className="section-title">Activity status</h2>
+            <GlassPanel padded className="col">
+              <p className="small">
+                Show when you are online or were last active (for example "Online" or "Active 5 minutes ago") to people you chat with.
+                If you turn it off, you will not see other people's status either.
+              </p>
+              <div role="group" aria-label="Show my activity status" className="chip-row">
+                <button type="button" className="chip" aria-pressed={showActivity} onClick={() => void changeActivity(true)}>Show</button>
+                <button type="button" className="chip" aria-pressed={!showActivity} onClick={() => void changeActivity(false)}>Hide</button>
+              </div>
+            </GlassPanel>
+          </>
+        ) : null}
 
         <h2 className="section-title">Safety</h2>
         <GlassPanel className="settings-list">

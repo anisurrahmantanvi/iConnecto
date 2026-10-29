@@ -5,6 +5,7 @@ import { useAuth, useMe } from '@/app/AuthProvider'
 import { useTheme, type ThemeMode } from '@/app/ThemeProvider'
 import { Avatar } from '@/components/ui/Avatar'
 import { Button } from '@/components/ui/Button'
+import { NotificationSetting } from '@/components/settings/NotificationSetting'
 import { GlassPanel } from '@/components/ui/GlassPanel'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { useToast } from '@/components/ui/Toast'
@@ -70,6 +71,9 @@ export default function SettingsHomePage() {
           <SettingsLink to="/settings/blocked" icon={<UserX size={22} aria-hidden />} title="Blocked accounts" />
           <SettingsLink to="/settings/account" icon={<UserCog size={22} aria-hidden />} title="Account" body="Email address and account deletion" />
         </GlassPanel>
+
+        <h2 className="section-title">Notifications</h2>
+        <NotificationSetting />
 
         <h2 className="section-title">{t('settings.appearance')}</h2>
         <GlassPanel padded className="col">
