@@ -137,3 +137,13 @@ export interface Page<T> {
   items: T[]
   nextCursor: string | null
 }
+
+export interface Reel {
+  id: string
+  video_id: string
+  tiktok_url: string
+  title: string | null
+  author_name: string | null
+  thumbnail_url: string | null
+  created_at: string
+}
