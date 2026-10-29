@@ -206,8 +206,8 @@
 }
 .nav-item[aria-current='page'] { color: var(--accent); background: transparent; }
 .nav-item[aria-current='page'] > span:not(.badge) { color: var(--text); }
-.kbd-open .bottom-nav { display: none; }
-.kbd-open .shell__main { padding-bottom: 16px; }
+.kbd-open .bottom-nav, html[data-kbd='1'] .bottom-nav { display: none; }
+.kbd-open .shell__main, html[data-kbd='1'] .shell__main { padding-bottom: 16px; }
 .bottom-nav--icons .nav-item svg { width: 27px; height: 27px; }
 .bottom-nav--icons .nav-item[aria-current='page'] svg { stroke-width: 2.4; }
 .bottom-nav--icons .badge { left: calc(50% + 8px); top: 8px; }

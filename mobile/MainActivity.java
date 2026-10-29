@@ -54,7 +54,8 @@ public class MainActivity extends BridgeActivity {
       float top = bars.top / density;
       float bottom = ime.bottom > 0 ? 0 : bars.bottom / density;
       script = "document.documentElement.style.setProperty('--sat','" + top + "px');"
-          + "document.documentElement.style.setProperty('--sab','" + bottom + "px');";
+          + "document.documentElement.style.setProperty('--sab','" + bottom + "px');"
+          + "document.documentElement.dataset.kbd='" + (ime.bottom > 0 ? "1" : "0") + "';";
       inject();
       return insets;
     });

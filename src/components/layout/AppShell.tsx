@@ -41,34 +41,30 @@ export function AppShell() {
   const badges = useBadges()
   const online = useOnline()
 
-  // While a text field is focused the on-screen keyboard is open: hide the bottom bar so it does not float above the keys.
+  // Hide the bottom bar only while the on-screen keyboard is really open (not just because a field still has focus).
+  // The Android app reports this itself (data-kbd on <html>); in a normal browser the visual viewport shrinks instead.
   useEffect(() => {
     const root = document.documentElement
+    const vv = window.visualViewport
     const NON_TEXT = new Set(['checkbox', 'radio', 'button', 'submit', 'reset', 'file', 'range', 'color', 'image'])
-    const isTextField = (el: EventTarget | null) => {
+    const isTextField = (el: Element | null) => {
       if (!(el instanceof HTMLElement)) return false
       if (el instanceof HTMLTextAreaElement) return true
       if (el instanceof HTMLInputElement) return !NON_TEXT.has(el.type)
       return el.isContentEditable
     }
-    let timer: number | undefined
-    const onIn = (e: FocusEvent) => {
-      window.clearTimeout(timer)
-      if (isTextField(e.target)) root.classList.add('kbd-open')
+    const update = () => {
+      if ('kbd' in root.dataset) return // the Android app decides; see CSS for html[data-kbd='1']
+      const shrunk = vv ? window.innerHeight - vv.height > 120 : true
+      root.classList.toggle('kbd-open', shrunk && isTextField(document.activeElement))
     }
-    const onOut = () => {
-      window.clearTimeout(timer)
-      // Wait a beat: moving from one field to another fires focusout then focusin.
-      timer = window.setTimeout(() => {
-        if (!isTextField(document.activeElement)) root.classList.remove('kbd-open')
-      }, 120)
-    }
-    document.addEventListener('focusin', onIn)
-    document.addEventListener('focusout', onOut)
+    vv?.addEventListener('resize', update)
+    document.addEventListener('focusin', update)
+    document.addEventListener('focusout', update)
     return () => {
-      window.clearTimeout(timer)
-      document.removeEventListener('focusin', onIn)
-      document.removeEventListener('focusout', onOut)
+      vv?.removeEventListener('resize', update)
+      document.removeEventListener('focusin', update)
+      document.removeEventListener('focusout', update)
       root.classList.remove('kbd-open')
     }
   }, [])
