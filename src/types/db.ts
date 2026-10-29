@@ -23,12 +23,15 @@ export interface ProfileAbout {
 
 export type ProfileLite = Pick<Profile, 'id' | 'username' | 'display_name' | 'avatar_url'>
 
+export type PostVisibility = 'public' | 'followers' | 'only_me'
+
 export interface Post {
   id: string
   author_id: string
   content: string
   media_urls: string[]
   community_id: string | null
+  visibility: PostVisibility
   like_count: number
   comment_count: number
   share_count: number

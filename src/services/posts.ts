@@ -1,11 +1,11 @@
 import { supabase } from '@/lib/supabase'
 import { check, isDuplicate, PAGE_SIZE, PROFILE_LITE } from '@/lib/api'
 import { sanitizeSearch } from '@/lib/format'
-import type { Page, Post, PostView, ReactionSummary } from '@/types/db'
+import type { Page, Post, PostView, PostVisibility, ReactionSummary } from '@/types/db'
 import { removeImages, uploadImage } from './storage'
 
 export const POST_SELECT =
-  `id, author_id, content, media_urls, community_id, like_count, comment_count, share_count, created_at, updated_at, edited_at, author:profiles!author_id(${PROFILE_LITE}), community:communities!community_id(slug, name)`
+  `id, author_id, content, media_urls, community_id, visibility, like_count, comment_count, share_count, created_at, updated_at, edited_at, author:profiles!author_id(${PROFILE_LITE}), community:communities!community_id(slug, name)`
 
 export const MAX_POST_IMAGES = 4
 export const MAX_POST_LENGTH = 5000
@@ -102,6 +102,7 @@ export interface NewPost {
   content: string
   files: File[]
   communityId?: string | null
+  visibility?: PostVisibility
 }
 
 export async function createPost(userId: string, input: NewPost): Promise<string> {
@@ -116,7 +117,7 @@ export async function createPost(userId: string, input: NewPost): Promise<string
     // author_id comes from the session; counters are server-owned.
     const res = await supabase
       .from('posts')
-      .insert({ content, media_urls: uploaded, community_id: input.communityId ?? null })
+      .insert({ content, media_urls: uploaded, community_id: input.communityId ?? null, visibility: input.communityId ? 'public' : input.visibility ?? 'public' })
       .select('id')
       .single()
     return (check(res) as { id: string }).id
@@ -130,6 +131,17 @@ export async function updatePost(id: string, content: string): Promise<void> {
   const text = content.trim()
   if (text.length > MAX_POST_LENGTH) throw new Error(`Posts can be up to ${MAX_POST_LENGTH} characters.`)
   check(await supabase.from('posts').update({ content: text }).eq('id', id).select('id').single())
+}
+
+export async function setPostVisibility(id: string, visibility: PostVisibility): Promise<void> {
+  check(await supabase.from('posts').update({ visibility }).eq('id', id).select('id').single())
+}
+
+/** Time of the newest post visible to me in the main feed (used to show a "new posts" button). */
+export async function latestFeedTime(): Promise<string | null> {
+  const res = await supabase.from('posts').select('created_at').is('community_id', null).order('created_at', { ascending: false }).limit(1)
+  const rows = check(res) as { created_at: string }[]
+  return rows[0]?.created_at ?? null
 }
 
 export async function deletePost(post: Pick<Post, 'id' | 'media_urls'>): Promise<void> {

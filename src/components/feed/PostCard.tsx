@@ -1,8 +1,8 @@
 import { memo, useCallback, useRef, useState } from 'react'
 import { appUrl } from '@/lib/base'
 import { Link, useNavigate } from 'react-router-dom'
-import { Bookmark, Copy, Flag, Heart, MessageCircle, Pencil, Share2, Trash2 } from 'lucide-react'
-import type { PostView } from '@/types/db'
+import { Bookmark, Copy, Flag, Globe, Heart, Lock, MessageCircle, Pencil, Share2, Trash2, Users } from 'lucide-react'
+import type { PostView, PostVisibility } from '@/types/db'
 import { useMe } from '@/app/AuthProvider'
 import { Avatar } from '@/components/ui/Avatar'
 import { Button, IconButton } from '@/components/ui/Button'
@@ -13,7 +13,7 @@ import { RichText } from '@/components/ui/Emoji'
 import { EmojiButton } from '@/components/ui/EmojiButton'
 import { useToast } from '@/components/ui/Toast'
 import { ReactionBar, applyReaction } from './ReactionBar'
-import { deletePost, MAX_POST_LENGTH, recordShare, setLike, setReaction, setSaved, updatePost } from '@/services/posts'
+import { deletePost, MAX_POST_LENGTH, recordShare, setLike, setPostVisibility, setReaction, setSaved, updatePost } from '@/services/posts'
 import { compactNumber, timeAgo } from '@/lib/format'
 import { errorMessage } from '@/lib/supabase'
 import { insertAtCaret, restoreCaret } from '@/hooks/ui'
@@ -127,8 +127,22 @@ export const PostCard = memo(function PostCard({ post, onChange, onDeleted, canM
     }
   }
 
+  const changeVisibility = async (visibility: PostVisibility) => {
+    try {
+      await setPostVisibility(post.id, visibility)
+      onChange({ ...post, visibility })
+      toast.show(visibility === 'public' ? 'Post is now public' : visibility === 'followers' ? 'Only your followers can see this post' : 'Only you can see this post')
+    } catch (e) {
+      toast.error(errorMessage(e))
+    }
+  }
+  const canChangePrivacy = mine && !post.community
+
   const menu: MenuItem[] = [
     { label: 'Edit', icon: <Pencil size={18} />, hidden: !mine, onSelect: () => { setDraft(post.content); setEditing(true) } },
+    { label: 'Make public', icon: <Globe size={18} />, hidden: !canChangePrivacy || post.visibility === 'public', onSelect: () => void changeVisibility('public') },
+    { label: 'Followers only', icon: <Users size={18} />, hidden: !canChangePrivacy || post.visibility === 'followers', onSelect: () => void changeVisibility('followers') },
+    { label: 'Only me', icon: <Lock size={18} />, hidden: !canChangePrivacy || post.visibility === 'only_me', onSelect: () => void changeVisibility('only_me') },
     { label: 'Copy link', icon: <Copy size={18} />, onSelect: () => void copyLink() },
     { label: 'Report', icon: <Flag size={18} />, hidden: mine, onSelect: () => navigate(`/report/post/${post.id}`) },
     { label: mine ? 'Delete' : 'Remove (moderator)', icon: <Trash2 size={18} />, danger: true, hidden: !mine && !canModerate, onSelect: () => setConfirmDelete(true) },
@@ -146,6 +160,8 @@ export const PostCard = memo(function PostCard({ post, onChange, onDeleted, canM
           </Link>
           <div className="post__sub truncate">
             @{author?.username ?? 'unknown'} · <Link to={`/p/${post.id}`} className="muted">{timeAgo(post.created_at)}</Link>
+            {post.visibility === 'followers' ? <span title="Followers only"> · <Users size={12} aria-label="Followers only" style={{ verticalAlign: '-1px' }} /></span> : null}
+            {post.visibility === 'only_me' ? <span title="Only me"> · <Lock size={12} aria-label="Only me" style={{ verticalAlign: '-1px' }} /></span> : null}
             {post.edited_at ? <span> · edited</span> : null}
             {post.community ? <> · <Link to={`/c/${post.community.slug}`}>{post.community.name}</Link></> : null}
           </div>

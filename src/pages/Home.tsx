@@ -1,24 +1,52 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { MessageCircle, Search, Sparkles, SquarePlus, Users } from 'lucide-react'
+import { ArrowUp, MessageCircle, Search, Sparkles, SquarePlus } from 'lucide-react'
 import { useAuth } from '@/app/AuthProvider'
 import { useBadges } from '@/app/BadgesProvider'
 import { PostFeed } from '@/components/feed/PostFeed'
 import { Button } from '@/components/ui/Button'
 import { GlassPanel } from '@/components/ui/GlassPanel'
 import { PageHeader } from '@/components/ui/PageHeader'
-import { Tabs } from '@/components/ui/Tabs'
-import { useT } from '@/lib/i18n'
+import { latestFeedTime } from '@/services/posts'
 import { markOnboardingDone, onboardingDismissed } from '@/pages/auth/onboardingKey'
 
-type Tab = 'following' | 'explore'
+const POLL_MS = 30_000
 
 export default function HomePage() {
-  const { t } = useT()
   const { profile } = useAuth()
   const badges = useBadges()
-  const [tab, setTab] = useState<Tab>('following')
-  const [refreshKey] = useState(0)
+  const [refreshKey, setRefreshKey] = useState(0)
+  const [hasNew, setHasNew] = useState(false)
+  const newest = useRef<string | null>(null)
+
+  // Every ~30 s (while the app is visible) check whether someone posted something newer than what is on screen.
+  useEffect(() => {
+    let stop = false
+    const check = async () => {
+      if (document.hidden) return
+      try {
+        const latest = await latestFeedTime()
+        if (stop || !latest) return
+        if (newest.current === null) newest.current = latest
+        else if (latest > newest.current) setHasNew(true)
+      } catch {
+        /* offline or signed out: try again on the next tick */
+      }
+    }
+    void check()
+    const id = window.setInterval(() => void check(), POLL_MS)
+    return () => {
+      stop = true
+      window.clearInterval(id)
+    }
+  }, [])
+
+  const showNew = useCallback(() => {
+    newest.current = null
+    setHasNew(false)
+    setRefreshKey((k) => k + 1)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
   const [nudgeHidden, setNudgeHidden] = useState(onboardingDismissed)
 
   const showNudge = !!profile && !profile.avatar_url && !profile.bio && !nudgeHidden
@@ -69,39 +97,22 @@ export default function HomePage() {
           </GlassPanel>
         ) : null}
 
-        <Tabs
-          label="Feed"
-          value={tab}
-          onChange={setTab}
-          tabs={[
-            { value: 'following', label: t('home.following') },
-            { value: 'explore', label: t('home.explore') },
-          ]}
-        />
+        {hasNew ? (
+          <div className="new-posts">
+            <Button variant="primary" size="sm" icon={<ArrowUp size={16} />} onClick={showNew}>New posts</Button>
+          </div>
+        ) : null}
 
-        {tab === 'following' ? (
-          <PostFeed
-            source={{ kind: 'home' }}
-            refreshKey={refreshKey}
-            empty={{
-              icon: <Users size={28} />,
-              title: 'Your feed is quiet',
-              body: 'Follow people to see their posts here, or explore what everyone is sharing.',
-              action: <Button variant="primary" onClick={() => setTab('explore')}>Explore posts</Button>,
-            }}
-          />
-        ) : (
-          <PostFeed
-            source={{ kind: 'explore' }}
-            refreshKey={refreshKey}
-            empty={{
-              icon: <Sparkles size={28} />,
-              title: 'Nothing here yet',
-              body: 'Be the first to share something.',
-              action: <Link to="/create" className="btn btn--primary">Create a post</Link>,
-            }}
-          />
-        )}
+        <PostFeed
+          source={{ kind: 'explore' }}
+          refreshKey={refreshKey}
+          empty={{
+            icon: <Sparkles size={28} />,
+            title: 'Nothing here yet',
+            body: 'Be the first to share something.',
+            action: <Link to="/create" className="btn btn--primary">Create a post</Link>,
+          }}
+        />
       </div>
     </>
   )

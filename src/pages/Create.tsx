@@ -15,6 +15,7 @@ import { validateImage } from '@/lib/image'
 import { errorMessage } from '@/lib/supabase'
 import { myCommunities } from '@/services/communities'
 import { createPost, MAX_POST_IMAGES, MAX_POST_LENGTH } from '@/services/posts'
+import type { PostVisibility } from '@/types/db'
 
 const MAX_ORIGINAL_BYTES = 20 * 1024 * 1024 // the service compresses, then enforces the real 5 MB limit
 
@@ -29,6 +30,7 @@ export default function CreatePage() {
   const [files, setFiles] = useState<File[]>([])
   const [previews, setPreviews] = useState<string[]>([])
   const [communityId, setCommunityId] = useState('')
+  const [visibility, setVisibility] = useState<PostVisibility>('public')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const area = useRef<HTMLTextAreaElement>(null)
@@ -76,7 +78,7 @@ export default function CreatePage() {
     setBusy(true)
     setError(null)
     try {
-      const id = await createPost(me.id, { content: text, files, communityId: communityId || null })
+      const id = await createPost(me.id, { content: text, files, communityId: communityId || null, visibility })
       navigate(`/p/${id}`, { replace: true })
     } catch (e) {
       setError(errorMessage(e))
@@ -126,6 +128,17 @@ export default function CreatePage() {
               {communities.data.map((c) => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
+            </select>
+          </div>
+        ) : null}
+
+        {!communityId ? (
+          <div className="field">
+            <label htmlFor="post-privacy">Who can see this post?</label>
+            <select id="post-privacy" className="input" value={visibility} disabled={busy} onChange={(e) => setVisibility(e.target.value as PostVisibility)}>
+              <option value="public">Public (everyone)</option>
+              <option value="followers">Followers only</option>
+              <option value="only_me">Only me</option>
             </select>
           </div>
         ) : null}
