@@ -202,3 +202,24 @@ a.list-row--link { text-decoration: none; }
 /* ---------- "New posts" button on the home feed ---------- */
 .new-posts { position: sticky; top: calc(64px + var(--safe-top)); z-index: 15; display: flex; justify-content: center; margin-bottom: -8px; pointer-events: none; }
 .new-posts .btn { pointer-events: auto; box-shadow: var(--shadow-md); }
+
+/* ---------- Full-screen photo viewer ---------- */
+.viewer { position: fixed; inset: 0; z-index: 200; background: rgba(0, 0, 0, 0.94); display: flex; flex-direction: column; }
+.viewer__stage { position: absolute; inset: 0; overflow: auto; display: flex; touch-action: pan-x pan-y; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.viewer__img { flex: none; margin: auto; object-fit: contain; user-select: none; -webkit-user-drag: none; }
+.viewer__bar { position: absolute; top: 0; left: 0; right: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; padding: calc(8px + var(--safe-top)) 12px 8px; pointer-events: none; }
+.viewer__bar > * { pointer-events: auto; }
+.viewer__count { color: #fff; font-weight: 600; font-size: 15px; background: rgba(0, 0, 0, 0.45); padding: 6px 12px; border-radius: 999px; }
+.viewer__btn { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; border: 0; color: #fff; background: rgba(0, 0, 0, 0.55); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.viewer__btn:disabled { opacity: 0.35; }
+.viewer__nav { position: absolute; z-index: 2; top: 50%; transform: translateY(-50%); }
+.viewer__nav--prev { left: 10px; }
+.viewer__nav--next { right: 10px; }
+.viewer__zoom { position: absolute; z-index: 2; right: 14px; bottom: calc(18px + var(--safe-bottom)); display: flex; gap: 10px; }
+
+/* ---------- Post privacy picker ---------- */
+.privacy-options { display: flex; flex-direction: column; gap: 8px; }
+.privacy-option { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; padding: 12px 14px; border-radius: var(--r-md); border: 1px solid var(--glass-edge); background: var(--glass-strong); color: var(--text); }
+.privacy-option[aria-checked='true'] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.privacy-option__text { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.privacy-option__check { color: var(--accent); }

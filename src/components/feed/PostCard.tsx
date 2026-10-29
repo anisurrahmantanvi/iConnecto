@@ -1,7 +1,7 @@
 import { memo, useCallback, useRef, useState } from 'react'
 import { appUrl } from '@/lib/base'
 import { Link, useNavigate } from 'react-router-dom'
-import { Bookmark, Copy, Flag, Globe, Heart, Lock, MessageCircle, Pencil, Share2, Trash2, Users } from 'lucide-react'
+import { Bookmark, Check, Copy, Flag, Globe, Heart, Lock, MessageCircle, Pencil, Share2, Trash2, Users } from 'lucide-react'
 import type { PostView, PostVisibility } from '@/types/db'
 import { useMe } from '@/app/AuthProvider'
 import { Avatar } from '@/components/ui/Avatar'
@@ -9,6 +9,7 @@ import { Button, IconButton } from '@/components/ui/Button'
 import { ActionMenu, type MenuItem } from '@/components/ui/ActionMenu'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { Dialog } from '@/components/ui/Dialog'
+import { PhotoViewer } from '@/components/ui/PhotoViewer'
 import { RichText } from '@/components/ui/Emoji'
 import { EmojiButton } from '@/components/ui/EmojiButton'
 import { useToast } from '@/components/ui/Toast'
@@ -40,7 +41,8 @@ export const PostCard = memo(function PostCard({ post, onChange, onDeleted, canM
   const [draft, setDraft] = useState(post.content)
   const [saving, setSaving] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
-  const [photo, setPhoto] = useState<string | null>(null)
+  const [photo, setPhoto] = useState<number | null>(null)
+  const [privacyOpen, setPrivacyOpen] = useState(false)
   const editRef = useRef<HTMLTextAreaElement>(null)
 
   const toggleLike = useCallback(async () => {
@@ -140,9 +142,7 @@ export const PostCard = memo(function PostCard({ post, onChange, onDeleted, canM
 
   const menu: MenuItem[] = [
     { label: 'Edit', icon: <Pencil size={18} />, hidden: !mine, onSelect: () => { setDraft(post.content); setEditing(true) } },
-    { label: 'Make public', icon: <Globe size={18} />, hidden: !canChangePrivacy || post.visibility === 'public', onSelect: () => void changeVisibility('public') },
-    { label: 'Followers only', icon: <Users size={18} />, hidden: !canChangePrivacy || post.visibility === 'followers', onSelect: () => void changeVisibility('followers') },
-    { label: 'Only me', icon: <Lock size={18} />, hidden: !canChangePrivacy || post.visibility === 'only_me', onSelect: () => void changeVisibility('only_me') },
+    { label: 'Privacy', icon: post.visibility === 'public' ? <Globe size={18} /> : post.visibility === 'followers' ? <Users size={18} /> : <Lock size={18} />, hidden: !canChangePrivacy, onSelect: () => setPrivacyOpen(true) },
     { label: 'Copy link', icon: <Copy size={18} />, onSelect: () => void copyLink() },
     { label: 'Report', icon: <Flag size={18} />, hidden: mine, onSelect: () => navigate(`/report/post/${post.id}`) },
     { label: mine ? 'Delete' : 'Remove (moderator)', icon: <Trash2 size={18} />, danger: true, hidden: !mine && !canModerate, onSelect: () => setConfirmDelete(true) },
@@ -199,7 +199,7 @@ export const PostCard = memo(function PostCard({ post, onChange, onDeleted, canM
       {post.media_urls.length ? (
         <div className="post__media" data-count={Math.min(post.media_urls.length, 4)}>
           {post.media_urls.slice(0, 4).map((url, i) => (
-            <button key={url} type="button" className="media-btn" aria-label={`Open photo ${i + 1} of ${post.media_urls.length}`} onClick={() => setPhoto(url)}>
+            <button key={url} type="button" className="media-btn" aria-label={`Open photo ${i + 1} of ${post.media_urls.length}`} onClick={() => setPhoto(i)}>
               <img src={url} alt="" loading="lazy" decoding="async" />
             </button>
           ))}
@@ -243,8 +243,32 @@ export const PostCard = memo(function PostCard({ post, onChange, onDeleted, canM
           toast.show('Post deleted')
         }}
       />
-      <Dialog open={photo !== null} title="Photo" onClose={() => setPhoto(null)}>
-        {photo ? <img className="lightbox" src={photo} alt="Full size attachment" /> : null}
+      <PhotoViewer urls={post.media_urls} index={photo} onIndexChange={setPhoto} onClose={() => setPhoto(null)} />
+
+      <Dialog open={privacyOpen} title="Who can see this post?" onClose={() => setPrivacyOpen(false)}>
+        <div className="privacy-options" role="radiogroup" aria-label="Post privacy">
+          {([
+            ['public', <Globe key="g" size={22} />, 'Public', 'Everyone on iConnecto'],
+            ['followers', <Users key="u" size={22} />, 'Followers only', 'Only people who follow you'],
+            ['only_me', <Lock key="l" size={22} />, 'Only me', 'Nobody else can see it'],
+          ] as const).map(([value, icon, title, body]) => (
+            <button
+              key={value}
+              type="button"
+              role="radio"
+              aria-checked={post.visibility === value}
+              className="privacy-option"
+              onClick={() => {
+                setPrivacyOpen(false)
+                if (post.visibility !== value) void changeVisibility(value)
+              }}
+            >
+              {icon}
+              <span className="privacy-option__text"><strong>{title}</strong><span className="small muted">{body}</span></span>
+              {post.visibility === value ? <Check size={20} className="privacy-option__check" aria-hidden /> : null}
+            </button>
+          ))}
+        </div>
       </Dialog>
     </article>
   )
