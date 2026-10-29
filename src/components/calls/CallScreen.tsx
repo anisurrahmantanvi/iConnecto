@@ -5,6 +5,8 @@ import { Avatar } from '@/components/ui/Avatar'
 import { Button } from '@/components/ui/Button'
 import { formatDuration } from '@/lib/format'
 
+const BLANK_POSTER = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+
 /** Plays a MediaStream. Audio-only calls use an <audio> element so no black video layer covers the screen. */
 function StreamMedia({ stream, kind, muted = false, className }: { stream: MediaStream | null; kind: 'video' | 'audio'; muted?: boolean; className?: string }) {
   const video = useRef<HTMLVideoElement>(null)
@@ -18,7 +20,8 @@ function StreamMedia({ stream, kind, muted = false, className }: { stream: Media
   }, [stream, kind])
 
   return kind === 'video' ? (
-    <video ref={video} className={className} autoPlay playsInline muted={muted} />
+    // The transparent poster stops Android's WebView from drawing its big grey "play" placeholder over the screen.
+    <video ref={video} className={className} autoPlay playsInline muted={muted} poster={BLANK_POSTER} />
   ) : (
     <audio ref={audio} autoPlay muted={muted} />
   )
@@ -59,7 +62,7 @@ export function CallScreen({ api, onClose }: { api: CallApi; onClose: () => void
   return (
     <div className={`call-screen ${showRemoteVideo ? 'call-screen--video' : ''}`} role="region" aria-label={`Call with ${name}`}>
       {/* Remote media plays even before the layout shows it (audio calls need no picture). */}
-      <StreamMedia stream={api.remoteStream} kind={isVideo ? 'video' : 'audio'} />
+      {isVideo ? (api.remoteStream ? <StreamMedia stream={api.remoteStream} kind="video" /> : null) : <StreamMedia stream={api.remoteStream} kind="audio" />}
       {isVideo && api.localStream && live ? <StreamMedia stream={api.localStream} kind="video" muted className="local-video" /> : null}
 
       <div className="call-screen__who">

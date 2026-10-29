@@ -35,12 +35,6 @@ export function ProfileHeader({ profile, isMe, following, onFollowingChange, onM
         <div className="profile-id">
           <h1>{profile.display_name || profile.username}</h1>
           <div className="muted">@{profile.username}</div>
-          {presence ? (
-            <div className={`small presence-line ${presence.online ? 'presence-line--online' : 'muted'}`}>
-              {presence.online ? <span className="presence-pip" aria-hidden /> : null}
-              {presence.label}
-            </div>
-          ) : null}
         </div>
         <span className="profile-ring">
           <PresenceAvatar online={!!presence?.online} src={profile.avatar_url} name={profile.display_name ?? profile.username} size="xl" />
