@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import { NavLink, Outlet, useMatch } from 'react-router-dom'
-import { Bell, Bookmark, Compass, Home, MessageCircle, Plus, Settings, User, Users, WifiOff, type LucideIcon } from 'lucide-react'
+import { Bell, Bookmark, Clapperboard, Compass, Home, MessageCircle, Plus, Settings, User, Users, WifiOff, type LucideIcon } from 'lucide-react'
 import { useAuth } from '@/app/AuthProvider'
 import { useBadges } from '@/app/BadgesProvider'
 import { useOnline } from '@/hooks/common'
@@ -16,9 +16,11 @@ interface NavItemProps {
   badge?: number
   end?: boolean
   create?: boolean
+  /** Phone bar: icon only; the label stays available to screen readers. */
+  iconOnly?: boolean
 }
 
-function NavItem({ to, icon: Icon, label, badge = 0, end, create }: NavItemProps) {
+function NavItem({ to, icon: Icon, label, badge = 0, end, create, iconOnly }: NavItemProps) {
   return (
     <NavLink to={to} end={end} className={`nav-item ${create ? 'nav-item--create' : ''}`}>
       {create ? (
@@ -26,7 +28,7 @@ function NavItem({ to, icon: Icon, label, badge = 0, end, create }: NavItemProps
       ) : (
         <Icon size={22} aria-hidden />
       )}
-      <span>{label}</span>
+      <span className={iconOnly ? 'sr-only' : undefined}>{label}</span>
       {badge > 0 ? <span className="badge" aria-label={`${badge} unread`}>{badge > 99 ? '99+' : badge}</span> : null}
     </NavLink>
   )
@@ -53,6 +55,7 @@ export function AppShell() {
         <div className="brand"><Logo size={34} decorative /> iConnecto</div>
         <NavItem to="/" icon={Home} label={t('nav.home')} end />
         <NavItem to="/discover" icon={Compass} label={t('nav.discover')} />
+        <NavItem to="/reels" icon={Clapperboard} label="Reels" />
         <NavItem to="/messages" icon={MessageCircle} label={t('nav.messages')} badge={badges.unreadMessages} />
         <NavItem to="/notifications" icon={Bell} label={t('nav.notifications')} badge={badges.unreadNotifications} />
         <NavItem to="/communities" icon={Users} label={t('nav.communities')} />
@@ -71,12 +74,12 @@ export function AppShell() {
       </main>
 
       {!immersive ? (
-        <nav className="glass bottom-nav" aria-label="Main navigation">
-          <NavItem to="/" icon={Home} label={t('nav.home')} end />
-          <NavItem to="/communities" icon={Users} label={t('nav.communities')} />
-          <NavItem to="/discover" icon={Compass} label={t('nav.discover')} />
-          <NavItem to="/notifications" icon={Bell} label={t('nav.notifications')} badge={badges.unreadNotifications} />
-          <NavItem to={`/u/${username}`} icon={User} label={t('nav.profile')} />
+        <nav className="glass bottom-nav bottom-nav--icons" aria-label="Main navigation">
+          <NavItem to="/" icon={Home} label={t('nav.home')} end iconOnly />
+          <NavItem to="/reels" icon={Clapperboard} label="Reels" iconOnly />
+          <NavItem to="/discover" icon={Compass} label={t('nav.discover')} iconOnly />
+          <NavItem to="/notifications" icon={Bell} label={t('nav.notifications')} badge={badges.unreadNotifications} iconOnly />
+          <NavItem to={`/u/${username}`} icon={User} label={t('nav.profile')} iconOnly />
         </nav>
       ) : null}
 
