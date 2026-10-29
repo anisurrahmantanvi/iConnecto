@@ -1,4 +1,4 @@
-import { Suspense } from 'react'
+import { Suspense, useEffect } from 'react'
 import { NavLink, Outlet, useMatch } from 'react-router-dom'
 import { Bell, Bookmark, Clapperboard, Compass, Home, MessageCircle, Plus, Settings, User, Users, WifiOff, type LucideIcon } from 'lucide-react'
 import { useAuth } from '@/app/AuthProvider'
@@ -40,6 +40,38 @@ export function AppShell() {
   const { profile } = useAuth()
   const badges = useBadges()
   const online = useOnline()
+
+  // While a text field is focused the on-screen keyboard is open: hide the bottom bar so it does not float above the keys.
+  useEffect(() => {
+    const root = document.documentElement
+    const NON_TEXT = new Set(['checkbox', 'radio', 'button', 'submit', 'reset', 'file', 'range', 'color', 'image'])
+    const isTextField = (el: EventTarget | null) => {
+      if (!(el instanceof HTMLElement)) return false
+      if (el instanceof HTMLTextAreaElement) return true
+      if (el instanceof HTMLInputElement) return !NON_TEXT.has(el.type)
+      return el.isContentEditable
+    }
+    let timer: number | undefined
+    const onIn = (e: FocusEvent) => {
+      window.clearTimeout(timer)
+      if (isTextField(e.target)) root.classList.add('kbd-open')
+    }
+    const onOut = () => {
+      window.clearTimeout(timer)
+      // Wait a beat: moving from one field to another fires focusout then focusin.
+      timer = window.setTimeout(() => {
+        if (!isTextField(document.activeElement)) root.classList.remove('kbd-open')
+      }, 120)
+    }
+    document.addEventListener('focusin', onIn)
+    document.addEventListener('focusout', onOut)
+    return () => {
+      window.clearTimeout(timer)
+      document.removeEventListener('focusin', onIn)
+      document.removeEventListener('focusout', onOut)
+      root.classList.remove('kbd-open')
+    }
+  }, [])
   // Conversations and calls need the full screen on a phone, so the tab bar is hidden there.
   // Both hooks must run on every render (`||` would skip the second one and break React's hook order).
   const inChat = useMatch('/messages/:chatId')
