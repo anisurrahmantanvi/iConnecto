@@ -20,7 +20,20 @@ export function NotificationSetting() {
     void notificationPermission().then(setPerm)
     refresh()
     const id = window.setInterval(refresh, 1500)
-    const ok = perm === 'granted'
+    return () => window.clearInterval(id)
+  }, [])
+
+  const enable = async () => {
+    const p = await requestNotificationPermission((url) => navigate(url))
+    setPerm(p)
+    if (p === 'granted') {
+      toast.show('Notifications are on')
+      if (!native) await showSystemNotification('iConnecto', 'Notifications are working 🎉', 'test')
+    } else if (p === 'denied') toast.error('Notifications are blocked. Turn them on in your phone settings for this app.')
+    refresh()
+  }
+
+  const ok = perm === 'granted'
   const lines = trail.filter((t) => /fail|error|denied/i.test(t))
   const trouble = native && ok && lines.length > 0
 
