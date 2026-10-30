@@ -116,7 +116,7 @@ production build served over HTTPS or on localhost). The structure is compatible
 Chrome only offers "Install app" over **HTTPS** (a LAN address like `http://192.168.x.x:5173` only gives a plain shortcut).
 
 1. Fill `.env` (see above), then `npm run build`. The `VITE_` values are baked in at build time.
-2. Host the `dist/` folder on any static HTTPS host. Easiest: drag `dist/` onto <https://app.netlify.com/drop>. `public/_redirects` (Netlify/Cloudflare Pages) and `vercel.json` (Vercel) make deep links such as `/login` survive a refresh.
+2. Host the `dist/` folder on any static HTTPS host (this project uses GitHub Pages, see `.github/workflows/pages.yml`, which copies `index.html` to `404.html` so deep links such as `/login` survive a refresh). `vercel.json` does the same for Vercel.
 3. In Supabase → Authentication → URL Configuration, set **Site URL** and add `https://YOUR-SITE/auth/callback` to **Redirect URLs**, or confirmation and reset e-mails will point to the wrong address.
 4. Open the HTTPS link in Chrome on Android → ⋮ menu → **Install app** (or "Add to Home screen").
 
