@@ -1,0 +1,2 @@
+# Minimal project file so the Supabase CLI can deploy Edge Functions from this repository.
+project_id = "iconnecto"

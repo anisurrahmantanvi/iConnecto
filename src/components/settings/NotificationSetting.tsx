@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Bell } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { pushAvailable } from '@/lib/push'
 import { Button } from '@/components/ui/Button'
 import { GlassPanel } from '@/components/ui/GlassPanel'
 import { useToast } from '@/components/ui/Toast'
@@ -8,6 +10,8 @@ import { notificationPermission, requestNotificationPermission, showSystemNotifi
 /** Turn phone notifications on and send a test one. */
 export function NotificationSetting() {
   const toast = useToast()
+  const navigate = useNavigate()
+  const native = pushAvailable()
   const [perm, setPerm] = useState<NotifyPermission | null>(null)
 
   useEffect(() => {
@@ -15,11 +19,11 @@ export function NotificationSetting() {
   }, [])
 
   const enable = async () => {
-    const p = await requestNotificationPermission()
+    const p = await requestNotificationPermission((url) => navigate(url))
     setPerm(p)
     if (p === 'granted') {
       toast.show('Notifications are on')
-      await showSystemNotification('iConnecto', 'Notifications are working 🎉', 'test')
+      if (!native) await showSystemNotification('iConnecto', 'Notifications are working 🎉', 'test')
     } else if (p === 'denied') toast.error('Notifications are blocked. Turn them on in your phone settings for this app.')
   }
 
@@ -31,21 +35,25 @@ export function NotificationSetting() {
           <strong>Phone notifications</strong>
           <p className="small muted" style={{ margin: '4px 0 0' }}>
             {perm === 'granted'
-              ? 'On. You get an alert for new messages, likes, comments and followers while the app is open or just minimised.'
+              ? native
+                ? 'On. You get alerts for messages, calls, likes, comments and new followers, even when the app is closed.'
+                : 'On. You get alerts for new messages, likes, comments and followers while this page is open in the background.'
               : perm === 'denied'
                 ? 'Blocked. Turn notifications on for iConnecto in your phone settings.'
                 : perm === 'unsupported'
                   ? 'This version of the app or browser cannot show notifications.'
                   : 'Get an alert for new messages, likes, comments and followers.'}
           </p>
-          <p className="small faint" style={{ margin: '6px 0 0' }}>
-            Alerts while the app is fully closed need a push service, which is not set up yet.
-          </p>
+          {native ? null : (
+            <p className="small faint" style={{ margin: '6px 0 0' }}>
+              In a browser, alerts only work while the page is still running. Install the Android app to get them when it is closed.
+            </p>
+          )}
         </div>
       </div>
       {perm === 'default' ? (
         <div className="form-actions"><Button variant="primary" onClick={() => void enable()}>Turn on notifications</Button></div>
-      ) : perm === 'granted' ? (
+      ) : perm === 'granted' && !native ? (
         <div className="form-actions"><Button variant="glass" onClick={() => void showSystemNotification('iConnecto', 'Test notification 🔔', 'test')}>Send a test</Button></div>
       ) : null}
     </GlassPanel>

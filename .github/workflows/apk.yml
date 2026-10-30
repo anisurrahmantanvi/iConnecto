@@ -29,7 +29,7 @@ jobs:
           VITE_SUPABASE_URL: ${{ inputs.supabase_url }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ inputs.publishable_key }}
       - name: Add Capacitor (build-time only, package.json untouched)
-        run: npm install --no-save --no-audit --no-fund @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/assets@3 @capacitor/local-notifications@6
+        run: npm install --no-save --no-audit --no-fund @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/assets@3 @capacitor/push-notifications@6
       - name: Create the Android project
         run: |
           cat > capacitor.config.json <<JSON
@@ -48,6 +48,16 @@ jobs:
           npx capacitor-assets generate --android --iconBackgroundColor '#ffffff' || echo "icon generation failed, default icon kept"
           grep -rl '@mipmap/ic_launcher_background' android/app/src/main/res | xargs -r sed -i 's#@mipmap/ic_launcher_background#@color/ic_launcher_background#g'
           npx cap sync android
+      - name: Firebase config (needed for push notifications)
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          if [ -n "$GOOGLE_SERVICES_JSON" ]; then
+            printf '%s' "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
+            echo "Firebase config added"
+          else
+            echo "::warning title=No Firebase config::Repository secret GOOGLE_SERVICES_JSON is missing, so this APK cannot receive push notifications."
+          fi
       - name: Build debug APK
         run: |
           cd android

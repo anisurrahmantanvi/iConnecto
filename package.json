@@ -13,6 +13,8 @@
     "emoji:vendor": "node scripts/vendor-emoji.mjs"
   },
   "dependencies": {
+    "@capacitor/core": "^6.1.0",
+    "@capacitor/push-notifications": "^6.0.0",
     "@supabase/supabase-js": "^2.45.0",
     "lucide-react": "^0.468.0",
     "react": "^18.3.1",

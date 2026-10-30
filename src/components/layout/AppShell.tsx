@@ -5,6 +5,7 @@ import { useAuth } from '@/app/AuthProvider'
 import { useBadges } from '@/app/BadgesProvider'
 import { useOnline } from '@/hooks/common'
 import { useHeartbeat } from '@/hooks/presence'
+import { usePush } from '@/hooks/usePush'
 import { useT } from '@/lib/i18n'
 import { IncomingCallListener } from '@/components/calls/IncomingCall'
 import { Spinner } from '@/components/ui/Feedback'
@@ -42,6 +43,7 @@ export function AppShell() {
   const badges = useBadges()
   const online = useOnline()
   useHeartbeat(!!profile)
+  usePush(!!profile)
 
   // Hide the bottom bar only while the on-screen keyboard is really open (not just because a field still has focus).
   // The Android app reports this itself (data-kbd on <html>); in a normal browser the visual viewport shrinks instead.

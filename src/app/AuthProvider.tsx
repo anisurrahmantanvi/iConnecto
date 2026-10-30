@@ -3,6 +3,7 @@ import { appUrl } from '@/lib/base'
 import type { Session, User } from '@supabase/supabase-js'
 import { supabase, errorMessage } from '@/lib/supabase'
 import { loadOrCreateMyProfile } from '@/services/profiles'
+import { disablePushForThisPhone } from '@/lib/push'
 import type { Profile } from '@/types/db'
 
 interface SignUpInput {
@@ -107,6 +108,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const signOut = useCallback(async () => {
+    await disablePushForThisPhone() // needs the session, so it runs first
     await supabase.auth.signOut()
   }, [])
 
