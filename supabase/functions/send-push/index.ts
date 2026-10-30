@@ -122,7 +122,7 @@ async function build(kind: string, id: string): Promise<Push | null> {
   return null
 }
 
-Deno.serve(async (req) => {
+async function handle(req: Request): Promise<Response> {
   if (req.method !== 'POST') return new Response('Method not allowed', { status: 405 })
   const expected = Deno.env.get('PUSH_WEBHOOK_SECRET') ?? ''
   const got = req.headers.get('x-push-secret') ?? ''
@@ -168,4 +168,15 @@ Deno.serve(async (req) => {
     }
   }
   return new Response(JSON.stringify({ sent, devices: tokens.length }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+}
+
+Deno.serve(async (req) => {
+  try {
+    return await handle(req)
+  } catch (e) {
+    // Say what went wrong (never any secret) so it shows in the database's net._http_response table.
+    const msg = e instanceof Error ? `${e.name}: ${e.message}` : String(e)
+    console.error('send-push failed', msg)
+    return new Response(`send-push failed: ${msg}`.slice(0, 400), { status: 500 })
+  }
 })
