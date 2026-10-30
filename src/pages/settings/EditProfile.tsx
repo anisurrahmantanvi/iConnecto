@@ -6,12 +6,14 @@ import { CoverUploader } from '@/components/profile/CoverUploader'
 import { Button } from '@/components/ui/Button'
 import { EmojiButton } from '@/components/ui/EmojiButton'
 import { TextAreaField, TextField } from '@/components/ui/Field'
+import { SuggestField } from '@/components/ui/SuggestField'
 import { ErrorBanner } from '@/components/ui/Feedback'
 import { GlassPanel } from '@/components/ui/GlassPanel'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { useToast } from '@/components/ui/Toast'
 import { useDebounce } from '@/hooks/common'
 import { insertAtCaret, restoreCaret } from '@/hooks/ui'
+import { searchSuggestions, type SuggestEntry } from '@/lib/suggest'
 import { isDuplicate } from '@/lib/api'
 import { errorMessage } from '@/lib/supabase'
 import { getProfileAbout, isUsernameAvailable, updateMyAbout, updateMyProfile, type ProfilePatch } from '@/services/profiles'
@@ -21,6 +23,10 @@ const USERNAME_RE = /^[A-Za-z0-9_]{3,20}$/
 const MAX_BIO = 300
 const MAX_NAME = 50
 const MAX_ABOUT = 80
+
+// The suggestion lists are loaded only when this screen opens (they are a separate download, not part of the main app).
+let placeList: SuggestEntry[] | null = null
+let schoolList: SuggestEntry[] | null = null
 
 type Availability = 'idle' | 'checking' | 'ok' | 'taken' | 'error'
 
@@ -43,6 +49,18 @@ export default function EditProfilePage() {
   const [education, setEducation] = useState('')
   const [place, setPlace] = useState('')
   const [status, setStatus] = useState<RelationshipStatus | null>(null)
+  const [lists, setLists] = useState(0)
+  useEffect(() => {
+    let cancelled = false
+    void Promise.all([import('@/data/bdPlaces'), import('@/data/bdEducation')]).then(([p, e]) => {
+      placeList = p.PLACES.map(([en, bn]) => ({ en, bn }))
+      schoolList = e.INSTITUTIONS.map(([en, bn, alt]) => ({ en, bn, alt }))
+      if (!cancelled) setLists((n) => n + 1)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
   useEffect(() => {
     let cancelled = false
     getProfileAbout(me.id)
@@ -193,8 +211,26 @@ export default function EditProfilePage() {
           <GlassPanel padded className="col">
             <h2 className="section-title" style={{ margin: 0 }}>About</h2>
             <TextField label="Work" value={work} maxLength={MAX_ABOUT} disabled={busy} placeholder="e.g. Designer at a company" onChange={(e) => setWork(e.target.value)} />
-            <TextField label="Education" value={education} maxLength={MAX_ABOUT} disabled={busy} placeholder="e.g. Dhaka University" onChange={(e) => setEducation(e.target.value)} />
-            <TextField label="Location" value={place} maxLength={MAX_ABOUT} disabled={busy} placeholder="e.g. Dhaka, Bangladesh" onChange={(e) => setPlace(e.target.value)} />
+            <SuggestField
+              label="Education"
+              value={education}
+              maxLength={MAX_ABOUT}
+              disabled={busy}
+              placeholder="e.g. University of Dhaka"
+              hint="Start typing and pick from the list, or write your own."
+              suggest={(q) => (lists >= 0 && schoolList ? searchSuggestions(schoolList, q) : [])}
+              onChange={setEducation}
+            />
+            <SuggestField
+              label="Location"
+              value={place}
+              maxLength={MAX_ABOUT}
+              disabled={busy}
+              placeholder="e.g. Jamalpur"
+              hint="Type your area (English or বাংলা) and pick from the list."
+              suggest={(q) => (lists >= 0 && placeList ? searchSuggestions(placeList, q) : [])}
+              onChange={setPlace}
+            />
             <div className="field">
               <span className="field-label" id="rel-label">Relationship status</span>
               <div role="group" aria-labelledby="rel-label" className="chip-row">

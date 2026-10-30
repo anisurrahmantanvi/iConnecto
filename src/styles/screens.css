@@ -231,3 +231,9 @@ a.list-row--link { text-decoration: none; }
 .presence-line--online { color: #16a34a; font-weight: 600; }
 .presence-pip { width: 9px; height: 9px; border-radius: 50%; background: #22c55e; }
 .presence-wrap .avatar--xl ~ .presence-dot { width: 20px; height: 20px; right: 4px; bottom: 4px; border-width: 3px; }
+
+/* ---------- Suggestion box (education / location) ---------- */
+.suggest { position: relative; }
+.suggest__list { list-style: none; margin: 4px 0 0; padding: 6px; display: flex; flex-direction: column; gap: 2px; border-radius: var(--r-md); max-height: 260px; overflow-y: auto; }
+.suggest__item { width: 100%; text-align: left; padding: 10px 12px; border: 0; background: transparent; color: var(--text); border-radius: var(--r-sm); font-size: 15px; }
+.suggest__item:active, .suggest__item:hover { background: var(--glass-strong); }
