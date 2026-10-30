@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Bell } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { pushAvailable } from '@/lib/push'
+import { enablePush, pushAvailable, pushStatus } from '@/lib/push'
 import { Button } from '@/components/ui/Button'
 import { GlassPanel } from '@/components/ui/GlassPanel'
 import { useToast } from '@/components/ui/Toast'
@@ -13,9 +13,14 @@ export function NotificationSetting() {
   const navigate = useNavigate()
   const native = pushAvailable()
   const [perm, setPerm] = useState<NotifyPermission | null>(null)
+  const [trail, setTrail] = useState<string[]>([])
+  const refresh = () => setTrail(pushStatus())
 
   useEffect(() => {
     void notificationPermission().then(setPerm)
+    refresh()
+    const id = window.setInterval(refresh, 1500)
+    return () => window.clearInterval(id)
   }, [])
 
   const enable = async () => {
@@ -51,6 +56,13 @@ export function NotificationSetting() {
           )}
         </div>
       </div>
+      {native ? (
+        <div className="col" style={{ gap: 4 }}>
+          <p className="small faint" style={{ margin: 0 }}>Push status:</p>
+          {trail.length ? trail.map((t, i) => <span key={i} className="small muted">{t}</span>) : <span className="small muted">Nothing yet</span>}
+          <div className="form-actions"><Button variant="glass" onClick={() => { void enablePush((url) => navigate(url)).catch(() => undefined); window.setTimeout(refresh, 1500) }}>Try again</Button></div>
+        </div>
+      ) : null}
       {perm === 'default' ? (
         <div className="form-actions"><Button variant="primary" onClick={() => void enable()}>Turn on notifications</Button></div>
       ) : perm === 'granted' && !native ? (

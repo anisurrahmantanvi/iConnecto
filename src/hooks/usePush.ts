@@ -7,6 +7,6 @@ export function usePush(enabled: boolean): void {
   const navigate = useNavigate()
   useEffect(() => {
     if (!enabled || !pushAvailable()) return
-    void enablePush((url) => navigate(url)).catch(() => undefined)
+    void enablePush((url) => navigate(url)).catch((e) => console.warn('Push setup failed', e))
   }, [enabled, navigate])
 }
