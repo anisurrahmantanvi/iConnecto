@@ -19,6 +19,24 @@ body {
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  /* It is an app, not a web page: buttons, titles and menus should not get selected or copied by accident. */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Real content stays selectable: things people type and things people write. */
+input,
+textarea,
+[contenteditable='true'],
+.post__body,
+.bubble,
+.comment__text,
+.profile-bio,
+.selectable {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
 }
 
 /* Soft colour orbs behind the glass give the blur something to refract. */

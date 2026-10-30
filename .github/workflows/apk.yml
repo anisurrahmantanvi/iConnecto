@@ -42,11 +42,17 @@ jobs:
           s=open(p).read()
           perms=''.join('<uses-permission android:name="android.permission.%s" />\n'%x for x in ['CAMERA','RECORD_AUDIO','MODIFY_AUDIO_SETTINGS','POST_NOTIFICATIONS'])
           s=s.replace('</manifest>',perms+'</manifest>')
+          # Notification icon: Android needs a one-colour silhouette, not the coloured app icon (which shows as a blank square).
+          meta='<meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/ic_stat_iconnecto" /><meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@color/ic_stat_color" />'
+          s=s.replace('</application>',meta+'</application>')
           open(p,'w').write(s)
           PY
           mkdir -p assets && cp design/logo-source.png assets/icon-only.png && cp design/logo-source.png assets/icon-foreground.png
           npx capacitor-assets generate --android --iconBackgroundColor '#ffffff' || echo "icon generation failed, default icon kept"
           grep -rl '@mipmap/ic_launcher_background' android/app/src/main/res | xargs -r sed -i 's#@mipmap/ic_launcher_background#@color/ic_launcher_background#g'
+          cp -r mobile/notification-icon/drawable-* android/app/src/main/res/
+          mkdir -p android/app/src/main/res/values
+          printf '<?xml version="1.0" encoding="utf-8"?>\n<resources><color name="ic_stat_color">#0A84FF</color></resources>\n' > android/app/src/main/res/values/ic_stat_color.xml
           npx cap sync android
       - name: Firebase config (needed for push notifications)
         env:

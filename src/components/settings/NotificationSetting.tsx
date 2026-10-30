@@ -20,52 +20,44 @@ export function NotificationSetting() {
     void notificationPermission().then(setPerm)
     refresh()
     const id = window.setInterval(refresh, 1500)
-    return () => window.clearInterval(id)
-  }, [])
-
-  const enable = async () => {
-    const p = await requestNotificationPermission((url) => navigate(url))
-    setPerm(p)
-    if (p === 'granted') {
-      toast.show('Notifications are on')
-      if (!native) await showSystemNotification('iConnecto', 'Notifications are working 🎉', 'test')
-    } else if (p === 'denied') toast.error('Notifications are blocked. Turn them on in your phone settings for this app.')
-  }
+    const ok = perm === 'granted'
+  const lines = trail.filter((t) => /fail|error|denied/i.test(t))
+  const trouble = native && ok && lines.length > 0
 
   return (
     <GlassPanel padded className="col">
       <div className="row" style={{ alignItems: 'flex-start' }}>
         <Bell size={22} color="var(--accent)" aria-hidden style={{ flex: 'none', marginTop: 2 }} />
         <div className="grow">
-          <strong>Phone notifications</strong>
+          <strong>Notifications</strong>
           <p className="small muted" style={{ margin: '4px 0 0' }}>
-            {perm === 'granted'
-              ? native
-                ? 'On. You get alerts for messages, calls, likes, comments and new followers, even when the app is closed.'
-                : 'On. You get alerts for new messages, likes, comments and followers while this page is open in the background.'
+            {ok
+              ? trouble
+                ? 'Notifications are allowed, but this phone could not be set up to receive them.'
+                : native
+                  ? 'You are all set. You will get alerts for messages, calls, likes, comments and new followers, even when the app is closed.'
+                  : 'You will get alerts for messages, likes, comments and new followers while this page stays open in the background.'
               : perm === 'denied'
-                ? 'Blocked. Turn notifications on for iConnecto in your phone settings.'
+                ? 'Notifications are turned off. Open your phone Settings, find iConnecto and allow notifications.'
                 : perm === 'unsupported'
-                  ? 'This version of the app or browser cannot show notifications.'
-                  : 'Get an alert for new messages, likes, comments and followers.'}
+                  ? 'This phone or browser cannot show notifications.'
+                  : 'Get an alert for messages, calls, likes, comments and new followers.'}
           </p>
           {native ? null : (
             <p className="small faint" style={{ margin: '6px 0 0' }}>
-              In a browser, alerts only work while the page is still running. Install the Android app to get them when it is closed.
+              Browser alerts only work while the page is running. Install the Android app to get them when it is closed.
             </p>
           )}
+          {trouble ? (
+            <p className="small faint" style={{ margin: '6px 0 0' }}>{lines[lines.length - 1]}</p>
+          ) : null}
         </div>
       </div>
-      {native ? (
-        <div className="col" style={{ gap: 4 }}>
-          <p className="small faint" style={{ margin: 0 }}>Push status:</p>
-          {trail.length ? trail.map((t, i) => <span key={i} className="small muted">{t}</span>) : <span className="small muted">Nothing yet</span>}
-          <div className="form-actions"><Button variant="glass" onClick={() => { void enablePush((url) => navigate(url)).catch(() => undefined); window.setTimeout(refresh, 1500) }}>Try again</Button></div>
-        </div>
-      ) : null}
       {perm === 'default' ? (
         <div className="form-actions"><Button variant="primary" onClick={() => void enable()}>Turn on notifications</Button></div>
-      ) : perm === 'granted' && !native ? (
+      ) : trouble ? (
+        <div className="form-actions"><Button variant="glass" onClick={() => { void enablePush((url) => navigate(url)).catch(() => undefined); window.setTimeout(refresh, 1500) }}>Try again</Button></div>
+      ) : ok && !native ? (
         <div className="form-actions"><Button variant="glass" onClick={() => void showSystemNotification('iConnecto', 'Test notification 🔔', 'test')}>Send a test</Button></div>
       ) : null}
     </GlassPanel>
