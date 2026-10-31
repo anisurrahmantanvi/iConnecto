@@ -379,6 +379,5 @@ export const SETTINGS_GROUPS: { title: string; sections: string[] }[] = [
   { title: 'Notifications & Wellbeing', sections: ['Notifications', 'Quiet Mode', 'Digital Wellbeing'] },
   { title: 'Feed, Reels & Media', sections: ['Feed Preferences', 'AI Content Recommendations', 'Activity', 'Reels Settings', 'Advanced Media Controls'] },
   { title: 'Appearance & Language', sections: ['Preferences', 'Themes', 'Accessibility', 'Profile Customization'] },
-  { title: 'Creator & Premium', sections: ['Creator Tools', 'Creator Monetization', 'Premium Subscription'] },
   { title: 'Help & Legal', sections: ['Help & Legal', 'Support & Feedback'] },
 ]
