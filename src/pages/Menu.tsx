@@ -58,23 +58,23 @@ export default function MenuPage() {
             <Avatar src={me.avatar_url} name={me.display_name ?? me.username} size="lg" />
             <span className="grow" style={{ minWidth: 0 }}>
               <strong className="truncate" style={{ display: 'block', fontSize: 18 }}>{me.display_name || me.username}</strong>
-              <span className="muted truncate" style={{ display: 'block' }}>View your profile</span>
+              <span className="muted truncate" style={{ display: 'block' }}>Your iConnecto profile</span>
             </span>
           </Link>
         </GlassPanel>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-          <Tile to="/messages" icon={<MessageCircle size={28} />} label="Messages" color="#7a5cff" />
+          <Tile to="/messages" icon={<MessageCircle size={28} />} label="iConnect" color="#7a5cff" />
           <Tile to="/communities" icon={<Users size={28} />} label="Communities" color="#0a84ff" />
-          <Tile to="/reels" icon={<Film size={28} />} label="Reels" color="#ff6a3d" />
-          <Tile to="/saved" icon={<Bookmark size={28} />} label="Saved" color="#a35cff" />
-          <Tile to="/discover" icon={<Compass size={28} />} label="Explore" color="#1db8a6" />
-          <Tile to="/notifications" icon={<Bell size={28} />} label="Notifications" color="#f5a524" />
-          <Tile to="/create" icon={<SquarePlus size={28} />} label="Create post" color="#0a84ff" />
-          <Tile to="/settings/profile" icon={<Pencil size={28} />} label="Edit profile" color="#34c759" />
+          <Tile to="/reels" icon={<Film size={28} />} label="iClips" color="#ff6a3d" />
+          <Tile to="/saved" icon={<Bookmark size={28} />} label="Collections" color="#a35cff" />
+          <Tile to="/discover" icon={<Compass size={28} />} label="Discover" color="#1db8a6" />
+          <Tile to="/notifications" icon={<Bell size={28} />} label="Activity" color="#f5a524" />
+          <Tile to="/create" icon={<SquarePlus size={28} />} label="Create" color="#0a84ff" />
+          <Tile to="/settings/profile" icon={<Pencil size={28} />} label="Edit Profile" color="#34c759" />
         </div>
 
-        <Expand icon={<Settings size={22} aria-hidden />} title="Settings & privacy">
+        <Expand icon={<Settings size={22} aria-hidden />} title="Settings & Privacy">
           <SubLink to="/settings" title="Settings & privacy" />
           <SubLink to="/settings/privacy" title="Privacy and security" />
           <SubLink to="/settings/blocked" title="Blocked accounts" />
@@ -83,7 +83,7 @@ export default function MenuPage() {
           <SubLink to={`/settings/section/${sectionSlug('Notifications')}`} title="Notifications" />
         </Expand>
 
-        <Expand icon={<HelpCircle size={22} aria-hidden />} title="Help & support">
+        <Expand icon={<HelpCircle size={22} aria-hidden />} title="Help Center">
           <SubLink to={`/settings/section/${sectionSlug('Support & Feedback')}`} title="Support & Feedback" />
           <SubLink to={`/settings/section/${sectionSlug('Help & Legal')}`} title="Help & Legal" />
         </Expand>
