@@ -377,7 +377,6 @@ export const SETTINGS_GROUPS: { title: string; sections: string[] }[] = [
   { title: 'Privacy', sections: ['Audience & Visibility', 'Privacy Center', 'Interaction Settings', 'Close Friends', 'Hidden Words', 'Content Safety', 'Parental Controls'] },
   { title: 'Security', sections: ['Security & Privacy', 'Login & Devices', 'Advanced Account Protection'] },
   { title: 'Notifications & Wellbeing', sections: ['Notifications', 'Quiet Mode', 'Digital Wellbeing'] },
-  { title: 'Messages', sections: ['Messaging Settings', 'Advanced Chat Features'] },
   { title: 'Feed, Reels & Media', sections: ['Feed Preferences', 'AI Content Recommendations', 'Activity', 'Reels Settings', 'Advanced Media Controls'] },
   { title: 'Appearance & Language', sections: ['Preferences', 'Themes', 'Accessibility', 'Profile Customization'] },
   { title: 'Creator & Premium', sections: ['Creator Tools', 'Creator Monetization', 'Premium Subscription'] },

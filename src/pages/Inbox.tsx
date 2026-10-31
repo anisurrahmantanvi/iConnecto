@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { MessageCircle, Plus } from 'lucide-react'
+import { MessageCircle, Plus, Settings } from 'lucide-react'
 import { useMe } from '@/app/AuthProvider'
 import { NewChatDialog } from '@/components/chat/NewChatDialog'
 import { PresenceAvatar } from '@/components/ui/PresenceAvatar'
@@ -40,7 +40,12 @@ export default function InboxPage() {
       <PageHeader
         title="Messages"
         back="/"
-        actions={<IconButton label="New message" onClick={() => setComposing(true)}><Plus size={22} /></IconButton>}
+        actions={
+          <span className="page-header__actions">
+            <Link to="/message-settings" className="icon-btn" aria-label="Message settings"><Settings size={22} /></Link>
+            <IconButton label="New message" onClick={() => setComposing(true)}><Plus size={22} /></IconButton>
+          </span>
+        }
       />
 
       {loading && !data ? (

@@ -31,6 +31,7 @@ const ReportPage = lazy(() => import('@/pages/Report'))
 const NotFoundPage = lazy(() => import('@/pages/NotFound'))
 
 const ReelsPage = lazy(() => import('@/pages/Reels'))
+const MessageSettingsPage = lazy(() => import('@/pages/MessageSettings'))
 const SettingsHomePage = lazy(() => import('@/pages/settings/SettingsHome'))
 const EditProfilePage = lazy(() => import('@/pages/settings/EditProfile'))
 const PrivacyPage = lazy(() => import('@/pages/settings/Privacy'))
@@ -80,6 +81,7 @@ export function App() {
                 <Route path="/u/:username/following" element={<FollowListPage kind="following" />} />
 
                 <Route path="/messages" element={<InboxPage />} />
+                <Route path="/message-settings" element={<MessageSettingsPage />} />
                 <Route path="/messages/:chatId" element={<ChatPage />} />
 
                 <Route path="/reels" element={<ReelsPage />} />
