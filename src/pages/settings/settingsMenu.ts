@@ -218,9 +218,6 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
     title: 'Verified Badge',
     items: [
       { title: 'Identity Verification' },
-      { title: 'Verified Profile Badge' },
-      { title: 'Verification Status' },
-      { title: 'Verification Renewal' },
       { title: 'Verification Support' },
     ],
   },
