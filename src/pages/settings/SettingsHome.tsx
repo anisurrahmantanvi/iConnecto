@@ -62,7 +62,7 @@ export default function SettingsHomePage() {
 
   return (
     <>
-      <PageHeader title="Settings & privacy" />
+      <PageHeader title="Settings & privacy" back="/menu" />
       <div className="stack">
         <SearchBox value={query} onChange={setQuery} label="Search settings" />
 

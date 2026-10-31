@@ -1,13 +1,11 @@
 import { useState, type ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Bell, Bookmark, ChevronDown, Compass, Film, Heart, HelpCircle, LogOut, MessageCircle, Pencil, Settings, SquarePlus, UserPlus, Users } from 'lucide-react'
+import { Bell, Bookmark, ChevronDown, Compass, Film, HelpCircle, LogOut, MessageCircle, Pencil, Settings, SquarePlus, UserPlus, Users } from 'lucide-react'
 import { useAuth, useMe } from '@/app/AuthProvider'
 import { Avatar } from '@/components/ui/Avatar'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { GlassPanel } from '@/components/ui/GlassPanel'
 import { PageHeader } from '@/components/ui/PageHeader'
-import { useToast } from '@/components/ui/Toast'
-import { appUrl } from '@/lib/base'
 import { sectionSlug } from '@/pages/settings/settingsMenu'
 
 function Tile({ to, icon, label, color }: { to: string; icon: ReactNode; label: string; color: string }) {
@@ -44,17 +42,8 @@ export default function MenuPage() {
   const me = useMe()
   const { signOut } = useAuth()
   const navigate = useNavigate()
-  const toast = useToast()
   const [confirmLogout, setConfirmLogout] = useState(false)
 
-  const invite = async () => {
-    try {
-      await navigator.clipboard.writeText(appUrl('/signup'))
-      toast.show('Invite link copied')
-    } catch {
-      toast.error('Could not copy the link.')
-    }
-  }
   const logOut = async () => {
     await signOut()
     navigate('/login', { replace: true })
@@ -72,13 +61,6 @@ export default function MenuPage() {
               <span className="muted truncate" style={{ display: 'block' }}>View your profile</span>
             </span>
           </Link>
-        </GlassPanel>
-
-        <GlassPanel className="settings-list" as="nav" aria-label="Invite friends">
-          <button type="button" className="list-row" onClick={() => void invite()} style={{ width: '100%', textAlign: 'left' }}>
-            <Heart size={22} color="#ff3b5c" fill="#ff3b5c" aria-hidden />
-            <strong className="grow">Invite friends</strong>
-          </button>
         </GlassPanel>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
