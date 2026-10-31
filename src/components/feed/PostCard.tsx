@@ -1,4 +1,5 @@
 import { memo, useCallback, useRef, useState } from 'react'
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge'
 import { appUrl } from '@/lib/base'
 import { Link, useNavigate } from 'react-router-dom'
 import { Bookmark, Check, Copy, Flag, Globe, Heart, Lock, MessageCircle, Pencil, Share2, Trash2, Users } from 'lucide-react'
@@ -156,7 +157,7 @@ export const PostCard = memo(function PostCard({ post, onChange, onDeleted, canM
         </Link>
         <div className="grow">
           <Link to={author ? `/u/${author.username}` : '#'} className="post__name truncate">
-            {author?.display_name || author?.username || 'Deleted user'}
+            {author?.display_name || author?.username || 'Deleted user'}<VerifiedBadge badge={author?.badge} size={15} />
           </Link>
           <div className="post__sub truncate">
             @{author?.username ?? 'unknown'} · <Link to={`/p/${post.id}`} className="muted">{timeAgo(post.created_at)}</Link>

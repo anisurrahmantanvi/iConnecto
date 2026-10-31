@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge'
 import { Link } from 'react-router-dom'
 import type { Page, ProfileLite } from '@/types/db'
 import { useMe } from '@/app/AuthProvider'
@@ -25,7 +26,7 @@ export function UserRow({ profile, right }: { profile: ProfileLite; right?: Reac
         <Avatar src={profile.avatar_url} name={profile.display_name ?? profile.username} />
       </Link>
       <Link to={`/u/${profile.username}`} className="grow user-link">
-        <strong className="truncate" style={{ display: 'block' }}>{profile.display_name || profile.username}</strong>
+        <strong className="truncate" style={{ display: 'block' }}>{profile.display_name || profile.username}<VerifiedBadge badge={profile.badge} size={14} /></strong>
         <span className="small muted truncate" style={{ display: 'block' }}>@{profile.username}</span>
       </Link>
       {right}

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge'
 import { MessageCircle, Pencil, Plus } from 'lucide-react'
 import type { Profile } from '@/types/db'
 import { PresenceAvatar } from '@/components/ui/PresenceAvatar'
@@ -33,7 +34,7 @@ export function ProfileHeader({ profile, isMe, following, onFollowingChange, onM
       </div>
       <div className="profile-top">
         <div className="profile-id">
-          <h1>{profile.display_name || profile.username}</h1>
+          <h1>{profile.display_name || profile.username}<VerifiedBadge badge={profile.badge} size={20} /></h1>
           <div className="muted">@{profile.username}</div>
         </div>
         <span className="profile-ring">

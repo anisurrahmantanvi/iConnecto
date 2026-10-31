@@ -19,6 +19,6 @@ export function isDuplicate(err: unknown): boolean {
   return (err as { code?: string } | null)?.code === '23505'
 }
 
-export const PROFILE_LITE = 'id, username, display_name, avatar_url'
+export const PROFILE_LITE = 'id, username, display_name, avatar_url, badge'
 export const PROFILE_FULL =
-  'id, username, display_name, bio, avatar_url, cover_url, followers_count, following_count, posts_count, created_at'
+  'id, username, display_name, bio, avatar_url, cover_url, badge, followers_count, following_count, posts_count, created_at'

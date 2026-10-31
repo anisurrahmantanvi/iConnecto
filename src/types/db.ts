@@ -5,6 +5,8 @@ export interface Profile {
   bio: string | null
   avatar_url: string | null
   cover_url: string | null
+  /** Set by the project owner in the database; users cannot change it. */
+  badge?: 'verified' | 'professional' | null
   followers_count: number
   following_count: number
   posts_count: number
@@ -21,7 +23,7 @@ export interface ProfileAbout {
   relationship_status: RelationshipStatus | null
 }
 
-export type ProfileLite = Pick<Profile, 'id' | 'username' | 'display_name' | 'avatar_url'>
+export type ProfileLite = Pick<Profile, 'id' | 'username' | 'display_name' | 'avatar_url'> & { badge?: Profile['badge'] }
 
 export type PostVisibility = 'public' | 'followers' | 'only_me'
 

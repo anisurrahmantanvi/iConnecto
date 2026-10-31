@@ -1,4 +1,5 @@
 import { memo, useCallback, useRef, useState } from 'react'
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge'
 import { Link, useNavigate } from 'react-router-dom'
 import { CornerDownRight, Flag, Heart, Pencil, Trash2 } from 'lucide-react'
 import type { CommentView, PostView } from '@/types/db'
@@ -287,7 +288,7 @@ const CommentRow = memo(function CommentRow({
       </Link>
       <div className="grow">
         <div className="comment__meta">
-          <Link to={a ? `/u/${a.username}` : '#'} className="post__name">{a?.display_name || a?.username || 'Deleted user'}</Link>
+          <Link to={a ? `/u/${a.username}` : '#'} className="post__name">{a?.display_name || a?.username || 'Deleted user'}<VerifiedBadge badge={a?.badge} size={14} /></Link>
           <span className="faint small"> {timeAgo(comment.created_at)}{comment.edited_at ? ' · edited' : ''}</span>
         </div>
         {editing ? (
