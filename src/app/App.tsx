@@ -33,6 +33,7 @@ const NotFoundPage = lazy(() => import('@/pages/NotFound'))
 const ReelsPage = lazy(() => import('@/pages/Reels'))
 const MessageSettingsPage = lazy(() => import('@/pages/MessageSettings'))
 const SettingsSectionPage = lazy(() => import('@/pages/settings/SettingsSection'))
+const MenuPage = lazy(() => import('@/pages/Menu'))
 const SettingsHomePage = lazy(() => import('@/pages/settings/SettingsHome'))
 const EditProfilePage = lazy(() => import('@/pages/settings/EditProfile'))
 const PrivacyPage = lazy(() => import('@/pages/settings/Privacy'))
@@ -94,6 +95,7 @@ export function App() {
                 <Route path="/call/:callId" element={<CallPage />} />
                 <Route path="/report/:targetType/:targetId" element={<ReportPage />} />
 
+                <Route path="/menu" element={<MenuPage />} />
                 <Route path="/settings" element={<SettingsHomePage />} />
                 <Route path="/settings/section/:slug" element={<SettingsSectionPage />} />
                 <Route path="/settings/profile" element={<EditProfilePage />} />

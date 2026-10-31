@@ -6,7 +6,7 @@ import { useAuth, useMe } from '@/app/AuthProvider'
 import { PostFeed } from '@/components/feed/PostFeed'
 import { ProfileAbout } from '@/components/profile/ProfileAbout'
 import { ProfileHeader } from '@/components/profile/ProfileHeader'
-import { ActionMenu, type MenuItem } from '@/components/ui/ActionMenu'
+import type { MenuItem } from '@/components/ui/ActionMenu'
 import { Button } from '@/components/ui/Button'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { EmptyState, ErrorState, ListSkeleton, Skeleton } from '@/components/ui/Feedback'
@@ -164,7 +164,7 @@ export default function ProfilePage() {
       <PageHeader
         title={`@${profile.username}`}
         back={isMe ? undefined : true}
-        actions={isMe ? <span className="page-header__actions"><ActionMenu items={menu} label="Menu" icon={<Menu size={24} />} /></span> : undefined}
+        actions={isMe ? <span className="page-header__actions"><Link to="/menu" className="icon-btn" aria-label="Menu"><Menu size={24} /></Link></span> : undefined}
       />
       <div className="stack">
         <ProfileHeader
