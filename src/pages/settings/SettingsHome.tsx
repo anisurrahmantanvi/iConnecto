@@ -12,6 +12,7 @@ import { useToast } from '@/components/ui/Toast'
 import { LANGUAGES, useT } from '@/lib/i18n'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { SETTINGS_GROUPS, SETTINGS_SECTIONS } from './settingsMenu'
+import { SETTINGS_ICONS } from './settingsIcons'
 
 function SettingsLink({ to, icon, title, body }: { to: string; icon: ReactNode; title: string; body?: string }) {
   return (
@@ -127,6 +128,7 @@ export default function SettingsHomePage() {
                 onClick={() => { setOpenGroup(groupOpen ? null : group.title); setOpen(null) }}
                 style={{ width: '100%', textAlign: 'left' }}
               >
+                {(() => { const I = SETTINGS_ICONS[group.title]; return I ? <I size={22} aria-hidden /> : null })()}
                 <strong className="grow">{group.title}</strong>
                 <span className="small muted">{group.sections.length}</span>
                 <ChevronRight size={18} className="chev" aria-hidden style={{ transform: groupOpen ? 'rotate(90deg)' : undefined, transition: 'transform 0.18s' }} />
@@ -145,6 +147,7 @@ export default function SettingsHomePage() {
                           onClick={() => setOpen(isOpen ? null : sec.title)}
                           style={{ width: '100%', textAlign: 'left' }}
                         >
+                          {(() => { const I = SETTINGS_ICONS[sec.title]; return I ? <I size={20} aria-hidden /> : null })()}
                           <span className="grow">{sec.title}</span>
                           <ChevronRight size={16} className="chev" aria-hidden style={{ transform: isOpen ? 'rotate(90deg)' : undefined, transition: 'transform 0.18s' }} />
                         </button>
