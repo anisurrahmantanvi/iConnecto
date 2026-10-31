@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { MailCheck, MailWarning, Trash2 } from 'lucide-react'
+import { ChevronRight, MailCheck, MailWarning, Trash2 } from 'lucide-react'
 import { useAuth, useMe } from '@/app/AuthProvider'
 import { Button } from '@/components/ui/Button'
 import { Dialog } from '@/components/ui/Dialog'
@@ -11,6 +11,7 @@ import { PageHeader } from '@/components/ui/PageHeader'
 import { useToast } from '@/components/ui/Toast'
 import { errorMessage } from '@/lib/supabase'
 import { deleteMyAccount, updateEmail } from '@/services/account'
+import { SETTINGS_SECTIONS } from './settingsMenu'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -119,6 +120,16 @@ export default function AccountPage() {
               <Button type="submit" variant="primary" loading={emailBusy} disabled={!newEmail.trim()}>Change email</Button>
             </div>
           </form>
+        </GlassPanel>
+
+        <h2 className="section-title">Account Memorialization</h2>
+        <GlassPanel className="settings-list" as="nav" aria-label="Account Memorialization">
+          {(SETTINGS_SECTIONS.find((x) => x.title === 'Account Memorialization')?.items ?? []).map((it) => (
+            <button key={it.title} type="button" className="list-row" onClick={() => toast.show('Coming soon')} style={{ width: '100%', textAlign: 'left' }}>
+              <strong className="grow">{it.title}</strong>
+              <ChevronRight size={18} className="chev" aria-hidden />
+            </button>
+          ))}
         </GlassPanel>
 
         <h2 className="section-title">Delete account</h2>

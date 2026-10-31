@@ -89,7 +89,7 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
     ],
   },
   {
-    title: 'Add Account & Logout',
+    title: 'Add Account',
     items: [
       { title: 'Add Another Existing Account' },
       { title: 'Switch Between Accounts' },
@@ -373,7 +373,7 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
 
 /** Top-level groups shown on the Settings screen. Each lists the sections above that live inside it. */
 export const SETTINGS_GROUPS: { title: string; caption: string; sections: string[] }[] = [
-  { title: 'Account', caption: 'Your account, profile, data and sign-in.', sections: ['Settings', 'Your Information', 'Verified Badge', 'Account Memorialization', 'Add Account & Logout'] },
+  { title: 'Account', caption: 'Your account, profile, data and sign-in.', sections: ['Settings', 'Your Information', 'Verified Badge'] },
   { title: 'Privacy', caption: 'Control who can see and do things with your content.', sections: ['Audience & Visibility', 'Privacy Center', 'Interaction Settings', 'Close Friends', 'Hidden Words', 'Content Safety', 'Parental Controls'] },
   { title: 'Security', caption: 'Passwords, devices and ways to protect your account.', sections: ['Security & Privacy', 'Login & Devices', 'Advanced Account Protection'] },
   { title: 'Notifications & Wellbeing', caption: 'Alerts, quiet time and healthy use.', sections: ['Notifications', 'Quiet Mode', 'Digital Wellbeing'] },

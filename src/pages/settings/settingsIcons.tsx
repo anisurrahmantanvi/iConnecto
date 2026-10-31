@@ -26,7 +26,7 @@ export const SETTINGS_ICONS: Record<string, Icon> = {
   Themes: Palette,
   'Security & Privacy': Shield,
   Notifications: Bell,
-  'Add Account & Logout': UserPlus,
+  'Add Account': UserPlus,
   'Privacy Center': ShieldCheck,
   'Login & Devices': Smartphone,
   'Messaging Settings': MessageCircle,

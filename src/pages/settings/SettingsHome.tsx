@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Bookmark, ChevronRight, LogOut, UserRound, Users } from 'lucide-react'
+import { Bookmark, ChevronRight, LogOut, UserPlus, UserRound, Users } from 'lucide-react'
 import { useAuth, useMe } from '@/app/AuthProvider'
 import { Avatar } from '@/components/ui/Avatar'
 import { Button } from '@/components/ui/Button'
@@ -112,6 +112,9 @@ export default function SettingsHomePage() {
               </section>
             ))}
 
+            <GlassPanel className="settings-list" as="nav" aria-label="Add account">
+              <Row to={`/settings/section/${sectionSlug('Add Account')}`} icon={<UserPlus size={22} aria-hidden />} title="Add Account" />
+            </GlassPanel>
             <Button variant="glass" block icon={<LogOut size={18} />} onClick={() => setConfirmLogout(true)}>{t('nav.logout')}</Button>
           </>
         )}
