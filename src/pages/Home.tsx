@@ -71,7 +71,7 @@ export default function HomePage() {
         }
       />
 
-      <div className="stack">
+      <div className="stack feed-bleed">
         {showNudge ? (
           <GlassPanel padded sheen>
             <div className="row">

@@ -272,6 +272,12 @@
 .stack > * + * { margin-top: var(--space-3); }
 
 .post { padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-3); }
+.feed-bleed .post {
+  /* Home feed: cards run edge to edge, like a full-screen feed. */
+  margin-inline: calc(var(--space-4) * -1);
+  border-radius: 0;
+  border-inline: 0;
+}
 .post__head { display: flex; align-items: center; gap: var(--space-3); }
 .post__body { font-size: 16px; line-height: 1.5; }
 .post__media { display: grid; gap: 4px; border-radius: var(--r-md); overflow: hidden; }
