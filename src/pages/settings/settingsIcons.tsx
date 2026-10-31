@@ -1,11 +1,11 @@
-import type { ComponentType } from 'react'
+import type { LucideIcon } from 'lucide-react'
 import {
   Accessibility, Activity, BadgeCheck, Baby, BarChart3, Bell, Brain, Brush, Clock, Crown, Eye, Film, Filter, Fingerprint, Globe,
   Heart, HelpCircle, Image, KeyRound, Languages, LifeBuoy, Lock, Mail, MessageCircle, MessageSquare, Moon, Palette, Settings,
   Shield, ShieldAlert, ShieldCheck, Smartphone, Sparkles, Star, Timer, User, UserCog, UserPlus, Users, Wallet,
 } from 'lucide-react'
 
-type Icon = ComponentType<{ size?: number; className?: string; 'aria-hidden'?: boolean }>
+type Icon = LucideIcon
 
 /** One icon per group and per section on the Settings screen. */
 export const SETTINGS_ICONS: Record<string, Icon> = {
