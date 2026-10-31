@@ -11,7 +11,7 @@ import { PageHeader } from '@/components/ui/PageHeader'
 import { useToast } from '@/components/ui/Toast'
 import { LANGUAGES, useT } from '@/lib/i18n'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { SETTINGS_SECTIONS } from './settingsMenu'
+import { SETTINGS_GROUPS, SETTINGS_SECTIONS } from './settingsMenu'
 
 function SettingsLink({ to, icon, title, body }: { to: string; icon: ReactNode; title: string; body?: string }) {
   return (
@@ -61,6 +61,7 @@ export default function SettingsHomePage() {
   }
 
   const [open, setOpen] = useState<string | null>(null)
+  const [openGroup, setOpenGroup] = useState<string | null>(null)
 
   const inline = (kind: 'language' | 'themes' | 'push' | undefined) => {
     if (kind === 'language')
@@ -115,33 +116,55 @@ export default function SettingsHomePage() {
         </GlassPanel>
 
         <h2 className="section-title">All settings</h2>
-        {SETTINGS_SECTIONS.map((sec) => {
-          const isOpen = open === sec.title
+        {SETTINGS_GROUPS.map((group) => {
+          const groupOpen = openGroup === group.title
           return (
-            <GlassPanel key={sec.title} className="settings-list" as="section" aria-label={sec.title}>
+            <GlassPanel key={group.title} className="settings-list" as="section" aria-label={group.title}>
               <button
                 type="button"
                 className="list-row"
-                aria-expanded={isOpen}
-                onClick={() => setOpen(isOpen ? null : sec.title)}
+                aria-expanded={groupOpen}
+                onClick={() => { setOpenGroup(groupOpen ? null : group.title); setOpen(null) }}
                 style={{ width: '100%', textAlign: 'left' }}
               >
-                <strong className="grow">{sec.title}</strong>
-                <ChevronRight size={18} className="chev" aria-hidden style={{ transform: isOpen ? 'rotate(90deg)' : undefined, transition: 'transform 0.18s' }} />
+                <strong className="grow">{group.title}</strong>
+                <span className="small muted">{group.sections.length}</span>
+                <ChevronRight size={18} className="chev" aria-hidden style={{ transform: groupOpen ? 'rotate(90deg)' : undefined, transition: 'transform 0.18s' }} />
               </button>
-              {isOpen ? (
-                <>
-                  {inline(sec.inline)}
-                  {sec.items.map((it) =>
-                    it.to ? <SettingsLink key={it.title} to={it.to} icon={null} title={it.title} /> : <SoonRow key={it.title} title={it.title} onTap={soon} />,
-                  )}
-                  {sec.title === 'Add Account & Logout' ? (
-                    <div style={{ padding: '8px 16px 16px' }}>
-                      <Button variant="glass" block icon={<LogOut size={18} />} onClick={() => setConfirmLogout(true)}>{t('nav.logout')}</Button>
-                    </div>
-                  ) : null}
-                </>
-              ) : null}
+              {groupOpen
+                ? group.sections.map((name) => {
+                    const sec = SETTINGS_SECTIONS.find((x) => x.title === name)
+                    if (!sec) return null
+                    const isOpen = open === sec.title
+                    return (
+                      <div key={sec.title} style={{ marginLeft: 12, borderLeft: '2px solid var(--glass-border)' }}>
+                        <button
+                          type="button"
+                          className="list-row"
+                          aria-expanded={isOpen}
+                          onClick={() => setOpen(isOpen ? null : sec.title)}
+                          style={{ width: '100%', textAlign: 'left' }}
+                        >
+                          <span className="grow">{sec.title}</span>
+                          <ChevronRight size={16} className="chev" aria-hidden style={{ transform: isOpen ? 'rotate(90deg)' : undefined, transition: 'transform 0.18s' }} />
+                        </button>
+                        {isOpen ? (
+                          <>
+                            {inline(sec.inline)}
+                            {sec.items.map((it) =>
+                              it.to ? <SettingsLink key={it.title} to={it.to} icon={null} title={it.title} /> : <SoonRow key={it.title} title={it.title} onTap={soon} />,
+                            )}
+                            {sec.title === 'Add Account & Logout' ? (
+                              <div style={{ padding: '8px 16px 16px' }}>
+                                <Button variant="glass" block icon={<LogOut size={18} />} onClick={() => setConfirmLogout(true)}>{t('nav.logout')}</Button>
+                              </div>
+                            ) : null}
+                          </>
+                        ) : null}
+                      </div>
+                    )
+                  })
+                : null}
             </GlassPanel>
           )
         })}

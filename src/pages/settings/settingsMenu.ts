@@ -370,3 +370,16 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
     ],
   },
 ]
+
+/** Top-level groups shown on the Settings screen. Each lists the sections above that live inside it. */
+export const SETTINGS_GROUPS: { title: string; sections: string[] }[] = [
+  { title: 'Account', sections: ['Settings', 'Your Information', 'Verified Badge', 'Account Memorialization', 'Add Account & Logout'] },
+  { title: 'Privacy', sections: ['Audience & Visibility', 'Privacy Center', 'Interaction Settings', 'Close Friends', 'Hidden Words', 'Content Safety', 'Parental Controls'] },
+  { title: 'Security', sections: ['Security & Privacy', 'Login & Devices', 'Advanced Account Protection'] },
+  { title: 'Notifications & Wellbeing', sections: ['Notifications', 'Quiet Mode', 'Digital Wellbeing'] },
+  { title: 'Messages', sections: ['Messaging Settings', 'Advanced Chat Features'] },
+  { title: 'Feed, Reels & Media', sections: ['Feed Preferences', 'AI Content Recommendations', 'Activity', 'Reels Settings', 'Advanced Media Controls'] },
+  { title: 'Appearance & Language', sections: ['Preferences', 'Themes', 'Accessibility', 'Profile Customization'] },
+  { title: 'Creator & Premium', sections: ['Creator Tools', 'Creator Monetization', 'Premium Subscription'] },
+  { title: 'Help & Legal', sections: ['Help & Legal', 'Support & Feedback'] },
+]
