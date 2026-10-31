@@ -372,12 +372,15 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
 ]
 
 /** Top-level groups shown on the Settings screen. Each lists the sections above that live inside it. */
-export const SETTINGS_GROUPS: { title: string; sections: string[] }[] = [
-  { title: 'Account', sections: ['Settings', 'Your Information', 'Verified Badge', 'Account Memorialization', 'Add Account & Logout'] },
-  { title: 'Privacy', sections: ['Audience & Visibility', 'Privacy Center', 'Interaction Settings', 'Close Friends', 'Hidden Words', 'Content Safety', 'Parental Controls'] },
-  { title: 'Security', sections: ['Security & Privacy', 'Login & Devices', 'Advanced Account Protection'] },
-  { title: 'Notifications & Wellbeing', sections: ['Notifications', 'Quiet Mode', 'Digital Wellbeing'] },
-  { title: 'Feed, Reels & Media', sections: ['Feed Preferences', 'AI Content Recommendations', 'Activity', 'Reels Settings', 'Advanced Media Controls'] },
-  { title: 'Appearance & Language', sections: ['Preferences', 'Themes', 'Accessibility', 'Profile Customization'] },
-  { title: 'Help & Legal', sections: ['Help & Legal', 'Support & Feedback'] },
+export const SETTINGS_GROUPS: { title: string; caption: string; sections: string[] }[] = [
+  { title: 'Account', caption: 'Your account, profile, data and sign-in.', sections: ['Settings', 'Your Information', 'Verified Badge', 'Account Memorialization', 'Add Account & Logout'] },
+  { title: 'Privacy', caption: 'Control who can see and do things with your content.', sections: ['Audience & Visibility', 'Privacy Center', 'Interaction Settings', 'Close Friends', 'Hidden Words', 'Content Safety', 'Parental Controls'] },
+  { title: 'Security', caption: 'Passwords, devices and ways to protect your account.', sections: ['Security & Privacy', 'Login & Devices', 'Advanced Account Protection'] },
+  { title: 'Notifications & Wellbeing', caption: 'Alerts, quiet time and healthy use.', sections: ['Notifications', 'Quiet Mode', 'Digital Wellbeing'] },
+  { title: 'Feed, Reels & Media', caption: 'Customize what you see and how media loads.', sections: ['Feed Preferences', 'AI Content Recommendations', 'Activity', 'Reels Settings', 'Advanced Media Controls'] },
+  { title: 'Appearance & Language', caption: 'Language, theme and how the app looks.', sections: ['Preferences', 'Themes', 'Accessibility', 'Profile Customization'] },
+  { title: 'Help & Legal', caption: 'Get help, send feedback and read our policies.', sections: ['Help & Legal', 'Support & Feedback'] },
 ]
+
+/** URL-friendly name of a section, used in /settings/section/:slug. */
+export const sectionSlug = (title: string): string => title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
