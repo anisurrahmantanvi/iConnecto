@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Bookmark, ChevronRight, LogOut, UserPlus, UserRound, Users } from 'lucide-react'
+import { Bookmark, ChevronRight, LogOut, UserRound, Users } from 'lucide-react'
 import { useAuth, useMe } from '@/app/AuthProvider'
 import { useTheme, type ThemeMode } from '@/app/ThemeProvider'
 import { Avatar } from '@/components/ui/Avatar'
@@ -60,19 +60,37 @@ export default function SettingsHomePage() {
     navigate('/login', { replace: true })
   }
 
-  const section = (title: string, items: { title: string; to?: string }[]) => (
-    <>
-      <h2 className="section-title">{title}</h2>
-      <GlassPanel className="settings-list" as="nav" aria-label={title}>
-        {items.map((it) =>
-          it.to ? <SettingsLink key={it.title} to={it.to} icon={null} title={it.title} /> : <SoonRow key={it.title} title={it.title} onTap={soon} />,
-        )}
-      </GlassPanel>
-    </>
-  )
+  const [open, setOpen] = useState<string | null>(null)
 
-  const [first, ...rest] = SETTINGS_SECTIONS
-  const [audience, activity, security, help] = rest
+  const inline = (kind: 'language' | 'themes' | 'push' | undefined) => {
+    if (kind === 'language')
+      return (
+        <div className="col" style={{ padding: '4px 16px 12px' }}>
+          <strong>Language</strong>
+          <div role="group" aria-label={t('settings.language')} className="chip-row">
+            {LANGUAGES.map((l) => (
+              <button key={l.value} type="button" className="chip" aria-pressed={lang === l.value} onClick={() => setLang(l.value)}>
+                {l.label}
+              </button>
+            ))}
+            <button type="button" className="chip" aria-pressed={false} onClick={soon}>हिन्दी</button>
+          </div>
+          <p className="small faint">Bengali currently covers navigation, sign-in and settings; other screens are in English.</p>
+        </div>
+      )
+    if (kind === 'themes')
+      return (
+        <div role="group" aria-label="Themes" className="chip-row" style={{ padding: '4px 16px 12px' }}>
+          {themes.map((th) => (
+            <button key={th.value} type="button" className="chip" aria-pressed={mode === th.value} onClick={() => setMode(th.value)}>
+              {th.label}
+            </button>
+          ))}
+        </div>
+      )
+    if (kind === 'push') return <div style={{ padding: '4px 12px 12px' }}><NotificationSetting /></div>
+    return null
+  }
 
   return (
     <>
@@ -96,54 +114,38 @@ export default function SettingsHomePage() {
           <SettingsLink to="/communities" icon={<Users size={22} aria-hidden />} title="Communities" />
         </GlassPanel>
 
-        {section(first.title, first.items)}
-
-        <h2 className="section-title">Preferences</h2>
-        <GlassPanel padded className="col">
-          <strong>Language</strong>
-          <div role="group" aria-label={t('settings.language')} className="chip-row">
-            {LANGUAGES.map((l) => (
-              <button key={l.value} type="button" className="chip" aria-pressed={lang === l.value} onClick={() => setLang(l.value)}>
-                {l.label}
+        <h2 className="section-title">All settings</h2>
+        {SETTINGS_SECTIONS.map((sec) => {
+          const isOpen = open === sec.title
+          return (
+            <GlassPanel key={sec.title} className="settings-list" as="section" aria-label={sec.title}>
+              <button
+                type="button"
+                className="list-row"
+                aria-expanded={isOpen}
+                onClick={() => setOpen(isOpen ? null : sec.title)}
+                style={{ width: '100%', textAlign: 'left' }}
+              >
+                <strong className="grow">{sec.title}</strong>
+                <ChevronRight size={18} className="chev" aria-hidden style={{ transform: isOpen ? 'rotate(90deg)' : undefined, transition: 'transform 0.18s' }} />
               </button>
-            ))}
-            <button type="button" className="chip" aria-pressed={false} onClick={soon}>हिन्दी</button>
-          </div>
-          <p className="small faint">Bengali currently covers navigation, sign-in and settings; other screens are in English.</p>
-        </GlassPanel>
-        <GlassPanel className="settings-list" as="nav" aria-label="Media">
-          <SoonRow title="Media: Data Saver" onTap={soon} />
-        </GlassPanel>
+              {isOpen ? (
+                <>
+                  {inline(sec.inline)}
+                  {sec.items.map((it) =>
+                    it.to ? <SettingsLink key={it.title} to={it.to} icon={null} title={it.title} /> : <SoonRow key={it.title} title={it.title} onTap={soon} />,
+                  )}
+                  {sec.title === 'Add Account & Logout' ? (
+                    <div style={{ padding: '8px 16px 16px' }}>
+                      <Button variant="glass" block icon={<LogOut size={18} />} onClick={() => setConfirmLogout(true)}>{t('nav.logout')}</Button>
+                    </div>
+                  ) : null}
+                </>
+              ) : null}
+            </GlassPanel>
+          )
+        })}
 
-        {section(audience.title, audience.items)}
-        {section(activity.title, activity.items)}
-
-        <h2 className="section-title">Themes</h2>
-        <GlassPanel padded className="col">
-          <div role="group" aria-label="Themes" className="chip-row">
-            {themes.map((th) => (
-              <button key={th.value} type="button" className="chip" aria-pressed={mode === th.value} onClick={() => setMode(th.value)}>
-                {th.label}
-              </button>
-            ))}
-          </div>
-        </GlassPanel>
-
-        {section(security.title, security.items)}
-
-        <h2 className="section-title">Notifications</h2>
-        <NotificationSetting />
-        <GlassPanel className="settings-list" as="nav" aria-label="More notifications">
-          <SoonRow title="In-App Notifications" onTap={soon} />
-          <SoonRow title="Email Notifications" onTap={soon} />
-        </GlassPanel>
-
-        {section(help.title, help.items)}
-
-        <h2 className="section-title">Add Account & Logout</h2>
-        <GlassPanel className="settings-list" as="nav" aria-label="Accounts">
-          <SoonRow icon={<UserPlus size={22} aria-hidden />} title="Add Account" onTap={soon} />
-        </GlassPanel>
         <Button variant="glass" block icon={<LogOut size={18} />} onClick={() => setConfirmLogout(true)}>{t('nav.logout')}</Button>
       </div>
 
