@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { appUrl } from '@/lib/base'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { Ban, Bookmark, Copy, Flag, LogOut, Menu, Pencil, Phone, Settings, ShieldCheck, Users, UserX, Video } from 'lucide-react'
+import { Ban, Copy, Flag, LogOut, Menu, Phone, Settings, UserPlus, UserX, Video } from 'lucide-react'
 import { useAuth, useMe } from '@/app/AuthProvider'
 import { PostFeed } from '@/components/feed/PostFeed'
 import { ProfileAbout } from '@/components/profile/ProfileAbout'
@@ -43,6 +43,7 @@ export default function ProfilePage() {
   const [blocked, setBlocked] = useState(false)
   const [messaging, setMessaging] = useState(false)
   const [confirmBlock, setConfirmBlock] = useState(false)
+  const [confirmLogout, setConfirmLogout] = useState(false)
 
   const profileId = profile?.id ?? null
   useEffect(() => {
@@ -106,14 +107,9 @@ export default function ProfilePage() {
   const menu: MenuItem[] = profile
     ? isMe
       ? [
-          { label: 'Edit profile', icon: <Pencil size={18} />, onSelect: () => navigate('/settings/profile') },
-          { label: 'Copy profile link', icon: <Copy size={18} />, onSelect: () => void copyLink() },
-          { label: 'Saved posts', icon: <Bookmark size={18} />, onSelect: () => navigate('/saved') },
-          { label: 'Communities', icon: <Users size={18} />, onSelect: () => navigate('/communities') },
-          { label: 'Settings', icon: <Settings size={18} />, onSelect: () => navigate('/settings') },
-          { label: 'Privacy and security', icon: <ShieldCheck size={18} />, onSelect: () => navigate('/settings/privacy') },
-          { label: 'Blocked accounts', icon: <UserX size={18} />, onSelect: () => navigate('/settings/blocked') },
-          { label: 'Log out', icon: <LogOut size={18} />, onSelect: () => void logOut() },
+          { label: 'Settings & Privacy', icon: <Settings size={18} />, onSelect: () => navigate('/settings') },
+          { label: 'Add Account', icon: <UserPlus size={18} />, onSelect: () => toast.show('Coming soon') },
+          { label: 'Log Out', icon: <LogOut size={18} />, danger: true, onSelect: () => setConfirmLogout(true) },
         ]
       : [
           { label: 'Voice call', icon: <Phone size={18} />, hidden: blocked, onSelect: () => navigate(`/call/new?to=${profile.id}&type=audio`) },
@@ -206,6 +202,14 @@ export default function ProfilePage() {
         )}
       </div>
 
+      <ConfirmDialog
+        open={confirmLogout}
+        title="Log out?"
+        message="You will be logged out of this account on this phone. Your account and data are not deleted."
+        confirmLabel="Log out"
+        onConfirm={logOut}
+        onClose={() => setConfirmLogout(false)}
+      />
       <ConfirmDialog
         open={confirmBlock}
         title={`Block @${profile.username}?`}
