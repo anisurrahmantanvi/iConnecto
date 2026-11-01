@@ -26,6 +26,8 @@ function describe(n: AppNotification): { text: string; icon: ReactElement } {
   switch (n.type) {
     case 'follow':
       return { text: 'started following you', icon: <UserPlus size={14} /> }
+    case 'follow_request':
+      return { text: 'wants to follow you', icon: <UserPlus size={14} /> }
     case 'like':
       return { text: n.comment_id ? 'liked your comment' : 'liked your post', icon: <Heart size={14} /> }
     case 'comment':
@@ -73,6 +75,7 @@ export default function NotificationsPage() {
         setItems((prev) => prev.map((x) => (x.id === n.id ? { ...x, is_read: true } : x)))
         void markNotificationRead(n.id).then(refreshNotifications).catch(() => refreshNotifications())
       }
+      if (n.type === 'follow_request') return navigate('/follow-requests')
       if (n.type === 'follow' && n.actor) return navigate(`/u/${n.actor.username}`)
       if (n.post_id) return navigate(n.type === 'comment' || n.type === 'reply' ? `/p/${n.post_id}#comments` : `/p/${n.post_id}`)
       if (n.type === 'community_join' && n.community_id) {

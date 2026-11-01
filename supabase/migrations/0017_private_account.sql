@@ -33,9 +33,14 @@ create policy followers_insert_own on public.followers for insert to authenticat
     and not coalesce((select p.is_private from public.profiles p where p.id = following_id), false)
   );
 
+-- allow the new notification type
+alter table public.notifications drop constraint if exists notifications_type_check;
+alter table public.notifications add constraint notifications_type_check
+  check (type in ('follow','like','comment','reply','community_join','follow_request')) not valid;
+
 create or replace function public.request_follow(p_target uuid) returns text
 language plpgsql security definer set search_path = public as $$
-declare me uuid := auth.uid(); priv boolean;
+declare me uuid := auth.uid(); priv boolean; n int;
 begin
   if me is null then raise exception 'Not signed in'; end if;
   if p_target is null or p_target = me then raise exception 'Invalid user'; end if;
@@ -48,6 +53,11 @@ begin
     return 'following';
   end if;
   insert into public.follow_requests (requester_id, target_id) values (me, p_target) on conflict do nothing;
+  get diagnostics n = row_count;
+  if n > 0 then
+    delete from public.notifications where recipient_id = p_target and actor_id = me and type = 'follow_request';
+    perform public.notify(p_target, me, 'follow_request');
+  end if;
   return 'requested';
 end $$;
 
