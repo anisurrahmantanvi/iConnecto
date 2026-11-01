@@ -67,8 +67,8 @@ const nameOf = (p: { display_name: string | null; username: string } | null | un
 
 async function build(kind: string, id: string): Promise<Push | null> {
   if (kind === 'message') {
-    const { data: m } = await admin.from('messages').select('id, chat_id, sender_id, content').eq('id', id).maybeSingle()
-    if (!m) return null
+    const { data: m } = await admin.from('messages').select('*').eq('id', id).maybeSingle()
+    if (!m || m.kind === 'call') return null
     const [{ data: members }, { data: sender }] = await Promise.all([
       admin.from('chat_members').select('user_id').eq('chat_id', m.chat_id).neq('user_id', m.sender_id),
       admin.from('profiles').select('display_name, username').eq('id', m.sender_id).maybeSingle(),

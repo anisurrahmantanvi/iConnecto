@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { AlertCircle, ArrowLeft, Flag, MessageCircle, Phone, Send, Trash2, UserRound, Video, WifiOff } from 'lucide-react'
-import type { Message } from '@/types/db'
+import { AlertCircle, ArrowLeft, Flag, MessageCircle, Phone, PhoneMissed, Send, UserRound, Video, WifiOff, X } from 'lucide-react'
+import type { Message, MessageReaction } from '@/types/db'
 import { useMe } from '@/app/AuthProvider'
 import { useBadges } from '@/app/BadgesProvider'
+import { ForwardDialog } from '@/components/chat/ForwardDialog'
+import { MessageSheet } from '@/components/chat/MessageSheet'
 import { ActionMenu, type MenuItem } from '@/components/ui/ActionMenu'
 import { PresenceAvatar } from '@/components/ui/PresenceAvatar'
 import { Button, IconButton } from '@/components/ui/Button'
@@ -20,7 +22,12 @@ import { clockTime } from '@/lib/format'
 import { errorMessage } from '@/lib/supabase'
 import {
   deleteMessage,
+  EDIT_WINDOW_MS,
+  editMessage,
   fetchMessages,
+  fetchReactions,
+  reactToMessage,
+  subscribeReactions,
   getChatPeer,
   markChatRead,
   MAX_MESSAGE_LENGTH,
@@ -67,6 +74,11 @@ export default function ChatPage() {
   const [text, setText] = useState('')
   const [live, setLive] = useState<Live>('connecting')
   const [toDelete, setToDelete] = useState<Message | null>(null)
+  const [sheet, setSheet] = useState<Message | null>(null)
+  const [forwarding, setForwarding] = useState<string | null>(null)
+  const [editing, setEditing] = useState<Message | null>(null)
+  const [reactions, setReactions] = useState<MessageReaction[]>([])
+  const [, setNow] = useState(0)
 
   const scroller = useRef<HTMLDivElement>(null)
   const area = useRef<HTMLTextAreaElement>(null)
@@ -112,6 +124,10 @@ export default function ChatPage() {
           setLive('down')
         }
       },
+      {
+        onUpdate: (m) => setItems((prev) => prev.map((x) => (x.id === m.id ? { ...x, ...m } : x))),
+        onDelete: (id) => setItems((prev) => prev.filter((x) => x.id !== id)),
+      },
     )
     const onOnline = () => handlers.current.reload()
     window.addEventListener('online', onOnline)
@@ -120,6 +136,61 @@ export default function ChatPage() {
       window.removeEventListener('online', onOnline)
     }
   }, [chatId, meId, peer, setItems])
+
+  // Reactions for the messages on screen, kept live.
+  const idsKey = items.map((m) => m.id).join(',')
+  useEffect(() => {
+    if (!peer || !idsKey) return
+    let cancelled = false
+    void fetchReactions(idsKey.split(',')).then((rows) => {
+      if (cancelled) return
+      setReactions((prev) => {
+        const ids = new Set(idsKey.split(','))
+        return [...prev.filter((r) => !ids.has(r.message_id)), ...rows]
+      })
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [idsKey, peer])
+  useEffect(() => {
+    if (!peer) return
+    return subscribeReactions(
+      (r) => setReactions((prev) => [...prev.filter((x) => !(x.message_id === r.message_id && x.user_id === r.user_id)), r]),
+      (mid, uid) => setReactions((prev) => prev.filter((x) => !(x.message_id === mid && x.user_id === uid))),
+    )
+  }, [peer])
+
+  // Re-evaluate the 2-minute edit window while the sheet is open.
+  useEffect(() => {
+    if (!sheet) return
+    const t = window.setInterval(() => setNow((n) => n + 1), 5000)
+    return () => window.clearInterval(t)
+  }, [sheet])
+
+  const react = async (m: Message, emoji: string | null) => {
+    const before = reactions
+    setReactions((prev) => [
+      ...prev.filter((x) => !(x.message_id === m.id && x.user_id === meId)),
+      ...(emoji ? [{ message_id: m.id, user_id: meId, emoji }] : []),
+    ])
+    try {
+      await reactToMessage(m.id, emoji)
+    } catch (e) {
+      setReactions(before)
+      toast.error(errorMessage(e))
+    }
+  }
+
+  const startEdit = (m: Message) => {
+    setEditing(m)
+    setText(m.content)
+    window.setTimeout(() => area.current?.focus(), 50)
+  }
+  const cancelEdit = () => {
+    setEditing(null)
+    setText('')
+  }
 
   // Keep the view pinned to the newest message, but never yank the reader away from older history.
   useLayoutEffect(() => {
@@ -167,6 +238,16 @@ export default function ChatPage() {
     e?.preventDefault()
     const body = text.trim()
     if (!body) return
+    if (editing) {
+      const target = editing
+      if (body === target.content) return cancelEdit()
+      setEditing(null)
+      setText('')
+      editMessage(target.id, body)
+        .then(() => setItems((prev) => prev.map((x) => (x.id === target.id ? { ...x, content: body, edited_at: new Date().toISOString() } : x))))
+        .catch((err) => toast.error(errorMessage(err)))
+      return
+    }
     setText('')
     void send(body)
   }
@@ -243,21 +324,65 @@ export default function ChatPage() {
           const label = dayLabel(m.created_at)
           const showDay = label !== lastDay
           lastDay = label
+          if (m.kind === 'call') {
+            const missed = /^(Missed|Cancelled)|declined$/.test(m.content)
+            return (
+              <div key={m.id} className="chat-item">
+                {showDay ? <div className="chat-day">{label}</div> : null}
+                <div className={`chat-call ${missed ? 'chat-call--missed' : ''}`}>
+                  {missed ? <PhoneMissed size={14} aria-hidden /> : /video/i.test(m.content) ? <Video size={14} aria-hidden /> : <Phone size={14} aria-hidden />}
+                  <span>{m.content}</span>
+                  <span className="faint">{clockTime(m.created_at)}</span>
+                </div>
+              </div>
+            )
+          }
+          const grouped = new Map<string, { n: number; mine: boolean }>()
+          for (const r of reactions) {
+            if (r.message_id !== m.id) continue
+            const g = grouped.get(r.emoji) ?? { n: 0, mine: false }
+            g.n += 1
+            if (r.user_id === meId) g.mine = true
+            grouped.set(r.emoji, g)
+          }
           return (
             <div key={m.id} className="chat-item">
               {showDay ? <div className="chat-day">{label}</div> : null}
               <div className={`bubble-row ${mine ? 'bubble-row--me' : ''}`}>
-                {mine ? (
-                  <ActionMenu
-                    label="Message options"
-                    items={[{ label: 'Delete message', icon: <Trash2 size={18} />, danger: true, onSelect: () => setToDelete(m) }]}
-                  />
-                ) : null}
-                <div className={`bubble ${mine ? 'bubble--me' : 'bubble--them'}`}>
+                <div
+                  className={`bubble bubble--tap ${mine ? 'bubble--me' : 'bubble--them'}`}
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Message options"
+                  onClick={(e) => {
+                    if ((e.target as HTMLElement).closest('a')) return
+                    setSheet(m)
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') setSheet(m)
+                  }}
+                >
+                  {m.forwarded ? <div className="bubble__fwd">Forwarded</div> : null}
                   <RichText text={m.content} jumbo />
-                  <div className="bubble__time">{clockTime(m.created_at)}</div>
+                  <div className="bubble__time">{m.edited_at ? 'edited · ' : ''}{clockTime(m.created_at)}</div>
                 </div>
               </div>
+              {grouped.size ? (
+                <div className={`reactions ${mine ? 'reactions--me' : ''}`}>
+                  {[...grouped.entries()].map(([emoji, g]) => (
+                    <button
+                      key={emoji}
+                      type="button"
+                      className="reaction-chip"
+                      aria-pressed={g.mine}
+                      aria-label={`${emoji} ${g.n}`}
+                      onClick={() => void react(m, g.mine ? null : emoji)}
+                    >
+                      {emoji}{g.n > 1 ? <span>{g.n}</span> : null}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
             </div>
           )
         })}
@@ -285,6 +410,12 @@ export default function ChatPage() {
         ))}
       </div>
 
+      {editing ? (
+        <div className="glass banner banner--info" role="status">
+          <span className="grow truncate">Editing message</span>
+          <IconButton label="Cancel editing" small onClick={cancelEdit}><X size={18} /></IconButton>
+        </div>
+      ) : null}
       <form className="glass composer" onSubmit={submit}>
         <EmojiButton
           label="Add emoji"
@@ -310,11 +441,28 @@ export default function ChatPage() {
         </IconButton>
       </form>
 
+      <MessageSheet
+        message={sheet}
+        mine={sheet?.sender_id === meId}
+        canChange={!!sheet && Date.now() - new Date(sheet.created_at).getTime() < EDIT_WINDOW_MS}
+        myReaction={sheet ? (reactions.find((r) => r.message_id === sheet.id && r.user_id === meId)?.emoji ?? null) : null}
+        onClose={() => setSheet(null)}
+        onReact={(emoji) => sheet && void react(sheet, emoji)}
+        onCopy={() => {
+          if (!sheet) return
+          void navigator.clipboard?.writeText(sheet.content).then(() => toast.show('Copied'), () => toast.error('Could not copy'))
+        }}
+        onForward={() => sheet && setForwarding(sheet.content)}
+        onEdit={() => sheet && startEdit(sheet)}
+        onUnsend={() => sheet && setToDelete(sheet)}
+      />
+      <ForwardDialog content={forwarding} onClose={() => setForwarding(null)} />
+
       <ConfirmDialog
         open={toDelete !== null}
-        title="Delete this message?"
+        title="Unsend this message?"
         message="It will be removed for you and for them. This can't be undone."
-        confirmLabel="Delete"
+        confirmLabel="Unsend"
         danger
         onClose={() => setToDelete(null)}
         onConfirm={async () => {

@@ -107,6 +107,16 @@ export interface Message {
   sender_id: string
   content: string
   created_at: string
+  /** Present once the chat-features SQL has been run. */
+  kind?: 'text' | 'call'
+  edited_at?: string | null
+  forwarded?: boolean
+}
+
+export interface MessageReaction {
+  message_id: string
+  user_id: string
+  emoji: string
 }
 
 export interface Community {
