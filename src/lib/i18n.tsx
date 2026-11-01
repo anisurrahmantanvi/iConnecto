@@ -1,12 +1,12 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 
 /**
- * Minimal localisation layer. English is the source language; Bengali ("bn") is provided for navigation,
+ * Minimal localisation layer. English is the source language; Bengali ("bn") and Hindi ("hi") are provided for navigation,
  * sign-in/sign-up, home and settings. Any key without a translation falls back to English, so adding a language
  * (or more Bengali strings) never breaks a screen. To translate more of the app, add keys to `en` and `bn` and
  * replace the literal with t('your.key').
  */
-export type Lang = 'en' | 'bn'
+export type Lang = 'en' | 'bn' | 'hi'
 const KEY = 'iconnecto-lang'
 
 const en = {
@@ -79,11 +79,46 @@ const bn: Partial<Record<MessageKey, string>> = {
   'settings.theme.dark': 'ডার্ক',
 }
 
-const DICTS: Record<Lang, Partial<Record<MessageKey, string>>> = { en, bn }
+const hi: Partial<Record<MessageKey, string>> = {
+  'nav.home': 'होम',
+  'nav.discover': 'खोजें',
+  'nav.create': 'बनाएं',
+  'nav.notifications': 'सूचनाएं',
+  'nav.profile': 'प्रोफ़ाइल',
+  'nav.messages': 'संदेश',
+  'nav.communities': 'समुदाय',
+  'nav.saved': 'सहेजे गए',
+  'nav.settings': 'सेटिंग्स',
+  'nav.logout': 'लॉग आउट',
+  'home.following': 'फ़ॉलोइंग',
+  'home.explore': 'एक्सप्लोर',
+  'auth.login': 'लॉग इन',
+  'auth.signup': 'साइन अप',
+  'auth.email': 'ईमेल',
+  'auth.password': 'पासवर्ड',
+  'auth.username': 'यूज़रनेम',
+  'auth.displayName': 'प्रदर्शित नाम',
+  'auth.forgot': 'पासवर्ड भूल गए?',
+  'auth.newHere': 'नए हैं?',
+  'auth.haveAccount': 'पहले से खाता है?',
+  'common.cancel': 'रद्द करें',
+  'common.save': 'सहेजें',
+  'common.delete': 'हटाएं',
+  'common.retry': 'फिर कोशिश करें',
+  'settings.title': 'सेटिंग्स',
+  'settings.appearance': 'रूप',
+  'settings.language': 'भाषा',
+  'settings.theme.system': 'सिस्टम',
+  'settings.theme.light': 'लाइट',
+  'settings.theme.dark': 'डार्क',
+}
+
+const DICTS: Record<Lang, Partial<Record<MessageKey, string>>> = { en, bn, hi }
 
 export const LANGUAGES: { value: Lang; label: string }[] = [
   { value: 'en', label: 'English' },
   { value: 'bn', label: 'বাংলা' },
+  { value: 'hi', label: 'हिन्दी' },
 ]
 
 interface I18nApi {
@@ -97,11 +132,11 @@ const I18nContext = createContext<I18nApi | null>(null)
 function readStored(): Lang {
   try {
     const v = localStorage.getItem(KEY)
-    if (v === 'en' || v === 'bn') return v
+    if (v === 'en' || v === 'bn' || v === 'hi') return v
   } catch {
     /* storage unavailable */
   }
-  return typeof navigator !== 'undefined' && navigator.language?.toLowerCase().startsWith('bn') ? 'bn' : 'en'
+  return typeof navigator !== 'undefined' && navigator.language?.toLowerCase().startsWith('bn') ? 'bn' : navigator.language?.toLowerCase().startsWith('hi') ? 'hi' : 'en'
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {

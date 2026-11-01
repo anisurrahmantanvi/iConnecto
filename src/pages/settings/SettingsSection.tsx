@@ -39,7 +39,7 @@ export default function SettingsSectionPage() {
       <div className="stack">
         {sec.inline === 'language' ? (
           <GlassPanel padded className="col">
-            <strong>Language</strong>
+            <strong>{t('settings.language')}</strong>
             <div role="group" aria-label={t('settings.language')} className="chip-row">
               {LANGUAGES.map((l) => (
                 <button key={l.value} type="button" className="chip" aria-pressed={lang === l.value} onClick={() => setLang(l.value)}>
