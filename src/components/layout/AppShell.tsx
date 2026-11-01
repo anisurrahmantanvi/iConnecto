@@ -8,6 +8,7 @@ import { useOnline } from '@/hooks/common'
 import { useHeartbeat } from '@/hooks/presence'
 import { usePush } from '@/hooks/usePush'
 import { useBackButton } from '@/hooks/useBackButton'
+import { usePullToRefresh } from '@/hooks/usePullToRefresh'
 import { useT } from '@/lib/i18n'
 import { IncomingCallListener } from '@/components/calls/IncomingCall'
 import { Spinner } from '@/components/ui/Feedback'
@@ -47,6 +48,7 @@ export function AppShell() {
   useHeartbeat(!!profile)
   usePush(!!profile)
   useBackButton()
+  usePullToRefresh()
   useEffect(() => unlockAudioOnFirstTouch(), [])
 
   // Hide the bottom bar only while the on-screen keyboard is really open (not just because a field still has focus).
