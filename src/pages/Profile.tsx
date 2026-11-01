@@ -215,6 +215,7 @@ export default function ProfilePage() {
             <p className="small muted">Follow @{profile.username} to see their posts. They need to approve your request first.</p>
           </div>
         ) : (
+          <div className="feed-bleed">
           <PostFeed
             source={{ kind: 'author', authorId: profile.id }}
             empty={
@@ -227,6 +228,7 @@ export default function ProfilePage() {
                 : { title: 'No posts yet', body: `@${profile.username} hasn't shared anything yet.` }
             }
           />
+          </div>
         )}
       </div>
 
