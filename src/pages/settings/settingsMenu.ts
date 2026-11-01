@@ -122,7 +122,7 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
   {
     title: 'Messaging Settings',
     items: [
-      { title: 'Message Requests' },
+      { title: 'Message Requests', to: '/messages?requests=1' },
       { title: 'Read Receipts ON/OFF' },
       { title: 'Typing Status ON/OFF' },
       { title: 'Online Status ON/OFF' },

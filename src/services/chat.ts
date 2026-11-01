@@ -83,3 +83,10 @@ export function subscribeAnyMessage(userId: string, onMessage: (m: Message) => v
     void supabase.removeChannel(channel)
   }
 }
+
+/** Chat ids that are message requests for me. Returns [] when the SQL has not been run yet. */
+export async function listMessageRequestIds(): Promise<string[]> {
+  const { data, error } = await supabase.rpc('my_message_requests')
+  if (error || !Array.isArray(data)) return []
+  return data.map((x: unknown) => String(x))
+}

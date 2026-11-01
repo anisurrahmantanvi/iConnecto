@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { MessageCircle, Plus, Settings } from 'lucide-react'
 import { useMe } from '@/app/AuthProvider'
 import { NewChatDialog } from '@/components/chat/NewChatDialog'
@@ -12,11 +12,17 @@ import { useAsync } from '@/hooks/common'
 import { usePresence } from '@/hooks/presence'
 import { describePresence } from '@/lib/presence'
 import { timeAgo } from '@/lib/format'
-import { listChats, subscribeAnyMessage } from '@/services/chat'
+import { listChats, listMessageRequestIds, subscribeAnyMessage } from '@/services/chat'
 
 export default function InboxPage() {
   const me = useMe()
-  const { data, loading, error, reload } = useAsync(listChats, [])
+  const { data: all, loading, error, reload } = useAsync(listChats, [])
+  const { data: reqIds } = useAsync(listMessageRequestIds, [all])
+  const [params] = useSearchParams()
+  const showRequests = params.get('requests') === '1'
+  const reqSet = new Set(reqIds ?? [])
+  const requestCount = (all ?? []).filter((c) => reqSet.has(c.chat_id)).length
+  const data = all ? all.filter((c) => reqSet.has(c.chat_id) === showRequests) : all
   const [composing, setComposing] = useState(false)
   const presenceMap = usePresence((data ?? []).map((c) => c.other_id))
   const timer = useRef<number | null>(null)
@@ -38,8 +44,8 @@ export default function InboxPage() {
   return (
     <>
       <PageHeader
-        title="Messages"
-        back="/"
+        title={showRequests ? 'Message requests' : 'Messages'}
+        back={showRequests ? '/messages' : '/'}
         actions={
           <span className="page-header__actions">
             <Link to="/message-settings" className="icon-btn" aria-label="Message settings"><Settings size={22} /></Link>
@@ -47,6 +53,13 @@ export default function InboxPage() {
           </span>
         }
       />
+
+      {!showRequests && requestCount > 0 ? (
+        <Link to="/messages?requests=1" className="list-row list-row--link glass">
+          <strong className="grow">Message requests</strong>
+          <span className="count-pill">{requestCount}</span>
+        </Link>
+      ) : null}
 
       {loading && !data ? (
         <ListSkeleton />
