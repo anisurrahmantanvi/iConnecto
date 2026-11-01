@@ -1,4 +1,9 @@
 import { BN, HI } from './strings'
+import { BN_APP, HI_APP } from './strings-app'
+import { setDomTranslation } from './domTranslate'
+
+const ALL_BN = { ...BN_APP, ...BN }
+const ALL_HI = { ...HI_APP, ...HI }
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 
 /**
@@ -147,6 +152,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     document.documentElement.lang = lang
+    setDomTranslation(lang === 'bn' ? ALL_BN : lang === 'hi' ? ALL_HI : null)
   }, [lang])
 
   const setLang = useCallback((l: Lang) => {
@@ -159,7 +165,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const t = useCallback((key: MessageKey) => DICTS[lang][key] ?? en[key], [lang])
-  const tx = useCallback((text: string) => (lang === 'bn' ? BN[text] : lang === 'hi' ? HI[text] : undefined) ?? text, [lang])
+  const tx = useCallback((text: string) => (lang === 'bn' ? ALL_BN[text] : lang === 'hi' ? ALL_HI[text] : undefined) ?? text, [lang])
   const value = useMemo(() => ({ lang, setLang, t, tx }), [lang, setLang, t, tx])
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>
 }
