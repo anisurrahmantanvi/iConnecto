@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { getIsPrivate, setMyPrivate } from '@/services/privateAccount'
+import { getIsPrivate, setMyPrivate, getWhoCanMessage, setWhoCanMessage, type WhoCanMessage } from '@/services/privateAccount'
 import { Link } from 'react-router-dom'
 import { BellOff, ChevronRight, Eye, Lock, MonitorSmartphone, UserX } from 'lucide-react'
 import { useAuth, useMe } from '@/app/AuthProvider'
@@ -25,6 +25,20 @@ export default function PrivacyPage() {
   useEffect(() => {
     void getIsPrivate(me.id).then(setIsPrivate)
   }, [me.id])
+  const [whoMsg, setWhoMsg] = useState<WhoCanMessage | null>(null)
+  useEffect(() => {
+    void getWhoCanMessage(me.id).then(setWhoMsg)
+  }, [me.id])
+  const changeWhoMsg = async (v: WhoCanMessage) => {
+    const before = whoMsg
+    setWhoMsg(v)
+    try {
+      await setWhoCanMessage(me.id, v)
+    } catch (err) {
+      setWhoMsg(before)
+      toast.error(errorMessage(err))
+    }
+  }
   const changePrivate = async (on: boolean) => {
     const before = isPrivate
     setIsPrivate(on)
@@ -116,6 +130,22 @@ export default function PrivacyPage() {
                 <button type="button" className="chip" aria-pressed={!isPrivate} onClick={() => void changePrivate(false)}>Public</button>
               </div>
               <Link to="/follow-requests" className="btn btn--glass btn--sm" style={{ alignSelf: 'flex-start' }}>Follow requests</Link>
+            </GlassPanel>
+          </>
+        ) : null}
+
+        {whoMsg !== null ? (
+          <>
+            <h2 className="section-title">Who can message you</h2>
+            <GlassPanel padded className="col">
+              <p className="small">
+                Choose who can start a chat with you. If you have already written to someone, they can always reply. Blocked people can never message you.
+              </p>
+              <div role="group" aria-label="Who can message you" className="chip-row">
+                <button type="button" className="chip" aria-pressed={whoMsg === 'everyone'} onClick={() => void changeWhoMsg('everyone')}>Everyone</button>
+                <button type="button" className="chip" aria-pressed={whoMsg === 'followers'} onClick={() => void changeWhoMsg('followers')}>My followers</button>
+                <button type="button" className="chip" aria-pressed={whoMsg === 'nobody'} onClick={() => void changeWhoMsg('nobody')}>Nobody</button>
+              </div>
             </GlassPanel>
           </>
         ) : null}

@@ -63,3 +63,17 @@ export async function respondFollowRequest(requester: string, accept: boolean): 
   const { error } = await supabase.rpc('respond_follow_request', { p_requester: requester, p_accept: accept })
   if (error) throw new Error(error.message)
 }
+
+export type WhoCanMessage = 'everyone' | 'followers' | 'nobody'
+
+/** Null when the database has not been updated yet. */
+export async function getWhoCanMessage(userId: string): Promise<WhoCanMessage | null> {
+  const { data, error } = await supabase.from('profiles').select('who_can_message').eq('id', userId).maybeSingle()
+  if (error || !data) return null
+  return (data as { who_can_message: WhoCanMessage }).who_can_message
+}
+
+export async function setWhoCanMessage(userId: string, v: WhoCanMessage): Promise<void> {
+  const { error } = await supabase.from('profiles').update({ who_can_message: v }).eq('id', userId)
+  if (error) throw new Error(error.message)
+}

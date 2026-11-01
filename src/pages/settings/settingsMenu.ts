@@ -126,7 +126,7 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
       { title: 'Read Receipts ON/OFF' },
       { title: 'Typing Status ON/OFF' },
       { title: 'Online Status ON/OFF' },
-      { title: 'Who Can Message You' },
+      { title: 'Who Can Message You', to: '/settings/privacy' },
       { title: 'Group Invitation Settings' },
       { title: 'Media Auto-Download' },
     ],
