@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { startRing, stopRing } from '@/lib/ringtone'
 import { Loader2, Mic, MicOff, Phone, PhoneOff, Video, VideoOff, TriangleAlert } from 'lucide-react'
 import type { CallApi } from '@/hooks/useCall'
 import { Avatar } from '@/components/ui/Avatar'
@@ -47,6 +48,14 @@ export function CallScreen({ api, onClose }: { api: CallApi; onClose: () => void
   const showRemoteVideo = isVideo && api.remoteStream !== null
   const name = api.peer?.display_name || api.peer?.username || 'Unknown'
   const live = phase === 'starting' || phase === 'ringing' || phase === 'connecting' || phase === 'connected'
+
+  // The caller hears a ring-back tone until the other person answers.
+  const waitingForAnswer = phase === 'ringing' && api.isCaller
+  useEffect(() => {
+    if (!waitingForAnswer) return
+    startRing('outgoing')
+    return () => stopRing()
+  }, [waitingForAnswer])
 
   // If the media path takes a while, say why instead of leaving the user guessing.
   const [slow, setSlow] = useState(false)

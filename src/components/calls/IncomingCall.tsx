@@ -5,6 +5,7 @@ import type { CallSession, ProfileLite } from '@/types/db'
 import { useAuth } from '@/app/AuthProvider'
 import { Avatar } from '@/components/ui/Avatar'
 import { getProfileById } from '@/services/profiles'
+import { startRing, stopRing } from '@/lib/ringtone'
 import { setCallStatus, subscribeCallStatus, subscribeIncomingCalls } from '@/services/calls'
 
 const RING_WINDOW_MS = 45_000
@@ -49,6 +50,14 @@ export function IncomingCallListener() {
       if (timer.current) window.clearTimeout(timer.current)
     }
   }, [callId])
+
+  // Ring while the answer / decline sheet is showing.
+  const ringing = !!incoming && !location.pathname.startsWith('/call/')
+  useEffect(() => {
+    if (!ringing) return
+    startRing('incoming')
+    return () => stopRing()
+  }, [ringing])
 
   if (!incoming || location.pathname.startsWith('/call/')) return null
   const { call, caller } = incoming
