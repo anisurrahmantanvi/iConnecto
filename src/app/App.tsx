@@ -41,6 +41,7 @@ const MessagePrivacyPage = lazy(() => import('@/pages/MessagePrivacy'))
 const ChatLookPage = lazy(() => import('@/pages/ChatLook'))
 const ArchivedChatsPage = lazy(() => import('@/pages/ArchivedChats'))
 const EditProfilePage = lazy(() => import('@/pages/settings/EditProfile'))
+const ChangePasswordPage = lazy(() => import('@/pages/settings/ChangePassword'))
 const PrivacyPage = lazy(() => import('@/pages/settings/Privacy'))
 const BlockedPage = lazy(() => import('@/pages/settings/Blocked'))
 const AccountPage = lazy(() => import('@/pages/settings/Account'))
@@ -115,6 +116,7 @@ export function App() {
                 <Route path="/settings/section/:slug" element={<SettingsSectionPage />} />
                 <Route path="/settings/profile" element={<EditProfilePage />} />
                 <Route path="/settings/privacy" element={<PrivacyPage />} />
+                <Route path="/settings/change-password" element={<ChangePasswordPage />} />
                 <Route path="/settings/blocked" element={<BlockedPage />} />
                 <Route path="/settings/account" element={<AccountPage />} />
 

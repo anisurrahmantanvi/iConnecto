@@ -1,11 +1,9 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useState } from 'react'
 import { getIsPrivate, setMyPrivate, getWhoCanMessage, setWhoCanMessage, type WhoCanMessage } from '@/services/privateAccount'
 import { Link } from 'react-router-dom'
 import { BellOff, ChevronRight, Eye, Lock, MonitorSmartphone, UserX } from 'lucide-react'
-import { useAuth, useMe } from '@/app/AuthProvider'
+import { useMe } from '@/app/AuthProvider'
 import { Button } from '@/components/ui/Button'
-import { TextField } from '@/components/ui/Field'
-import { ErrorBanner } from '@/components/ui/Feedback'
 import { GlassPanel } from '@/components/ui/GlassPanel'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { useToast } from '@/components/ui/Toast'
@@ -14,7 +12,6 @@ import { signOutOtherDevices } from '@/services/account'
 import { getMyShowActivity, setMyShowActivity } from '@/services/presence'
 
 export default function PrivacyPage() {
-  const { updatePassword } = useAuth()
   const toast = useToast()
   const me = useMe()
   const [showActivity, setShowActivity] = useState<boolean | null>(null)
@@ -59,29 +56,7 @@ export default function PrivacyPage() {
       toast.error(errorMessage(err))
     }
   }
-  const [password, setPassword] = useState('')
-  const [confirm, setConfirm] = useState('')
-  const [pwBusy, setPwBusy] = useState(false)
-  const [pwError, setPwError] = useState<string | null>(null)
   const [devBusy, setDevBusy] = useState(false)
-
-  const changePassword = async (e: FormEvent) => {
-    e.preventDefault()
-    if (password.length < 8) return setPwError('Use a password with at least 8 characters.')
-    if (password !== confirm) return setPwError('The two passwords do not match.')
-    setPwBusy(true)
-    setPwError(null)
-    try {
-      await updatePassword(password)
-      setPassword('')
-      setConfirm('')
-      toast.show('Password updated')
-    } catch (err) {
-      setPwError(errorMessage(err))
-    } finally {
-      setPwBusy(false)
-    }
-  }
 
   const signOutOthers = async () => {
     setDevBusy(true)
@@ -178,28 +153,12 @@ export default function PrivacyPage() {
         </GlassPanel>
 
         <h2 className="section-title">Password</h2>
-        <GlassPanel padded>
-          <form className="col" onSubmit={(e) => void changePassword(e)} noValidate>
-            {pwError ? <ErrorBanner>{pwError}</ErrorBanner> : null}
-            <TextField
-              label="New password"
-              type="password"
-              autoComplete="new-password"
-              hint="At least 8 characters."
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <TextField
-              label="Confirm new password"
-              type="password"
-              autoComplete="new-password"
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-            />
-            <div className="form-actions">
-              <Button type="submit" variant="primary" loading={pwBusy} disabled={!password}>Change password</Button>
-            </div>
-          </form>
+        <GlassPanel className="settings-list" as="nav" aria-label="Password">
+          <Link to="/settings/change-password" className="list-row">
+            <Lock size={22} color="var(--accent)" aria-hidden />
+            <strong className="grow">Change password</strong>
+            <ChevronRight size={18} className="chev" aria-hidden />
+          </Link>
         </GlassPanel>
 
         <h2 className="section-title">Devices</h2>

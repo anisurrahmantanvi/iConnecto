@@ -408,6 +408,12 @@ export const BN_APP: Record<string, string> = {
   'My friends': 'আমার বন্ধুরা',
   'No friends yet': 'এখনো কোনো বন্ধু নেই',
   'Friends are not available yet. The database update has not been run.': 'ফ্রেন্ড সুবিধা এখনো চালু হয়নি। ডেটাবেস আপডেট চালানো হয়নি।',
+  'For your security, enter your current password first.': 'নিরাপত্তার জন্য আগে আপনার বর্তমান পাসওয়ার্ড দিন।',
+  'Enter your current password.': 'বর্তমান পাসওয়ার্ড দিন।',
+  'That password is not correct.': 'এই পাসওয়ার্ডটি সঠিক নয়।',
+  'Your password': 'আপনার পাসওয়ার্ড',
+  'Verify': 'যাচাই করুন',
+  'Forgot password?': 'পাসওয়ার্ড ভুলে গেছেন?',
 }
 
 export const HI_APP: Record<string, string> = {
@@ -819,4 +825,10 @@ export const HI_APP: Record<string, string> = {
   'My friends': 'मेरे दोस्त',
   'No friends yet': 'अभी कोई दोस्त नहीं',
   'Friends are not available yet. The database update has not been run.': 'दोस्त सुविधा अभी उपलब्ध नहीं है। डेटाबेस अपडेट नहीं चलाया गया है।',
+  'For your security, enter your current password first.': 'सुरक्षा के लिए पहले अपना मौजूदा पासवर्ड डालें।',
+  'Enter your current password.': 'अपना मौजूदा पासवर्ड डालें।',
+  'That password is not correct.': 'यह पासवर्ड सही नहीं है।',
+  'Your password': 'आपका पासवर्ड',
+  'Verify': 'सत्यापित करें',
+  'Forgot password?': 'पासवर्ड भूल गए?',
 }
