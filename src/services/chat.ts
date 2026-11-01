@@ -50,7 +50,8 @@ export async function sendMessage(chatId: string, content: string, forwarded = f
   const text = content.trim()
   if (!text) throw new Error('Type a message first.')
   if (text.length > MAX_MESSAGE_LENGTH) throw new Error(`Messages can be up to ${MAX_MESSAGE_LENGTH} characters.`)
-  const row = forwarded ? { chat_id: chatId, content: text, forwarded: true } : { chat_id: chatId, content: text }
+  const row: Record<string, unknown> = { chat_id: chatId, content: text }
+  if (forwarded) row.forwarded = true
   const res = await supabase.from('messages').insert(row).select(BASE_COLS).single()
   return check(res) as unknown as Message
 }
