@@ -14,14 +14,14 @@ export default function SettingsSectionPage() {
   const { slug = '' } = useParams()
   const toast = useToast()
   const { mode, setMode } = useTheme()
-  const { t, lang, setLang } = useT()
+  const { t, tx, lang, setLang } = useT()
   const sec = SETTINGS_SECTIONS.find((s) => sectionSlug(s.title) === slug)
-  const soon = () => toast.show('Coming soon')
+  const soon = () => toast.show(tx('Coming soon'))
 
   if (!sec) {
     return (
       <>
-        <PageHeader title="Settings" back="/settings" />
+        <PageHeader title={tx('Settings')} back="/settings" />
         <EmptyState title="Not found" body="This settings page does not exist." />
       </>
     )
@@ -35,7 +35,7 @@ export default function SettingsSectionPage() {
 
   return (
     <>
-      <PageHeader title={sec.title} back="/settings" />
+      <PageHeader title={tx(sec.title)} back="/settings" />
       <div className="stack">
         {sec.inline === 'language' ? (
           <GlassPanel padded className="col">
@@ -46,9 +46,8 @@ export default function SettingsSectionPage() {
                   {l.label}
                 </button>
               ))}
-              <button type="button" className="chip" aria-pressed={false} onClick={soon}>हिन्दी</button>
             </div>
-            <p className="small faint">Bengali currently covers navigation, sign-in and settings; other screens are in English.</p>
+            <p className="small faint">Settings, menus and main screens are translated. Some screens are still in English.</p>
           </GlassPanel>
         ) : null}
         {sec.inline === 'themes' ? (
@@ -65,16 +64,16 @@ export default function SettingsSectionPage() {
         {sec.inline === 'push' ? <NotificationSetting /> : null}
 
         {sec.items.length ? (
-          <GlassPanel className="settings-list" as="nav" aria-label={sec.title}>
+          <GlassPanel className="settings-list" as="nav" aria-label={tx(sec.title)}>
             {sec.items.map((it) =>
               it.to ? (
                 <Link key={it.title} to={it.to} className="list-row">
-                  <strong className="grow">{it.title}</strong>
+                  <strong className="grow">{tx(it.title)}</strong>
                   <ChevronRight size={18} className="chev" aria-hidden />
                 </Link>
               ) : (
                 <button key={it.title} type="button" className="list-row" onClick={soon} style={{ width: '100%', textAlign: 'left' }}>
-                  <strong className="grow">{it.title}</strong>
+                  <strong className="grow">{tx(it.title)}</strong>
                   <ChevronRight size={18} className="chev" aria-hidden />
                 </button>
               ),

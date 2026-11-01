@@ -6,6 +6,7 @@ import { Avatar } from '@/components/ui/Avatar'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { GlassPanel } from '@/components/ui/GlassPanel'
 import { PageHeader } from '@/components/ui/PageHeader'
+import { useT } from '@/lib/i18n'
 import { sectionSlug } from '@/pages/settings/settingsMenu'
 
 function Tile({ to, icon, label, color }: { to: string; icon: ReactNode; label: string; color: string }) {
@@ -40,6 +41,7 @@ const SubLink = ({ to, title }: { to: string; title: string }) => (
 /** The full-screen Menu opened from the profile's three-line button. */
 export default function MenuPage() {
   const me = useMe()
+  const { tx } = useT()
   const { signOut } = useAuth()
   const navigate = useNavigate()
   const [confirmLogout, setConfirmLogout] = useState(false)
@@ -51,7 +53,7 @@ export default function MenuPage() {
 
   return (
     <>
-      <PageHeader title="Menu" back />
+      <PageHeader title={tx('Menu')} back />
       <div className="stack">
         <GlassPanel as="section" aria-label="Your profile">
           <Link to={`/u/${me.username}`} className="settings-user">
@@ -65,46 +67,46 @@ export default function MenuPage() {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <Tile to="/messages" icon={<MessageCircle size={28} />} label="iConnect" color="#7a5cff" />
-          <Tile to="/communities" icon={<Users size={28} />} label="Communities" color="#0a84ff" />
+          <Tile to="/communities" icon={<Users size={28} />} label={tx('Communities')} color="#0a84ff" />
           <Tile to="/reels" icon={<Film size={28} />} label="iClips" color="#ff6a3d" />
           <Tile to="/saved" icon={<Bookmark size={28} />} label="Collections" color="#a35cff" />
           <Tile to="/discover" icon={<Compass size={28} />} label="Discover" color="#1db8a6" />
           <Tile to="/notifications" icon={<Bell size={28} />} label="Activity" color="#f5a524" />
           <Tile to="/create" icon={<SquarePlus size={28} />} label="Create" color="#0a84ff" />
-          <Tile to="/settings/profile" icon={<Pencil size={28} />} label="Edit Profile" color="#34c759" />
+          <Tile to="/settings/profile" icon={<Pencil size={28} />} label={tx('Edit profile')} color="#34c759" />
         </div>
 
-        <Expand icon={<Settings size={22} aria-hidden />} title="Settings & Privacy">
-          <SubLink to="/settings" title="Settings & privacy" />
+        <Expand icon={<Settings size={22} aria-hidden />} title={tx('Settings & privacy')}>
+          <SubLink to="/settings" title={tx('Settings & privacy')} />
           <SubLink to="/settings/privacy" title="Privacy and security" />
           <SubLink to="/settings/blocked" title="Blocked accounts" />
-          <SubLink to={`/settings/section/${sectionSlug('Preferences')}`} title="Language" />
-          <SubLink to={`/settings/section/${sectionSlug('Themes')}`} title="Themes" />
-          <SubLink to={`/settings/section/${sectionSlug('Notifications')}`} title="Notifications" />
+          <SubLink to={`/settings/section/${sectionSlug('Preferences')}`} title={tx('Language')} />
+          <SubLink to={`/settings/section/${sectionSlug('Themes')}`} title={tx('Themes')} />
+          <SubLink to={`/settings/section/${sectionSlug('Notifications')}`} title={tx('Notifications')} />
         </Expand>
 
-        <Expand icon={<HelpCircle size={22} aria-hidden />} title="Help Center">
-          <SubLink to={`/settings/section/${sectionSlug('Support & Feedback')}`} title="Support & Feedback" />
-          <SubLink to={`/settings/section/${sectionSlug('Help & Legal')}`} title="Help & Legal" />
+        <Expand icon={<HelpCircle size={22} aria-hidden />} title={tx('Help Center')}>
+          <SubLink to={`/settings/section/${sectionSlug('Support & Feedback')}`} title={tx('Support & Feedback')} />
+          <SubLink to={`/settings/section/${sectionSlug('Help & Legal')}`} title={tx('Help & Legal')} />
         </Expand>
 
         <GlassPanel className="settings-list" as="nav" aria-label="Account">
           <Link to={`/settings/section/${sectionSlug('Add Account')}`} className="list-row">
             <UserPlus size={22} aria-hidden />
-            <strong className="grow">Add account</strong>
+            <strong className="grow">{tx('Add Account')}</strong>
           </Link>
           <button type="button" className="list-row" onClick={() => setConfirmLogout(true)} style={{ width: '100%', textAlign: 'left' }}>
             <LogOut size={22} aria-hidden />
-            <strong className="grow">Log out</strong>
+            <strong className="grow">{tx('Log out')}</strong>
           </button>
         </GlassPanel>
       </div>
 
       <ConfirmDialog
         open={confirmLogout}
-        title="Log out?"
+        title={`${tx('Log out')}?`}
         message="You will be logged out of this account on this phone. Your account and data are not deleted."
-        confirmLabel="Log out"
+        confirmLabel={tx('Log out')}
         onConfirm={logOut}
         onClose={() => setConfirmLogout(false)}
       />

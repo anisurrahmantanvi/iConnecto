@@ -35,12 +35,12 @@ function Row({ to, icon, title, body, onTap }: { to?: string; icon?: ReactNode; 
 export default function SettingsHomePage() {
   const me = useMe()
   const { signOut } = useAuth()
-  const { t } = useT()
+  const { t, tx } = useT()
   const navigate = useNavigate()
   const toast = useToast()
   const [confirmLogout, setConfirmLogout] = useState(false)
   const [query, setQuery] = useState('')
-  const soon = () => toast.show('Coming soon')
+  const soon = () => toast.show(tx('Coming soon'))
 
   const logOut = async () => {
     await signOut()
@@ -62,15 +62,15 @@ export default function SettingsHomePage() {
 
   return (
     <>
-      <PageHeader title="Settings & privacy" back="/menu" />
+      <PageHeader title={tx('Settings & privacy')} back="/menu" />
       <div className="stack">
-        <SearchBox value={query} onChange={setQuery} label="Search settings" />
+        <SearchBox value={query} onChange={setQuery} label={tx('Search settings')} />
 
         {q ? (
           results.length ? (
             <GlassPanel className="settings-list" as="nav" aria-label="Search results">
               {results.map((r, i) => (
-                <Row key={`${r.where}-${r.title}-${i}`} to={r.to} onTap={soon} title={r.title} body={r.where} />
+                <Row key={`${r.where}-${r.title}-${i}`} to={r.to} onTap={soon} title={tx(r.title)} body={tx(r.where)} />
               ))}
             </GlassPanel>
           ) : (
@@ -78,7 +78,7 @@ export default function SettingsHomePage() {
           )
         ) : (
           <>
-            <h2 className="section-title">Your account</h2>
+            <h2 className="section-title">{tx('Your account')}</h2>
             <GlassPanel as="section" aria-label="Your profile">
               <Link to={`/u/${me.username}`} className="settings-user">
                 <Avatar src={me.avatar_url} name={me.display_name ?? me.username} size="lg" />
@@ -90,30 +90,30 @@ export default function SettingsHomePage() {
               </Link>
             </GlassPanel>
             <GlassPanel className="settings-list" as="nav" aria-label="Shortcuts">
-              <Row to="/settings/profile" icon={<UserRound size={22} aria-hidden />} title="Edit profile" />
+              <Row to="/settings/profile" icon={<UserRound size={22} aria-hidden />} title={tx('Edit profile')} />
               <Row to="/saved" icon={<Bookmark size={22} aria-hidden />} title={t('nav.saved')} />
-              <Row to="/communities" icon={<Users size={22} aria-hidden />} title="Communities" />
+              <Row to="/communities" icon={<Users size={22} aria-hidden />} title={tx('Communities')} />
             </GlassPanel>
 
             {SETTINGS_GROUPS.map((group) => (
-              <section key={group.title} aria-label={group.title} className="stack">
+              <section key={group.title} aria-label={tx(group.title)} className="stack">
                 <div>
-                  <h2 className="section-title" style={{ marginBottom: 2 }}>{group.title}</h2>
-                  <p className="small muted" style={{ margin: '0 4px' }}>{group.caption}</p>
+                  <h2 className="section-title" style={{ marginBottom: 2 }}>{tx(group.title)}</h2>
+                  <p className="small muted" style={{ margin: '0 4px' }}>{tx(group.caption)}</p>
                 </div>
                 <GlassPanel className="settings-list" as="nav" aria-label={group.title}>
                   {group.sections.map((name) => {
                     const sec = SETTINGS_SECTIONS.find((x) => x.title === name)
                     if (!sec) return null
                     const Icon = SETTINGS_ICONS[sec.title]
-                    return <Row key={sec.title} to={`/settings/section/${sectionSlug(sec.title)}`} icon={Icon ? <Icon size={22} aria-hidden /> : undefined} title={sec.title} />
+                    return <Row key={sec.title} to={`/settings/section/${sectionSlug(sec.title)}`} icon={Icon ? <Icon size={22} aria-hidden /> : undefined} title={tx(sec.title)} />
                   })}
                 </GlassPanel>
               </section>
             ))}
 
             <GlassPanel className="settings-list" as="nav" aria-label="Add account">
-              <Row to={`/settings/section/${sectionSlug('Add Account')}`} icon={<UserPlus size={22} aria-hidden />} title="Add Account" />
+              <Row to={`/settings/section/${sectionSlug('Add Account')}`} icon={<UserPlus size={22} aria-hidden />} title={tx('Add Account')} />
             </GlassPanel>
             <Button variant="glass" block icon={<LogOut size={18} />} onClick={() => setConfirmLogout(true)}>{t('nav.logout')}</Button>
           </>
@@ -122,9 +122,9 @@ export default function SettingsHomePage() {
 
       <ConfirmDialog
         open={confirmLogout}
-        title="Log out?"
+        title={`${tx('Log out')}?`}
         message="You will be logged out of this account on this phone. Your account and data are not deleted."
-        confirmLabel="Log out"
+        confirmLabel={tx('Log out')}
         onConfirm={logOut}
         onClose={() => setConfirmLogout(false)}
       />

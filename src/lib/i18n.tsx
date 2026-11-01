@@ -1,3 +1,4 @@
+import { BN, HI } from './strings'
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 
 /**
@@ -125,6 +126,8 @@ interface I18nApi {
   lang: Lang
   setLang: (l: Lang) => void
   t: (key: MessageKey) => string
+  /** Translate an English UI text; returns it unchanged when there is no translation. */
+  tx: (text: string) => string
 }
 
 const I18nContext = createContext<I18nApi | null>(null)
@@ -156,7 +159,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const t = useCallback((key: MessageKey) => DICTS[lang][key] ?? en[key], [lang])
-  const value = useMemo(() => ({ lang, setLang, t }), [lang, setLang, t])
+  const tx = useCallback((text: string) => (lang === 'bn' ? BN[text] : lang === 'hi' ? HI[text] : undefined) ?? text, [lang])
+  const value = useMemo(() => ({ lang, setLang, t, tx }), [lang, setLang, t, tx])
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>
 }
 
