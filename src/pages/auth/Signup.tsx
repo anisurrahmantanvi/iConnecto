@@ -13,9 +13,18 @@ import { errorMessage } from '@/lib/supabase'
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 type Step = 1 | 2 | 3
 
+/** A starting username made from the person's name plus random digits (e.g. "Akash Khan" -> "akashkhan48"). Never from the email. */
+function usernameFromName(name: string): string {
+  const letters = name.normalize('NFKD').replace(/[^A-Za-z]/g, '').toLowerCase().slice(0, 13)
+  const base = letters.length >= 3 ? letters : 'user'
+  const digits = String(Math.floor(Math.random() * 90) + 10)
+  return base + digits
+}
+
 /**
  * Sign up in small steps: your name, your email, a password, then the code we email you.
- * No username is asked for: the database makes one from your email, and you can change it in Edit profile.
+ * No username is asked for: one is made from your name plus random digits (never from your email, so nobody can
+ * guess your login name), and you can change it in Edit profile.
  */
 export default function SignupPage() {
   const { t } = useT()
@@ -57,7 +66,7 @@ export default function SignupPage() {
     if (password !== confirm) return setError('The two passwords do not match.')
     setBusy(true)
     try {
-      const { needsEmailConfirmation } = await signUp({ email, password, username: '', displayName })
+      const { needsEmailConfirmation } = await signUp({ email, password, username: usernameFromName(displayName), displayName })
       if (needsEmailConfirmation) {
         setSentTo(email.trim())
         setCooldown(30)
