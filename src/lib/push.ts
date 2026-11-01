@@ -61,6 +61,9 @@ async function enablePushInner(onOpen: (url: string) => void): Promise<PushPermi
 
   await PushNotifications.createChannel({ id: 'iconnecto', name: 'Messages and activity', importance: 5, visibility: 1, vibration: true })
   await PushNotifications.createChannel({ id: 'calls', name: 'Calls', importance: 5, visibility: 1, vibration: true })
+  // Android cannot change a channel's sound after it exists, so the ringing channel is a new one. The ringtone file is
+  // bundled in the app (res/raw). Older app builds without it simply fall back to the normal notification sound.
+  await PushNotifications.createChannel({ id: 'calls_ring', name: 'Incoming calls', description: 'Rings when someone calls you', importance: 5, visibility: 1, vibration: true, sound: 'iconnecto_ring.wav' })
 
   await PushNotifications.removeAllListeners()
   await PushNotifications.addListener('registration', (t) => {

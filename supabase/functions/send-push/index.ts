@@ -15,7 +15,7 @@ interface Push {
   body: string
   url: string
   tag: string
-  channel: 'iconnecto' | 'calls'
+  channel: 'iconnecto' | 'calls_ring'
   ttl: string
 }
 
@@ -115,7 +115,7 @@ async function build(kind: string, id: string): Promise<Push | null> {
       body: c.call_type === 'video' ? 'Incoming video call' : 'Incoming voice call',
       url: `/call/${c.id}`,
       tag: `call-${c.id}`,
-      channel: 'calls',
+      channel: 'calls_ring',
       ttl: '30s',
     }
   }
