@@ -13,16 +13,19 @@ import { usePresence } from '@/hooks/presence'
 import { describePresence } from '@/lib/presence'
 import { timeAgo } from '@/lib/format'
 import { listChats, listMessageRequestIds, subscribeAnyMessage } from '@/services/chat'
+import { listArchivedIds } from '@/services/chatPrefs'
 
 export default function InboxPage() {
   const me = useMe()
   const { data: all, loading, error, reload } = useAsync(listChats, [])
   const { data: reqIds } = useAsync(listMessageRequestIds, [all])
+  const { data: archivedIds } = useAsync(listArchivedIds, [all])
+  const archivedSet = new Set(archivedIds ?? [])
   const [params] = useSearchParams()
   const showRequests = params.get('requests') === '1'
   const reqSet = new Set(reqIds ?? [])
-  const requestCount = (all ?? []).filter((c) => reqSet.has(c.chat_id)).length
-  const data = all ? all.filter((c) => reqSet.has(c.chat_id) === showRequests) : all
+  const requestCount = (all ?? []).filter((c) => reqSet.has(c.chat_id) && !archivedSet.has(c.chat_id)).length
+  const data = all ? all.filter((c) => !archivedSet.has(c.chat_id) && reqSet.has(c.chat_id) === showRequests) : all
   const [composing, setComposing] = useState(false)
   const presenceMap = usePresence((data ?? []).map((c) => c.other_id))
   const timer = useRef<number | null>(null)

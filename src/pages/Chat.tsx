@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { AlertCircle, ArrowLeft, Flag, MessageCircle, Phone, PhoneMissed, Send, UserRound, Video, WifiOff, X } from 'lucide-react'
+import { AlertCircle, Archive, ArrowLeft, Flag, MessageCircle, Phone, PhoneMissed, Send, UserRound, Video, WifiOff, X } from 'lucide-react'
 import type { Message, MessageReaction } from '@/types/db'
 import { useMe } from '@/app/AuthProvider'
 import { useBadges } from '@/app/BadgesProvider'
@@ -16,6 +16,9 @@ import { EmptyState, ErrorState, Spinner } from '@/components/ui/Feedback'
 import { useToast } from '@/components/ui/Toast'
 import { usePaged, useAsync } from '@/hooks/common'
 import { usePresence } from '@/hooks/presence'
+import { useTyping } from '@/hooks/useTyping'
+import { chatLookStyle } from '@/lib/chatLook'
+import { getChatPrivacy, getChatSeen, setArchived } from '@/services/chatPrefs'
 import { describePresence } from '@/lib/presence'
 import { insertAtCaret, restoreCaret, useAutosize } from '@/hooks/ui'
 import { clockTime } from '@/lib/format'
@@ -79,6 +82,25 @@ export default function ChatPage() {
   const [editing, setEditing] = useState<Message | null>(null)
   const [reactions, setReactions] = useState<MessageReaction[]>([])
   const [, setNow] = useState(0)
+  const [typingOn, setTypingOn] = useState(false)
+  const [seenAt, setSeenAt] = useState<string | null>(null)
+  const { peerTyping, ping } = useTyping(chatId, me.id, typingOn)
+  useEffect(() => {
+    void getChatPrivacy(me.id).then((p) => setTypingOn(p ? p.typing_status : false))
+  }, [me.id])
+  // "Seen": ask now, after each new message, and every 10 seconds while the chat is open.
+  const seenKey = items[0]?.id ?? ''
+  useEffect(() => {
+    if (!peer) return
+    let live = true
+    const load = () => void getChatSeen(chatId).then((v) => live && setSeenAt(v))
+    load()
+    const t = window.setInterval(load, 10000)
+    return () => {
+      live = false
+      window.clearInterval(t)
+    }
+  }, [chatId, peer, seenKey])
 
   const scroller = useRef<HTMLDivElement>(null)
   const area = useRef<HTMLTextAreaElement>(null)
@@ -281,20 +303,28 @@ export default function ChatPage() {
   const ordered = [...items].reverse() // fetched newest-first, shown oldest-first
   const menu: MenuItem[] = [
     { label: 'View profile', icon: <UserRound size={18} />, onSelect: () => navigate(`/u/${peer.other_username}`) },
+    {
+      label: 'Archive chat',
+      icon: <Archive size={18} />,
+      onSelect: () => {
+        setArchived(chatId, true).then(() => { toast.show('Chat archived'); navigate('/messages') }, (e) => toast.error(errorMessage(e)))
+      },
+    },
     { label: 'Report', icon: <Flag size={18} />, danger: true, onSelect: () => navigate(`/report/user/${peer.other_id}`) },
   ]
 
   let lastDay = ''
+  const lastMineId = [...ordered].reverse().find((x) => x.sender_id === me.id && x.kind !== 'call')?.id
   return (
-    <div className="chat-view">
+    <div className="chat-view" style={chatLookStyle() as React.CSSProperties}>
       <header className="chat-header">
         <IconButton label="Back to messages" onClick={() => navigate('/messages')}><ArrowLeft size={22} /></IconButton>
         <Link to={`/u/${peer.other_username}`} className="row grow chat-header__who" aria-label={`Open ${name}'s profile`}>
           <PresenceAvatar online={!!presence?.online} src={peer.other_avatar_url} name={name} />
           <span style={{ minWidth: 0 }}>
             <strong className="truncate" style={{ display: 'block' }}>{name}</strong>
-            <span className={`small truncate presence-line ${presence?.online ? 'presence-line--online' : 'muted'}`} style={{ display: 'flex' }}>
-              {presence ? presence.label : `@${peer.other_username}`}
+            <span className={`small truncate presence-line ${peerTyping || presence?.online ? 'presence-line--online' : 'muted'}`} style={{ display: 'flex' }}>
+              {peerTyping ? 'typing…' : presence ? presence.label : `@${peer.other_username}`}
             </span>
           </span>
         </Link>
@@ -367,6 +397,9 @@ export default function ChatPage() {
                   <div className="bubble__time">{m.edited_at ? 'edited · ' : ''}{clockTime(m.created_at)}</div>
                 </div>
               </div>
+              {mine && seenAt && m.id === lastMineId && new Date(seenAt).getTime() >= new Date(m.created_at).getTime() ? (
+                <div className="seen-line">Seen</div>
+              ) : null}
               {grouped.size ? (
                 <div className={`reactions ${mine ? 'reactions--me' : ''}`}>
                   {[...grouped.entries()].map(([emoji, g]) => (
@@ -433,7 +466,10 @@ export default function ChatPage() {
           placeholder="Message"
           maxLength={MAX_MESSAGE_LENGTH}
           value={text}
-          onChange={(e) => setText(e.target.value)}
+          onChange={(e) => {
+            setText(e.target.value)
+            if (e.target.value) ping()
+          }}
           onKeyDown={onKeyDown}
         />
         <IconButton label="Send message" type="submit" disabled={!text.trim()} active={!!text.trim()}>

@@ -252,3 +252,7 @@ a.list-row--link { text-decoration: none; }
 .reaction-pick { display: flex; justify-content: space-between; gap: 4px; padding: 4px 0 10px; }
 .reaction-pick__btn { font-size: 26px; padding: 6px 8px; border-radius: 12px; background: transparent; border: 0; cursor: pointer; }
 .reaction-pick__btn[aria-pressed='true'] { background: var(--hover); }
+
+.chat-view .chat-scroll { background: var(--chat-wall, transparent); border-radius: var(--r-lg); }
+.chat-preview-box { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: var(--r-lg); background: var(--chat-wall, transparent); }
+.seen-line { text-align: right; font-size: 11px; color: var(--text-muted); margin: 2px 12px 0; }

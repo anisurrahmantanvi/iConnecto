@@ -123,9 +123,9 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
     title: 'Messaging Settings',
     items: [
       { title: 'Message Requests', to: '/messages?requests=1' },
-      { title: 'Read Receipts ON/OFF' },
-      { title: 'Typing Status ON/OFF' },
-      { title: 'Online Status ON/OFF' },
+      { title: 'Read Receipts ON/OFF', to: '/message-settings/privacy' },
+      { title: 'Typing Status ON/OFF', to: '/message-settings/privacy' },
+      { title: 'Online Status ON/OFF', to: '/message-settings/privacy' },
       { title: 'Who Can Message You', to: '/settings/privacy' },
       { title: 'Group Invitation Settings' },
       { title: 'Media Auto-Download' },
@@ -327,12 +327,12 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
   {
     title: 'Advanced Chat Features',
     items: [
-      { title: 'Chat Themes' },
-      { title: 'Custom Chat Wallpaper' },
+      { title: 'Chat Themes', to: '/message-settings/themes' },
+      { title: 'Custom Chat Wallpaper', to: '/message-settings/wallpaper' },
       { title: 'Disappearing Messages' },
-      { title: 'Message Privacy' },
+      { title: 'Message Privacy', to: '/message-settings/privacy' },
       { title: 'Chat Backup' },
-      { title: 'Manage Archived Chats' },
+      { title: 'Manage Archived Chats', to: '/message-settings/archived' },
     ],
   },
   {

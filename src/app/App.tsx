@@ -37,6 +37,9 @@ const MenuPage = lazy(() => import('@/pages/Menu'))
 const PrivacyPolicyPage = lazy(() => import('@/pages/PrivacyPolicy'))
 const FollowRequestsPage = lazy(() => import('@/pages/FollowRequests'))
 const SettingsHomePage = lazy(() => import('@/pages/settings/SettingsHome'))
+const MessagePrivacyPage = lazy(() => import('@/pages/MessagePrivacy'))
+const ChatLookPage = lazy(() => import('@/pages/ChatLook'))
+const ArchivedChatsPage = lazy(() => import('@/pages/ArchivedChats'))
 const EditProfilePage = lazy(() => import('@/pages/settings/EditProfile'))
 const PrivacyPage = lazy(() => import('@/pages/settings/Privacy'))
 const BlockedPage = lazy(() => import('@/pages/settings/Blocked'))
@@ -90,6 +93,10 @@ export function App() {
 
                 <Route path="/messages" element={<InboxPage />} />
                 <Route path="/message-settings" element={<MessageSettingsPage />} />
+                <Route path="/message-settings/privacy" element={<MessagePrivacyPage />} />
+                <Route path="/message-settings/themes" element={<ChatLookPage mode="theme" />} />
+                <Route path="/message-settings/wallpaper" element={<ChatLookPage mode="wallpaper" />} />
+                <Route path="/message-settings/archived" element={<ArchivedChatsPage />} />
                 <Route path="/messages/:chatId" element={<ChatPage />} />
 
                 <Route path="/reels" element={<ReelsPage />} />
