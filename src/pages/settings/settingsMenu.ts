@@ -84,7 +84,7 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
       { title: 'Help Center' },
       { title: 'Report a Problem' },
       { title: 'Terms of Service' },
-      { title: 'Privacy Policy' },
+      { title: 'Privacy Policy', to: '/privacy-policy' },
       { title: 'About iConnecto' },
     ],
   },

@@ -34,6 +34,7 @@ const ReelsPage = lazy(() => import('@/pages/Reels'))
 const MessageSettingsPage = lazy(() => import('@/pages/MessageSettings'))
 const SettingsSectionPage = lazy(() => import('@/pages/settings/SettingsSection'))
 const MenuPage = lazy(() => import('@/pages/Menu'))
+const PrivacyPolicyPage = lazy(() => import('@/pages/PrivacyPolicy'))
 const SettingsHomePage = lazy(() => import('@/pages/settings/SettingsHome'))
 const EditProfilePage = lazy(() => import('@/pages/settings/EditProfile'))
 const PrivacyPage = lazy(() => import('@/pages/settings/Privacy'))
@@ -61,6 +62,9 @@ export function App() {
               <Route path="/signup" element={<SignupPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             </Route>
+
+            {/* Public pages */}
+            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
 
             {/* Email links: must work whatever the auth state is */}
             <Route path="/auth/callback" element={<AuthCallbackPage />} />
