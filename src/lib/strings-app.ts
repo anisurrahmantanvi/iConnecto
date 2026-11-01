@@ -414,6 +414,17 @@ export const BN_APP: Record<string, string> = {
   'Your password': 'আপনার পাসওয়ার্ড',
   'Verify': 'যাচাই করুন',
   'Forgot password?': 'পাসওয়ার্ড ভুলে গেছেন?',
+  "What's your name?": 'আপনার নাম কী?',
+  'Enter your real name.': 'আপনার আসল নাম লিখুন।',
+  'Your real name': 'আপনার আসল নাম',
+  "What's your email address?": 'আপনার ইমেইল ঠিকানা কী?',
+  'We will send a verification code to this email.': 'এই ইমেইলে একটি ভেরিফিকেশন কোড পাঠানো হবে।',
+  'Create a password': 'একটি পাসওয়ার্ড বানান',
+  'Choose a password with at least 8 characters.': 'অন্তত ৮ অক্ষরের পাসওয়ার্ড বেছে নিন।',
+  'Verify your email': 'ইমেইল যাচাই করুন',
+  'Enter a valid email address.': 'সঠিক ইমেইল ঠিকানা দিন।',
+  'Confirm and continue': 'নিশ্চিত করে চালিয়ে যান',
+  'We sent a verification code to': 'আমরা একটি ভেরিফিকেশন কোড পাঠিয়েছি',
 }
 
 export const HI_APP: Record<string, string> = {
@@ -831,4 +842,15 @@ export const HI_APP: Record<string, string> = {
   'Your password': 'आपका पासवर्ड',
   'Verify': 'सत्यापित करें',
   'Forgot password?': 'पासवर्ड भूल गए?',
+  "What's your name?": 'आपका नाम क्या है?',
+  'Enter your real name.': 'अपना असली नाम लिखें।',
+  'Your real name': 'आपका असली नाम',
+  "What's your email address?": 'आपका ईमेल पता क्या है?',
+  'We will send a verification code to this email.': 'इस ईमेल पर एक सत्यापन कोड भेजा जाएगा।',
+  'Create a password': 'पासवर्ड बनाएं',
+  'Choose a password with at least 8 characters.': 'कम से कम 8 अक्षर का पासवर्ड चुनें।',
+  'Verify your email': 'अपना ईमेल सत्यापित करें',
+  'Enter a valid email address.': 'सही ईमेल पता डालें।',
+  'Confirm and continue': 'पुष्टि करें और जारी रखें',
+  'We sent a verification code to': 'हमने एक सत्यापन कोड भेजा है',
 }
