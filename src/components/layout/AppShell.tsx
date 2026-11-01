@@ -1,4 +1,5 @@
 import { Suspense, useEffect } from 'react'
+import { unlockAudioOnFirstTouch } from '@/lib/ringtone'
 import { NavLink, Outlet, useMatch } from 'react-router-dom'
 import { Bell, Bookmark, Clapperboard, Compass, Home, MessageCircle, Plus, Settings, User, Users, WifiOff, type LucideIcon } from 'lucide-react'
 import { useAuth } from '@/app/AuthProvider'
@@ -46,6 +47,7 @@ export function AppShell() {
   useHeartbeat(!!profile)
   usePush(!!profile)
   useBackButton()
+  useEffect(() => unlockAudioOnFirstTouch(), [])
 
   // Hide the bottom bar only while the on-screen keyboard is really open (not just because a field still has focus).
   // The Android app reports this itself (data-kbd on <html>); in a normal browser the visual viewport shrinks instead.

@@ -88,3 +88,30 @@ export function startRing(kind: Kind): void {
     playCycle(kind)
   }, PATTERNS[kind].period * 1000)
 }
+
+/**
+ * Phones only let a page make sound after the person has touched it. Call this once at start-up: on the first tap the
+ * audio engine is switched on, so a later incoming call can ring even if nobody is touching the screen.
+ */
+export function unlockAudioOnFirstTouch(): () => void {
+  const events = ['pointerdown', 'touchstart', 'keydown'] as const
+  const unlock = () => {
+    const c = audio()
+    if (c) {
+      try {
+        const buf = c.createBuffer(1, 1, 22050)
+        const src = c.createBufferSource()
+        src.buffer = buf
+        src.connect(c.destination)
+        src.start(0)
+      } catch {
+        /* silent blip failed: resume() above is usually enough */
+      }
+    }
+    for (const e of events) window.removeEventListener(e, unlock)
+  }
+  for (const e of events) window.addEventListener(e, unlock, { passive: true })
+  return () => {
+    for (const e of events) window.removeEventListener(e, unlock)
+  }
+}
