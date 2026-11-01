@@ -280,6 +280,14 @@
   border-radius: 0;
   box-shadow: none;
 }
+/* Profile header and cards run edge to edge too. */
+.feed-bleed .profile-head, .feed-bleed .glass.card {
+  margin-inline: calc(var(--space-4) * -1);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.feed-bleed .profile-cover { border-radius: 0; }
 /* Photos run the full width of the screen. */
 .feed-bleed .post__media {
   margin-inline: calc(var(--space-4) * -1);

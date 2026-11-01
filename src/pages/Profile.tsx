@@ -185,7 +185,7 @@ export default function ProfilePage() {
         back={isMe ? undefined : true}
         actions={isMe ? <span className="page-header__actions"><Link to="/menu" className="icon-btn" aria-label="Menu"><Menu size={24} /></Link></span> : undefined}
       />
-      <div className="stack">
+      <div className="stack feed-bleed">
         <ProfileHeader
           profile={profile}
           isMe={isMe}
@@ -215,7 +215,7 @@ export default function ProfilePage() {
             <p className="small muted">Follow @{profile.username} to see their posts. They need to approve your request first.</p>
           </div>
         ) : (
-          <div className="feed-bleed">
+          <div>
           <PostFeed
             source={{ kind: 'author', authorId: profile.id }}
             empty={
