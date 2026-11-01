@@ -63,3 +63,10 @@ export async function followingAmong(me: string, ids: string[]): Promise<Set<str
   ) as { following_id: string }[]
   return new Set(rows.map((r) => r.following_id))
 }
+
+/** Friends: people who follow this user AND are followed back by them. Pages are taken from the followers list and filtered. */
+export async function listFriends(userId: string, cursor: string | null): Promise<Page<ProfileLite>> {
+  const page = await listFollowers(userId, cursor)
+  const back = await followingAmong(userId, page.items.map((p) => p.id))
+  return { items: page.items.filter((p) => back.has(p.id)), nextCursor: page.nextCursor }
+}

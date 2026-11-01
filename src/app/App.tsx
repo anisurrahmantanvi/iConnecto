@@ -90,6 +90,7 @@ export function App() {
                 <Route path="/u/:username" element={<ProfilePage />} />
                 <Route path="/u/:username/followers" element={<FollowListPage kind="followers" />} />
                 <Route path="/u/:username/following" element={<FollowListPage kind="following" />} />
+                <Route path="/u/:username/friends" element={<FollowListPage kind="friends" />} />
 
                 <Route path="/messages" element={<InboxPage />} />
                 <Route path="/message-settings" element={<MessageSettingsPage />} />

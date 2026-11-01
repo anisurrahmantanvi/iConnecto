@@ -7,10 +7,10 @@ import { EmptyState, ErrorState, ListSkeleton } from '@/components/ui/Feedback'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Tabs } from '@/components/ui/Tabs'
 import { useAsync } from '@/hooks/common'
-import { listFollowers, listFollowing } from '@/services/follows'
+import { listFollowers, listFollowing, listFriends } from '@/services/follows'
 import { getProfileByUsername } from '@/services/profiles'
 
-export default function FollowListPage({ kind }: { kind: 'followers' | 'following' }) {
+export default function FollowListPage({ kind }: { kind: 'followers' | 'following' | 'friends' }) {
   const { username = '' } = useParams()
   const navigate = useNavigate()
   const { data: profile, loading, error, reload } = useAsync(() => getProfileByUsername(username), [username])
@@ -19,7 +19,7 @@ export default function FollowListPage({ kind }: { kind: 'followers' | 'followin
   const fetchPage = useCallback(
     (cursor: string | null): Promise<Page<ProfileLite>> => {
       if (!profileId) return Promise.resolve({ items: [], nextCursor: null })
-      return kind === 'followers' ? listFollowers(profileId, cursor) : listFollowing(profileId, cursor)
+      return kind === 'followers' ? listFollowers(profileId, cursor) : kind === 'friends' ? listFriends(profileId, cursor) : listFollowing(profileId, cursor)
     },
     [kind, profileId],
   )
@@ -35,6 +35,7 @@ export default function FollowListPage({ kind }: { kind: 'followers' | 'followin
           tabs={[
             { value: 'followers', label: 'Followers' },
             { value: 'following', label: 'Following' },
+            { value: 'friends', label: 'Friends' },
           ]}
         />
         {loading ? (
@@ -52,8 +53,8 @@ export default function FollowListPage({ kind }: { kind: 'followers' | 'followin
             fetchPage={fetchPage}
             empty={{
               icon: <Users size={28} />,
-              title: kind === 'followers' ? 'No followers yet' : 'Not following anyone yet',
-              body: kind === 'followers' ? `When people follow @${profile.username}, they will show up here.` : `Accounts @${profile.username} follows will show up here.`,
+              title: kind === 'followers' ? 'No followers yet' : kind === 'friends' ? 'No friends yet' : 'Not following anyone yet',
+              body: kind === 'friends' ? `People who follow @${profile.username} and are followed back will show up here.` : kind === 'followers' ? `When people follow @${profile.username}, they will show up here.` : `Accounts @${profile.username} follows will show up here.`,
             }}
           />
         )}
