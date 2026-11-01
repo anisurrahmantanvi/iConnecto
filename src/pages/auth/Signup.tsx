@@ -55,7 +55,7 @@ export default function SignupPage() {
     e.preventDefault()
     setError(null)
     if (step === 1) {
-      if (displayName.trim().length < 2) return setError('Enter your real name.')
+      if (displayName.trim().length < 2) return setError('Enter the name you use in real life.')
       return setStep(2)
     }
     if (step === 2) {
@@ -108,7 +108,7 @@ export default function SignupPage() {
 
   const titles: Record<Step, string> = { 1: "What's your name?", 2: "What's your email address?", 3: 'Create a password' }
   const subtitles: Record<Step, string> = {
-    1: 'Enter your real name.',
+    1: 'Enter the name you use in real life.',
     2: 'We will send a verification code to this email.',
     3: 'Choose a password with at least 8 characters.',
   }
@@ -124,7 +124,7 @@ export default function SignupPage() {
         {error ? <ErrorBanner>{error}</ErrorBanner> : null}
         {step === 1 ? (
           <TextField
-            label="Your real name"
+            label="Name you use in real life"
             name="name"
             autoComplete="name"
             maxLength={50}

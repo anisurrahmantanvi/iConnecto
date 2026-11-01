@@ -425,6 +425,8 @@ export const BN_APP: Record<string, string> = {
   'Enter a valid email address.': 'সঠিক ইমেইল ঠিকানা দিন।',
   'Confirm and continue': 'নিশ্চিত করে চালিয়ে যান',
   'We sent a verification code to': 'আমরা একটি ভেরিফিকেশন কোড পাঠিয়েছি',
+  'Enter the name you use in real life.': 'বাস্তব জীবনে যে নামে পরিচিত সেটি লিখুন।',
+  'Name you use in real life': 'বাস্তব জীবনে ব্যবহার করা নাম',
 }
 
 export const HI_APP: Record<string, string> = {
@@ -853,4 +855,6 @@ export const HI_APP: Record<string, string> = {
   'Enter a valid email address.': 'सही ईमेल पता डालें।',
   'Confirm and continue': 'पुष्टि करें और जारी रखें',
   'We sent a verification code to': 'हमने एक सत्यापन कोड भेजा है',
+  'Enter the name you use in real life.': 'असल ज़िंदगी में जिस नाम से जाने जाते हैं वह लिखें।',
+  'Name you use in real life': 'असल ज़िंदगी में इस्तेमाल होने वाला नाम',
 }
