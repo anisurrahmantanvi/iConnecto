@@ -8,6 +8,8 @@ import type { AppNotification, Message } from '@/types/db'
 const NOTE_TEXT: Record<AppNotification['type'], string> = {
   follow: 'started following you',
   follow_request: 'wants to follow you',
+  friend_request: 'sent you a friend request',
+  friend_accepted: 'accepted your friend request',
   like: 'liked your post',
   comment: 'commented on your post',
   reply: 'replied to your comment',

@@ -7,8 +7,8 @@ import { Avatar } from '@/components/ui/Avatar'
 import { Button } from '@/components/ui/Button'
 import { EmptyState, ErrorState, ListSkeleton, Spinner } from '@/components/ui/Feedback'
 import { useInfiniteSentinel, usePaged } from '@/hooks/common'
-import { followingAmong } from '@/services/follows'
-import { FollowButton } from './FollowButton'
+import { friendStatesAmong, type FriendState } from '@/services/friends'
+import { FriendButton } from './FriendButton'
 
 interface UserListProps {
   /** Must be stable (useCallback); a new function reloads the list. */
@@ -39,7 +39,7 @@ export function UserList({ fetchPage, empty, showFollow = true, renderAction }: 
   const me = useMe()
   const { items, loading, loadingMore, error, hasMore, loadMore, reload } = usePaged<ProfileLite>(fetchPage)
   const sentinel = useInfiniteSentinel(loadMore, hasMore && !loadingMore && !error)
-  const [following, setFollowing] = useState<Set<string>>(new Set())
+  const [states, setStates] = useState<Map<string, FriendState>>(new Map())
   const known = useRef<Set<string>>(new Set())
 
   useEffect(() => {
@@ -48,21 +48,16 @@ export function UserList({ fetchPage, empty, showFollow = true, renderAction }: 
     if (!fresh.length) return
     fresh.forEach((id) => known.current.add(id))
     let cancelled = false
-    followingAmong(me.id, fresh)
-      .then((set) => !cancelled && setFollowing((prev) => new Set([...prev, ...set])))
-      .catch(() => undefined) // buttons simply show "Follow"; the server still rejects duplicates
+    friendStatesAmong(me.id, fresh)
+      .then((m) => !cancelled && setStates((prev) => new Map([...prev, ...m])))
+      .catch(() => undefined) // buttons simply show "Add friend"; the server still rejects duplicates
     return () => {
       cancelled = true
     }
   }, [items, me.id, showFollow])
 
-  const setOne = useCallback((id: string, on: boolean) => {
-    setFollowing((prev) => {
-      const n = new Set(prev)
-      if (on) n.add(id)
-      else n.delete(id)
-      return n
-    })
+  const setOne = useCallback((id: string, st: FriendState) => {
+    setStates((prev) => new Map(prev).set(id, st))
   }, [])
 
   if (loading) return <ListSkeleton />
@@ -78,7 +73,7 @@ export function UserList({ fetchPage, empty, showFollow = true, renderAction }: 
             profile={p}
             right={
               renderAction ? renderAction(p) : showFollow ? (
-                <FollowButton targetId={p.id} following={following.has(p.id)} onChange={(on) => setOne(p.id, on)} />
+                <FriendButton targetId={p.id} state={states.get(p.id) ?? 'none'} onChange={(st) => setOne(p.id, st)} />
               ) : null
             }
           />

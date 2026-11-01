@@ -104,7 +104,7 @@ export default function PrivacyPage() {
           <div className="row" style={{ alignItems: 'flex-start' }}>
             <Eye size={22} color="var(--accent)" aria-hidden style={{ flex: 'none', marginTop: 2 }} />
             <p className="small">
-              Your profile, posts, followers and following lists are visible to anyone who has an account. Posts in a private
+              Your profile, posts and friends list are visible to anyone who has an account. Posts in a private
               community are visible to its members only.
             </p>
           </div>
@@ -122,14 +122,13 @@ export default function PrivacyPage() {
             <h2 className="section-title">Private account</h2>
             <GlassPanel padded className="col">
               <p className="small">
-                When your account is private, people must send a follow request and you approve them. Only your followers can see
-                your posts. People who already follow you stay as they are. Switching back to public accepts everyone waiting.
+                When your account is private, only your friends can see your posts. Anyone can still send you a friend request. Switching back to public lets everyone see your public posts.
               </p>
               <div role="group" aria-label="Private account" className="chip-row">
                 <button type="button" className="chip" aria-pressed={isPrivate} onClick={() => void changePrivate(true)}>Private</button>
                 <button type="button" className="chip" aria-pressed={!isPrivate} onClick={() => void changePrivate(false)}>Public</button>
               </div>
-              <Link to="/follow-requests" className="btn btn--glass btn--sm" style={{ alignSelf: 'flex-start' }}>Follow requests</Link>
+              <Link to="/friend-requests" className="btn btn--glass btn--sm" style={{ alignSelf: 'flex-start' }}>Friend requests</Link>
             </GlassPanel>
           </>
         ) : null}
@@ -143,7 +142,7 @@ export default function PrivacyPage() {
               </p>
               <div role="group" aria-label="Who can message you" className="chip-row">
                 <button type="button" className="chip" aria-pressed={whoMsg === 'everyone'} onClick={() => void changeWhoMsg('everyone')}>Everyone</button>
-                <button type="button" className="chip" aria-pressed={whoMsg === 'followers'} onClick={() => void changeWhoMsg('followers')}>My followers</button>
+                <button type="button" className="chip" aria-pressed={whoMsg === 'followers'} onClick={() => void changeWhoMsg('followers')}>My friends</button>
                 <button type="button" className="chip" aria-pressed={whoMsg === 'nobody'} onClick={() => void changeWhoMsg('nobody')}>Nobody</button>
               </div>
             </GlassPanel>

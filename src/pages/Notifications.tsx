@@ -12,7 +12,7 @@ import { useToast } from '@/components/ui/Toast'
 import { useInfiniteSentinel, usePaged } from '@/hooks/common'
 import { timeAgo } from '@/lib/format'
 import { errorMessage } from '@/lib/supabase'
-import { countFollowRequests } from '@/services/privateAccount'
+import { countFriendRequests } from '@/services/friends'
 import { getCommunityById } from '@/services/communities'
 import {
   deleteNotification,
@@ -26,6 +26,10 @@ function describe(n: AppNotification): { text: string; icon: ReactElement } {
   switch (n.type) {
     case 'follow':
       return { text: 'started following you', icon: <UserPlus size={14} /> }
+    case 'friend_request':
+      return { text: 'sent you a friend request', icon: <UserPlus size={14} /> }
+    case 'friend_accepted':
+      return { text: 'accepted your friend request', icon: <UserPlus size={14} /> }
     case 'follow_request':
       return { text: 'wants to follow you', icon: <UserPlus size={14} /> }
     case 'like':
@@ -75,7 +79,8 @@ export default function NotificationsPage() {
         setItems((prev) => prev.map((x) => (x.id === n.id ? { ...x, is_read: true } : x)))
         void markNotificationRead(n.id).then(refreshNotifications).catch(() => refreshNotifications())
       }
-      if (n.type === 'follow_request') return navigate('/follow-requests')
+      if (n.type === 'friend_request') return navigate('/friend-requests')
+      if ((n.type === 'friend_accepted' || n.type === 'follow_request') && n.actor) return navigate(`/u/${n.actor.username}`)
       if (n.type === 'follow' && n.actor) return navigate(`/u/${n.actor.username}`)
       if (n.post_id) return navigate(n.type === 'comment' || n.type === 'reply' ? `/p/${n.post_id}#comments` : `/p/${n.post_id}`)
       if (n.type === 'community_join' && n.community_id) {
@@ -105,7 +110,7 @@ export default function NotificationsPage() {
 
   const [requestCount, setRequestCount] = useState(0)
   useEffect(() => {
-    void countFollowRequests(me.id).then(setRequestCount)
+    void countFriendRequests(me.id).then(setRequestCount)
   }, [me.id])
 
   return (
@@ -120,8 +125,8 @@ export default function NotificationsPage() {
       />
 
       {requestCount > 0 ? (
-        <Link to="/follow-requests" className="glass banner banner--info banner--button">
-          <UserPlus size={18} aria-hidden /> {requestCount} follow {requestCount === 1 ? 'request' : 'requests'}. Tap to review.
+        <Link to="/friend-requests" className="glass banner banner--info banner--button">
+          <UserPlus size={18} aria-hidden /> {requestCount} friend {requestCount === 1 ? 'request' : 'requests'}. Tap to review.
         </Link>
       ) : null}
 

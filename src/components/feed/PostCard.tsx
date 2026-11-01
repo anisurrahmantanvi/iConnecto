@@ -134,7 +134,7 @@ export const PostCard = memo(function PostCard({ post, onChange, onDeleted, canM
     try {
       await setPostVisibility(post.id, visibility)
       onChange({ ...post, visibility })
-      toast.show(visibility === 'public' ? 'Post is now public' : visibility === 'followers' ? 'Only your followers can see this post' : 'Only you can see this post')
+      toast.show(visibility === 'public' ? 'Post is now public' : visibility === 'followers' ? 'Only your friends can see this post' : 'Only you can see this post')
     } catch (e) {
       toast.error(errorMessage(e))
     }
@@ -161,7 +161,7 @@ export const PostCard = memo(function PostCard({ post, onChange, onDeleted, canM
           </Link>
           <div className="post__sub truncate">
             @{author?.username ?? 'unknown'} · <Link to={`/p/${post.id}`} className="muted">{timeAgo(post.created_at)}</Link>
-            {post.visibility === 'followers' ? <span title="Followers only"> · <Users size={12} aria-label="Followers only" style={{ verticalAlign: '-1px' }} /></span> : null}
+            {post.visibility === 'followers' ? <span title="Friends only"> · <Users size={12} aria-label="Friends only" style={{ verticalAlign: '-1px' }} /></span> : null}
             {post.visibility === 'only_me' ? <span title="Only me"> · <Lock size={12} aria-label="Only me" style={{ verticalAlign: '-1px' }} /></span> : null}
             {post.edited_at ? <span> · edited</span> : null}
             {post.community ? <> · <Link to={`/c/${post.community.slug}`}>{post.community.name}</Link></> : null}
@@ -250,7 +250,7 @@ export const PostCard = memo(function PostCard({ post, onChange, onDeleted, canM
         <div className="privacy-options" role="radiogroup" aria-label="Post privacy">
           {([
             ['public', <Globe key="g" size={22} />, 'Public', 'Everyone on iConnecto'],
-            ['followers', <Users key="u" size={22} />, 'Followers only', 'Only people who follow you'],
+            ['followers', <Users key="u" size={22} />, 'Friends only', 'Only your friends'],
             ['only_me', <Lock key="l" size={22} />, 'Only me', 'Nobody else can see it'],
           ] as const).map(([value, icon, title, body]) => (
             <button

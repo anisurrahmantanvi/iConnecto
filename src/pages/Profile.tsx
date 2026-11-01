@@ -15,8 +15,8 @@ import { useToast } from '@/components/ui/Toast'
 import { useAsync } from '@/hooks/common'
 import { errorMessage } from '@/lib/supabase'
 import { getOrCreateDm } from '@/services/chat'
-import { isFollowing } from '@/services/follows'
-import { getIsPrivate, hasRequested } from '@/services/privateAccount'
+import { countFriends, getFriendState, type FriendState } from '@/services/friends'
+import { getIsPrivate } from '@/services/privateAccount'
 import { blockUser, isBlockedByMe, unblockUser } from '@/services/moderation'
 import { getProfileAbout, getProfileByUsername } from '@/services/profiles'
 
@@ -35,13 +35,13 @@ export default function ProfilePage() {
     }
   }
 
-  const { data: profile, setData: setProfile, loading, error, reload } = useAsync(() => getProfileByUsername(username), [username])
+  const { data: profile, loading, error, reload } = useAsync(() => getProfileByUsername(username), [username])
   const isMe = profile?.id === me.id
   // Optional details; if they cannot be loaded the About card still shows the joining date.
   const { data: about } = useAsync(() => (profile ? getProfileAbout(profile.id).catch(() => null) : Promise.resolve(null)), [profile?.id])
 
-  const [following, setFollowing] = useState(false)
-  const [requested, setRequested] = useState(false)
+  const [friendState, setFriendState] = useState<FriendState>('none')
+  const [friendsCount, setFriendsCount] = useState<number | null>(null)
   const [isPrivate, setIsPrivate] = useState(false)
   const [blocked, setBlocked] = useState(false)
   const [messaging, setMessaging] = useState(false)
@@ -51,20 +51,19 @@ export default function ProfilePage() {
   const profileId = profile?.id ?? null
   useEffect(() => {
     if (!profileId || profileId === me.id) {
-      setFollowing(false)
+      setFriendState('none')
       setBlocked(false)
-      setRequested(false)
       setIsPrivate(false)
       return
     }
     let cancelled = false
-    Promise.all([isFollowing(me.id, profileId), isBlockedByMe(me.id, profileId)])
+    Promise.all([getFriendState(me.id, profileId), isBlockedByMe(me.id, profileId)])
       .then(([f, b]) => {
         if (cancelled) return
-        setFollowing(f)
+        setFriendState(f)
         setBlocked(b)
       })
-      .catch(() => undefined) // the buttons fall back to "Follow"; the server still rejects duplicates
+      .catch(() => undefined) // the button falls back to "Add friend"; the server still rejects duplicates
     return () => {
       cancelled = true
     }
@@ -74,23 +73,24 @@ export default function ProfilePage() {
   useEffect(() => {
     if (!profileId || profileId === me.id) return
     let cancelled = false
-    void Promise.all([getIsPrivate(profileId), hasRequested(me.id, profileId)]).then(([priv, req]) => {
-      if (cancelled) return
-      setIsPrivate(priv === true)
-      setRequested(req)
+    void getIsPrivate(profileId).then((priv) => {
+      if (!cancelled) setIsPrivate(priv === true)
     })
     return () => {
       cancelled = true
     }
   }, [profileId, me.id])
 
-  const onFollowingChange = useCallback(
-    (on: boolean) => {
-      setFollowing(on)
-      setProfile((p) => (p ? { ...p, followers_count: Math.max(0, p.followers_count + (on ? 1 : -1)) } : p))
-    },
-    [setProfile],
-  )
+  useEffect(() => {
+    if (!profileId) return
+    let cancelled = false
+    void countFriends(profileId).then((n) => !cancelled && setFriendsCount(n))
+    return () => {
+      cancelled = true
+    }
+  }, [profileId, friendState])
+
+  const onFriendStateChange = useCallback((s: FriendState) => setFriendState(s), [])
 
   const message = async () => {
     if (!profile) return
@@ -189,11 +189,10 @@ export default function ProfilePage() {
         <ProfileHeader
           profile={profile}
           isMe={isMe}
-          following={following}
-          requested={requested}
-          onRequestedChange={setRequested}
+          friendState={friendState}
+          onFriendStateChange={onFriendStateChange}
+          friendsCount={friendsCount}
           isPrivate={isPrivate}
-          onFollowingChange={onFollowingChange}
           onMessage={() => void message()}
           messaging={messaging}
           menu={isMe ? [] : menu}
@@ -208,11 +207,11 @@ export default function ProfilePage() {
             <p className="small muted">You can't see each other's posts or message one another. Unblock to see their posts again.</p>
             <div><Button variant="glass" size="sm" onClick={() => void unblock()}>Unblock</Button></div>
           </div>
-        ) : !isMe && isPrivate && !following ? (
+        ) : !isMe && isPrivate && friendState !== 'friends' ? (
           <div className="glass card col" role="status" style={{ alignItems: 'center', textAlign: 'center' }}>
             <Lock size={28} aria-hidden />
             <strong>This account is private</strong>
-            <p className="small muted">Follow @{profile.username} to see their posts. They need to approve your request first.</p>
+            <p className="small muted">Send @{profile.username} a friend request to see their posts. They need to accept it first.</p>
           </div>
         ) : (
           <div>
@@ -250,7 +249,7 @@ export default function ProfilePage() {
         onConfirm={async () => {
           await blockUser(profile.id)
           setBlocked(true)
-          setFollowing(false)
+          setFriendState('none')
           reload()
           toast.show(`Blocked @${profile.username}`)
         }}

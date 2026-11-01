@@ -137,7 +137,7 @@ export default function CreatePage() {
             <label htmlFor="post-privacy">Who can see this post?</label>
             <select id="post-privacy" className="input" value={visibility} disabled={busy} onChange={(e) => setVisibility(e.target.value as PostVisibility)}>
               <option value="public">Public (everyone)</option>
-              <option value="followers">Followers only</option>
+              <option value="followers">Friends only</option>
               <option value="only_me">Only me</option>
             </select>
           </div>

@@ -9,16 +9,16 @@ import { RichText } from '@/components/ui/Emoji'
 import { usePresence } from '@/hooks/presence'
 import { compactNumber } from '@/lib/format'
 import { describePresence } from '@/lib/presence'
-import { FollowButton } from './FollowButton'
+import { FriendButton } from './FriendButton'
+import type { FriendState } from '@/services/friends'
 
 interface ProfileHeaderProps {
   profile: Profile
   isMe: boolean
-  following: boolean
-  requested?: boolean
-  onRequestedChange?: (requested: boolean) => void
+  friendState: FriendState
+  onFriendStateChange: (s: FriendState) => void
+  friendsCount: number | null
   isPrivate?: boolean
-  onFollowingChange: (on: boolean) => void
   onMessage: () => void
   messaging: boolean
   menu: MenuItem[]
@@ -26,7 +26,7 @@ interface ProfileHeaderProps {
   onAddStory?: () => void
 }
 
-export function ProfileHeader({ profile, isMe, following, requested, onRequestedChange, isPrivate, onFollowingChange, onMessage, messaging, menu, onAddStory }: ProfileHeaderProps) {
+export function ProfileHeader({ profile, isMe, friendState, onFriendStateChange, friendsCount, isPrivate, onMessage, messaging, menu, onAddStory }: ProfileHeaderProps) {
   const base = `/u/${profile.username}`
   const presenceMap = usePresence(isMe ? [] : [profile.id])
   const presence = isMe ? null : describePresence(presenceMap.get(profile.id))
@@ -48,8 +48,7 @@ export function ProfileHeader({ profile, isMe, following, requested, onRequested
 
       <div className="stats">
         <div><strong>{compactNumber(profile.posts_count)}</strong><span>Posts</span></div>
-        <Link to={`${base}/followers`}><strong>{compactNumber(profile.followers_count)}</strong><span>Followers</span></Link>
-        <Link to={`${base}/following`}><strong>{compactNumber(profile.following_count)}</strong><span>Following</span></Link>
+        <Link to={`${base}/friends`}><strong>{friendsCount === null ? '–' : compactNumber(friendsCount)}</strong><span>Friends</span></Link>
       </div>
 
       <div className="row profile-actions">
@@ -60,7 +59,7 @@ export function ProfileHeader({ profile, isMe, following, requested, onRequested
           </>
         ) : (
           <>
-            <FollowButton targetId={profile.id} following={following} onChange={onFollowingChange} size="md" requested={requested} onRequestedChange={onRequestedChange} />
+            <FriendButton targetId={profile.id} state={friendState} onChange={onFriendStateChange} size="md" />
             <Button variant="glass" icon={<MessageCircle size={16} />} loading={messaging} onClick={onMessage}>Message</Button>
           </>
         )}

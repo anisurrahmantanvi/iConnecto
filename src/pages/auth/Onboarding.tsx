@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth, useMe } from '@/app/AuthProvider'
 import { AvatarUploader } from '@/components/profile/AvatarUploader'
-import { FollowButton } from '@/components/profile/FollowButton'
+import { FriendButton } from '@/components/profile/FriendButton'
+import type { FriendState } from '@/services/friends'
 import { UserRow } from '@/components/profile/UserList'
 import { Button } from '@/components/ui/Button'
 import { TextAreaField, TextField } from '@/components/ui/Field'
@@ -22,7 +23,7 @@ export default function OnboardingPage() {
   const [bio, setBio] = useState(me.bio ?? '')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [following, setFollowing] = useState<Record<string, boolean>>({})
+  const [states, setStates] = useState<Record<string, FriendState>>({})
   const suggestions = useAsync(() => suggestedProfiles(me.id, 6), [me.id])
 
   const finish = async () => {
@@ -67,7 +68,7 @@ export default function OnboardingPage() {
         />
 
         <section className="col" aria-label="People you may know">
-          <h2>People to follow</h2>
+          <h2>People you may know</h2>
           {suggestions.loading ? (
             <ListSkeleton rows={3} />
           ) : suggestions.data && suggestions.data.length ? (
@@ -77,10 +78,10 @@ export default function OnboardingPage() {
                   key={p.id}
                   profile={p}
                   right={
-                    <FollowButton
+                    <FriendButton
                       targetId={p.id}
-                      following={!!following[p.id]}
-                      onChange={(on) => setFollowing((f) => ({ ...f, [p.id]: on }))}
+                      state={states[p.id] ?? 'none'}
+                      onChange={(st) => setStates((f) => ({ ...f, [p.id]: st }))}
                     />
                   }
                 />

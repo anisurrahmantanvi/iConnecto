@@ -90,12 +90,14 @@ async function build(kind: string, id: string): Promise<Push | null> {
     const text: Record<string, string> = {
       follow: 'started following you',
       follow_request: 'wants to follow you',
+      friend_request: 'sent you a friend request',
+      friend_accepted: 'accepted your friend request',
       like: 'liked your post',
       comment: 'commented on your post',
       reply: 'replied to your comment',
       community_join: 'joined your community',
     }
-    const url = n.type === 'follow_request' ? '/follow-requests' : n.type === 'follow' && actor ? `/u/${actor.username}` : n.post_id ? `/p/${n.post_id}` : '/notifications'
+    const url = n.type === 'friend_request' ? '/friend-requests' : n.type === 'follow_request' ? '/friend-requests' : n.type === 'follow' && actor ? `/u/${actor.username}` : n.post_id ? `/p/${n.post_id}` : '/notifications'
     return {
       recipients: [n.recipient_id as string],
       title: 'iConnecto',

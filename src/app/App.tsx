@@ -35,7 +35,7 @@ const MessageSettingsPage = lazy(() => import('@/pages/MessageSettings'))
 const SettingsSectionPage = lazy(() => import('@/pages/settings/SettingsSection'))
 const MenuPage = lazy(() => import('@/pages/Menu'))
 const PrivacyPolicyPage = lazy(() => import('@/pages/PrivacyPolicy'))
-const FollowRequestsPage = lazy(() => import('@/pages/FollowRequests'))
+const FriendRequestsPage = lazy(() => import('@/pages/FriendRequests'))
 const SettingsHomePage = lazy(() => import('@/pages/settings/SettingsHome'))
 const MessagePrivacyPage = lazy(() => import('@/pages/MessagePrivacy'))
 const ChatLookPage = lazy(() => import('@/pages/ChatLook'))
@@ -85,12 +85,13 @@ export function App() {
                 <Route path="/p/:postId" element={<PostDetailPage />} />
                 <Route path="/saved" element={<SavedPage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
-                <Route path="/follow-requests" element={<FollowRequestsPage />} />
+                <Route path="/friend-requests" element={<FriendRequestsPage />} />
+                <Route path="/follow-requests" element={<FriendRequestsPage />} />
 
                 <Route path="/u/:username" element={<ProfilePage />} />
-                <Route path="/u/:username/followers" element={<FollowListPage kind="followers" />} />
-                <Route path="/u/:username/following" element={<FollowListPage kind="following" />} />
-                <Route path="/u/:username/friends" element={<FollowListPage kind="friends" />} />
+                <Route path="/u/:username/followers" element={<FollowListPage />} />
+                <Route path="/u/:username/following" element={<FollowListPage />} />
+                <Route path="/u/:username/friends" element={<FollowListPage />} />
 
                 <Route path="/messages" element={<InboxPage />} />
                 <Route path="/message-settings" element={<MessageSettingsPage />} />

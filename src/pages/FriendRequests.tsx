@@ -10,21 +10,21 @@ import { PageHeader } from '@/components/ui/PageHeader'
 import { useToast } from '@/components/ui/Toast'
 import { useAsync } from '@/hooks/common'
 import { errorMessage } from '@/lib/supabase'
-import { listFollowRequests, respondFollowRequest } from '@/services/privateAccount'
+import { listFriendRequests, respondFriendRequest } from '@/services/friends'
 
-/** People who asked to follow your private account. */
-export default function FollowRequestsPage() {
+/** People who sent you a friend request. */
+export default function FriendRequestsPage() {
   const me = useMe()
   const toast = useToast()
-  const { data, setData, loading, error, reload } = useAsync(() => listFollowRequests(me.id), [me.id])
+  const { data, setData, loading, error, reload } = useAsync(() => listFriendRequests(me.id), [me.id])
   const [busy, setBusy] = useState<string | null>(null)
 
   const answer = async (id: string, accept: boolean) => {
     setBusy(id)
     try {
-      await respondFollowRequest(id, accept)
+      await respondFriendRequest(id, accept)
       setData((prev) => (prev ? prev.filter((r) => r.requester.id !== id) : prev))
-      toast.show(accept ? 'Request accepted' : 'Request declined')
+      toast.show(accept ? 'You are now friends' : 'Request declined')
     } catch (e) {
       toast.error(errorMessage(e))
     } finally {
@@ -34,15 +34,15 @@ export default function FollowRequestsPage() {
 
   return (
     <>
-      <PageHeader title="Follow requests" back="/notifications" />
+      <PageHeader title="Friend requests" back="/notifications" />
       {loading ? (
         <ListSkeleton rows={3} />
       ) : error ? (
         <ErrorState message={error} onRetry={reload} />
       ) : !data || data.length === 0 ? (
-        <EmptyState icon={<Lock size={28} />} title="No requests" body="When your account is private, people ask to follow you and you approve them here." />
+        <EmptyState icon={<Lock size={28} />} title="No requests" body="When someone sends you a friend request, you can accept it here." />
       ) : (
-        <GlassPanel className="settings-list" as="section" aria-label="Follow requests">
+        <GlassPanel className="settings-list" as="section" aria-label="Friend requests">
           {data.map(({ requester }) => (
             <div key={requester.id} className="list-row">
               <Link to={`/u/${requester.username}`} aria-label={`Open ${requester.display_name ?? requester.username}`}>
