@@ -101,7 +101,7 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
     items: [
       { title: 'Privacy Checkup' },
       { title: 'Profile Visibility', to: '/settings/privacy' },
-      { title: 'Private Account' },
+      { title: 'Private Account', to: '/settings/privacy' },
       { title: 'Blocked Users', to: '/settings/blocked' },
       { title: 'Restricted Users' },
       { title: 'Who Can See My Content' },

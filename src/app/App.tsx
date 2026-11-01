@@ -35,6 +35,7 @@ const MessageSettingsPage = lazy(() => import('@/pages/MessageSettings'))
 const SettingsSectionPage = lazy(() => import('@/pages/settings/SettingsSection'))
 const MenuPage = lazy(() => import('@/pages/Menu'))
 const PrivacyPolicyPage = lazy(() => import('@/pages/PrivacyPolicy'))
+const FollowRequestsPage = lazy(() => import('@/pages/FollowRequests'))
 const SettingsHomePage = lazy(() => import('@/pages/settings/SettingsHome'))
 const EditProfilePage = lazy(() => import('@/pages/settings/EditProfile'))
 const PrivacyPage = lazy(() => import('@/pages/settings/Privacy'))
@@ -81,6 +82,7 @@ export function App() {
                 <Route path="/p/:postId" element={<PostDetailPage />} />
                 <Route path="/saved" element={<SavedPage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
+                <Route path="/follow-requests" element={<FollowRequestsPage />} />
 
                 <Route path="/u/:username" element={<ProfilePage />} />
                 <Route path="/u/:username/followers" element={<FollowListPage kind="followers" />} />

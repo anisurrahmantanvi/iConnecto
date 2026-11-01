@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge'
-import { MessageCircle, Pencil, Plus } from 'lucide-react'
+import { Lock, MessageCircle, Pencil, Plus } from 'lucide-react'
 import type { Profile } from '@/types/db'
 import { PresenceAvatar } from '@/components/ui/PresenceAvatar'
 import { Button } from '@/components/ui/Button'
@@ -15,6 +15,9 @@ interface ProfileHeaderProps {
   profile: Profile
   isMe: boolean
   following: boolean
+  requested?: boolean
+  onRequestedChange?: (requested: boolean) => void
+  isPrivate?: boolean
   onFollowingChange: (on: boolean) => void
   onMessage: () => void
   messaging: boolean
@@ -23,7 +26,7 @@ interface ProfileHeaderProps {
   onAddStory?: () => void
 }
 
-export function ProfileHeader({ profile, isMe, following, onFollowingChange, onMessage, messaging, menu, onAddStory }: ProfileHeaderProps) {
+export function ProfileHeader({ profile, isMe, following, requested, onRequestedChange, isPrivate, onFollowingChange, onMessage, messaging, menu, onAddStory }: ProfileHeaderProps) {
   const base = `/u/${profile.username}`
   const presenceMap = usePresence(isMe ? [] : [profile.id])
   const presence = isMe ? null : describePresence(presenceMap.get(profile.id))
@@ -35,7 +38,7 @@ export function ProfileHeader({ profile, isMe, following, onFollowingChange, onM
       <div className="profile-top">
         <div className="profile-id">
           <h1>{profile.display_name || profile.username}<VerifiedBadge badge={profile.badge} size={20} /></h1>
-          <div className="muted">@{profile.username}</div>
+          <div className="muted">@{profile.username}{isPrivate ? <Lock size={13} aria-label="Private account" style={{ marginLeft: 6, verticalAlign: '-0.1em' }} /> : null}</div>
         </div>
         <span className="profile-ring">
           <PresenceAvatar online={!!presence?.online} src={profile.avatar_url} name={profile.display_name ?? profile.username} size="xl" />
@@ -57,7 +60,7 @@ export function ProfileHeader({ profile, isMe, following, onFollowingChange, onM
           </>
         ) : (
           <>
-            <FollowButton targetId={profile.id} following={following} onChange={onFollowingChange} size="md" />
+            <FollowButton targetId={profile.id} following={following} onChange={onFollowingChange} size="md" requested={requested} onRequestedChange={onRequestedChange} />
             <Button variant="glass" icon={<MessageCircle size={16} />} loading={messaging} onClick={onMessage}>Message</Button>
           </>
         )}

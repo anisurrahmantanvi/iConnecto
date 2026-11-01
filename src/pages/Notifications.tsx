@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, type ReactElement } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Bell, CheckCheck, Heart, MessageCircle, UserPlus, Users, X } from 'lucide-react'
 import type { AppNotification } from '@/types/db'
 import { useMe } from '@/app/AuthProvider'
@@ -12,6 +12,7 @@ import { useToast } from '@/components/ui/Toast'
 import { useInfiniteSentinel, usePaged } from '@/hooks/common'
 import { timeAgo } from '@/lib/format'
 import { errorMessage } from '@/lib/supabase'
+import { countFollowRequests } from '@/services/privateAccount'
 import { getCommunityById } from '@/services/communities'
 import {
   deleteNotification,
@@ -99,6 +100,11 @@ export default function NotificationsPage() {
     }
   }
 
+  const [requestCount, setRequestCount] = useState(0)
+  useEffect(() => {
+    void countFollowRequests(me.id).then(setRequestCount)
+  }, [me.id])
+
   return (
     <>
       <PageHeader
@@ -109,6 +115,12 @@ export default function NotificationsPage() {
           </Button>
         }
       />
+
+      {requestCount > 0 ? (
+        <Link to="/follow-requests" className="glass banner banner--info banner--button">
+          <UserPlus size={18} aria-hidden /> {requestCount} follow {requestCount === 1 ? 'request' : 'requests'}. Tap to review.
+        </Link>
+      ) : null}
 
       {fresh ? (
         <button

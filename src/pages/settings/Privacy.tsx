@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
+import { getIsPrivate, setMyPrivate } from '@/services/privateAccount'
 import { Link } from 'react-router-dom'
 import { BellOff, ChevronRight, Eye, Lock, MonitorSmartphone, UserX } from 'lucide-react'
 import { useAuth, useMe } from '@/app/AuthProvider'
@@ -20,6 +21,20 @@ export default function PrivacyPage() {
   useEffect(() => {
     void getMyShowActivity(me.id).then(setShowActivity)
   }, [me.id])
+  const [isPrivate, setIsPrivate] = useState<boolean | null>(null)
+  useEffect(() => {
+    void getIsPrivate(me.id).then(setIsPrivate)
+  }, [me.id])
+  const changePrivate = async (on: boolean) => {
+    const before = isPrivate
+    setIsPrivate(on)
+    try {
+      await setMyPrivate(me.id, on)
+    } catch (err) {
+      setIsPrivate(before)
+      toast.error(errorMessage(err))
+    }
+  }
   const changeActivity = async (on: boolean) => {
     const before = showActivity
     setShowActivity(on)
@@ -86,8 +101,24 @@ export default function PrivacyPage() {
               only to you. Your email address is never shown to other users.
             </p>
           </div>
-          <p className="small faint">Private (approve-to-follow) accounts are not available yet.</p>
         </GlassPanel>
+
+        {isPrivate !== null ? (
+          <>
+            <h2 className="section-title">Private account</h2>
+            <GlassPanel padded className="col">
+              <p className="small">
+                When your account is private, people must send a follow request and you approve them. Only your followers can see
+                your posts. People who already follow you stay as they are. Switching back to public accepts everyone waiting.
+              </p>
+              <div role="group" aria-label="Private account" className="chip-row">
+                <button type="button" className="chip" aria-pressed={isPrivate} onClick={() => void changePrivate(true)}>Private</button>
+                <button type="button" className="chip" aria-pressed={!isPrivate} onClick={() => void changePrivate(false)}>Public</button>
+              </div>
+              <Link to="/follow-requests" className="btn btn--glass btn--sm" style={{ alignSelf: 'flex-start' }}>Follow requests</Link>
+            </GlassPanel>
+          </>
+        ) : null}
 
         {showActivity !== null ? (
           <>

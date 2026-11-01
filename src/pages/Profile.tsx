@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { appUrl } from '@/lib/base'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { Ban, Copy, Flag, LogOut, Menu, Phone, Settings, UserPlus, UserX, Video } from 'lucide-react'
+import { Ban, Copy, Flag, Lock, LogOut, Menu, Phone, Settings, UserPlus, UserX, Video } from 'lucide-react'
 import { useAuth, useMe } from '@/app/AuthProvider'
 import { PostFeed } from '@/components/feed/PostFeed'
 import { ProfileAbout } from '@/components/profile/ProfileAbout'
@@ -16,6 +16,7 @@ import { useAsync } from '@/hooks/common'
 import { errorMessage } from '@/lib/supabase'
 import { getOrCreateDm } from '@/services/chat'
 import { isFollowing } from '@/services/follows'
+import { getIsPrivate, hasRequested } from '@/services/privateAccount'
 import { blockUser, isBlockedByMe, unblockUser } from '@/services/moderation'
 import { getProfileAbout, getProfileByUsername } from '@/services/profiles'
 
@@ -40,6 +41,8 @@ export default function ProfilePage() {
   const { data: about } = useAsync(() => (profile ? getProfileAbout(profile.id).catch(() => null) : Promise.resolve(null)), [profile?.id])
 
   const [following, setFollowing] = useState(false)
+  const [requested, setRequested] = useState(false)
+  const [isPrivate, setIsPrivate] = useState(false)
   const [blocked, setBlocked] = useState(false)
   const [messaging, setMessaging] = useState(false)
   const [confirmBlock, setConfirmBlock] = useState(false)
@@ -50,6 +53,8 @@ export default function ProfilePage() {
     if (!profileId || profileId === me.id) {
       setFollowing(false)
       setBlocked(false)
+      setRequested(false)
+      setIsPrivate(false)
       return
     }
     let cancelled = false
@@ -60,6 +65,20 @@ export default function ProfilePage() {
         setBlocked(b)
       })
       .catch(() => undefined) // the buttons fall back to "Follow"; the server still rejects duplicates
+    return () => {
+      cancelled = true
+    }
+  }, [profileId, me.id])
+
+  // Private-account details load on their own, so an older database simply shows an ordinary profile.
+  useEffect(() => {
+    if (!profileId || profileId === me.id) return
+    let cancelled = false
+    void Promise.all([getIsPrivate(profileId), hasRequested(me.id, profileId)]).then(([priv, req]) => {
+      if (cancelled) return
+      setIsPrivate(priv === true)
+      setRequested(req)
+    })
     return () => {
       cancelled = true
     }
@@ -171,6 +190,9 @@ export default function ProfilePage() {
           profile={profile}
           isMe={isMe}
           following={following}
+          requested={requested}
+          onRequestedChange={setRequested}
+          isPrivate={isPrivate}
           onFollowingChange={onFollowingChange}
           onMessage={() => void message()}
           messaging={messaging}
@@ -185,6 +207,12 @@ export default function ProfilePage() {
             <strong>You blocked @{profile.username}</strong>
             <p className="small muted">You can't see each other's posts or message one another. Unblock to see their posts again.</p>
             <div><Button variant="glass" size="sm" onClick={() => void unblock()}>Unblock</Button></div>
+          </div>
+        ) : !isMe && isPrivate && !following ? (
+          <div className="glass card col" role="status" style={{ alignItems: 'center', textAlign: 'center' }}>
+            <Lock size={28} aria-hidden />
+            <strong>This account is private</strong>
+            <p className="small muted">Follow @{profile.username} to see their posts. They need to approve your request first.</p>
           </div>
         ) : (
           <PostFeed
