@@ -1,3 +1,4 @@
+import type { Session } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 
 const KEY = 'iconnecto.deviceKey'
@@ -93,4 +94,52 @@ export async function pendingMfaFactor(): Promise<string | null> {
     return f.data?.totp?.[0]?.id ?? null
   }
   return null
+}
+
+/* ---- Email code as a second step (checked in the app after the password) ---- */
+export function sessionIdOf(session: Session | null): string {
+  try {
+    const part = session?.access_token.split('.')[1]
+    if (!part) return ''
+    const json = JSON.parse(atob(part.replace(/-/g, '+').replace(/_/g, '/'))) as { session_id?: string }
+    return json.session_id ?? ''
+  } catch {
+    return ''
+  }
+}
+
+const MARK = 'iconnecto.2sv.'
+export const isSessionChecked = (sid: string): boolean => {
+  try { return !!sid && localStorage.getItem(MARK + sid) === '1' } catch { return false }
+}
+export const markSessionChecked = (sid: string): void => {
+  try {
+    if (!sid) return
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i)
+      if (k && k.startsWith(MARK)) localStorage.removeItem(k)
+    }
+    localStorage.setItem(MARK + sid, '1')
+  } catch { /* ignore */ }
+}
+
+export const emailStepOn = (user: { user_metadata?: Record<string, unknown> } | null | undefined): boolean =>
+  user?.user_metadata?.two_step_email === true
+
+export async function sendEmailStepCode(email: string): Promise<void> {
+  const { error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: false } })
+  if (error) throw new Error(error.message)
+}
+
+/** Checks the emailed code. Supabase starts a fresh session for it, so the new session is the one we mark as checked. */
+export async function verifyEmailStepCode(email: string, code: string): Promise<void> {
+  const { error } = await supabase.auth.verifyOtp({ email, token: code.replace(/\s+/g, ''), type: 'email' })
+  if (error) throw new Error(/expired|invalid/i.test(error.message) ? 'That code is wrong or has expired. Check it or request a new one.' : error.message)
+  const { data } = await supabase.auth.getSession()
+  markSessionChecked(sessionIdOf(data.session))
+}
+
+export async function setEmailStep(on: boolean): Promise<void> {
+  const { error } = await supabase.auth.updateUser({ data: { two_step_email: on } })
+  if (error) throw new Error(error.message)
 }

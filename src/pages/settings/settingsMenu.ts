@@ -358,7 +358,7 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
   {
     title: 'Advanced Account Protection',
     items: [
-      { title: 'Passkeys' },
+      { title: 'Passkeys', to: '/settings/two-factor' },
       { title: 'Two-Factor Authentication', to: '/settings/two-factor' },
       { title: 'Trusted Devices', to: '/settings/devices' },
       { title: 'Security Alerts', to: '/settings/security-alerts' },

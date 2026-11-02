@@ -7,7 +7,8 @@ import { GlassPanel } from '@/components/ui/GlassPanel'
 import { Logo } from '@/components/ui/Logo'
 import { env, missingEnv, unsafeKey } from '@/lib/env'
 import { MfaChallenge } from '@/components/auth/MfaChallenge'
-import { pendingMfaFactor } from '@/services/security'
+import { EmailChallenge } from '@/components/auth/EmailChallenge'
+import { emailStepOn, isSessionChecked, pendingMfaFactor, sessionIdOf } from '@/services/security'
 
 export function Splash({ label = 'Loading' }: { label?: string }) {
   return (
@@ -66,14 +67,19 @@ export function ProtectedRoute() {
   // null = not checked yet, '' = no second step needed, otherwise the factor to ask for.
   const [mfa, setMfa] = useState<string | null>(null)
   const uid = session?.user.id ?? ''
+  const sid = sessionIdOf(session)
+  const [emailDone, setEmailDone] = useState(0)
+  const needEmail = !!session && emailStepOn(session.user) && !isSessionChecked(sid) && !!session.user.email
   useEffect(() => {
     if (!uid) { setMfa(null); return }
     let on = true
+    setMfa(null)
     void pendingMfaFactor().then((f) => on && setMfa(f ?? '')).catch(() => on && setMfa(''))
     return () => { on = false }
-  }, [uid])
+  }, [uid, sid])
 
   if (loading) return <Splash />
+  if (session && needEmail) return <EmailChallenge key={emailDone} email={session.user.email as string} onDone={() => setEmailDone((n) => n + 1)} />
   if (session && mfa === null) return <Splash />
   if (session && mfa) return <MfaChallenge factorId={mfa} onDone={() => setMfa('')} />
   if (!session) return <Navigate to="/login" replace state={{ from: location.pathname + location.search }} />
