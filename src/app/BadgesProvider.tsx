@@ -10,6 +10,7 @@ const NOTE_TEXT: Record<AppNotification['type'], string> = {
   follow_request: 'wants to follow you',
   friend_request: 'sent you a friend request',
   friend_accepted: 'accepted your friend request',
+  security_alert: 'A new device signed in to your account',
   like: 'liked your post',
   comment: 'commented on your post',
   reply: 'replied to your comment',

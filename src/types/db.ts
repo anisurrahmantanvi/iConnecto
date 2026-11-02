@@ -75,7 +75,7 @@ export interface CommentView extends Comment {
   liked: boolean
 }
 
-export type NotificationType = 'follow' | 'like' | 'comment' | 'reply' | 'community_join' | 'follow_request' | 'friend_request' | 'friend_accepted'
+export type NotificationType = 'follow' | 'like' | 'comment' | 'reply' | 'community_join' | 'follow_request' | 'friend_request' | 'friend_accepted' | 'security_alert'
 
 export interface AppNotification {
   id: string

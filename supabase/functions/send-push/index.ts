@@ -92,16 +92,17 @@ async function build(kind: string, id: string): Promise<Push | null> {
       follow_request: 'wants to follow you',
       friend_request: 'sent you a friend request',
       friend_accepted: 'accepted your friend request',
+      security_alert: 'A new device signed in to your account',
       like: 'liked your post',
       comment: 'commented on your post',
       reply: 'replied to your comment',
       community_join: 'joined your community',
     }
-    const url = n.type === 'friend_request' ? '/friend-requests' : n.type === 'follow_request' ? '/friend-requests' : n.type === 'follow' && actor ? `/u/${actor.username}` : n.post_id ? `/p/${n.post_id}` : '/notifications'
+    const url = n.type === 'security_alert' ? '/settings/devices' : n.type === 'friend_request' ? '/friend-requests' : n.type === 'follow_request' ? '/friend-requests' : n.type === 'follow' && actor ? `/u/${actor.username}` : n.post_id ? `/p/${n.post_id}` : '/notifications'
     return {
       recipients: [n.recipient_id as string],
       title: 'iConnecto',
-      body: `${nameOf(actor)} ${text[n.type as string] ?? 'sent you a notification'}`,
+      body: n.type === 'security_alert' ? text.security_alert : `${nameOf(actor)} ${text[n.type as string] ?? 'sent you a notification'}`,
       url,
       tag: `note-${n.id}`,
       channel: 'iconnecto',

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { ShieldAlert } from 'lucide-react'
 import { useAuth } from './AuthProvider'
@@ -5,6 +6,8 @@ import { Button } from '@/components/ui/Button'
 import { GlassPanel } from '@/components/ui/GlassPanel'
 import { Logo } from '@/components/ui/Logo'
 import { env, missingEnv, unsafeKey } from '@/lib/env'
+import { MfaChallenge } from '@/components/auth/MfaChallenge'
+import { pendingMfaFactor } from '@/services/security'
 
 export function Splash({ label = 'Loading' }: { label?: string }) {
   return (
@@ -60,8 +63,19 @@ export function ConfigGate({ children }: { children: React.ReactNode }) {
 export function ProtectedRoute() {
   const { session, loading, profileError, retryProfile, signOut } = useAuth()
   const location = useLocation()
+  // null = not checked yet, '' = no second step needed, otherwise the factor to ask for.
+  const [mfa, setMfa] = useState<string | null>(null)
+  const uid = session?.user.id ?? ''
+  useEffect(() => {
+    if (!uid) { setMfa(null); return }
+    let on = true
+    void pendingMfaFactor().then((f) => on && setMfa(f ?? '')).catch(() => on && setMfa(''))
+    return () => { on = false }
+  }, [uid])
 
   if (loading) return <Splash />
+  if (session && mfa === null) return <Splash />
+  if (session && mfa) return <MfaChallenge factorId={mfa} onDone={() => setMfa('')} />
   if (!session) return <Navigate to="/login" replace state={{ from: location.pathname + location.search }} />
   if (profileError) {
     return (

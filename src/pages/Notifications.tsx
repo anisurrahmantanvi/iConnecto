@@ -28,6 +28,8 @@ function describe(n: AppNotification): { text: string; icon: ReactElement } {
       return { text: 'started following you', icon: <UserPlus size={14} /> }
     case 'friend_request':
       return { text: 'sent you a friend request', icon: <UserPlus size={14} /> }
+    case 'security_alert':
+      return { text: 'A new device signed in to your account. If it was not you, change your password.', icon: <Bell size={14} /> }
     case 'friend_accepted':
       return { text: 'accepted your friend request', icon: <UserPlus size={14} /> }
     case 'follow_request':
@@ -80,6 +82,7 @@ export default function NotificationsPage() {
         void markNotificationRead(n.id).then(refreshNotifications).catch(() => refreshNotifications())
       }
       if (n.type === 'friend_request') return navigate('/friend-requests')
+      if (n.type === 'security_alert') return navigate('/settings/devices')
       if ((n.type === 'friend_accepted' || n.type === 'follow_request') && n.actor) return navigate(`/u/${n.actor.username}`)
       if (n.type === 'follow' && n.actor) return navigate(`/u/${n.actor.username}`)
       if (n.post_id) return navigate(n.type === 'comment' || n.type === 'reply' ? `/p/${n.post_id}#comments` : `/p/${n.post_id}`)
@@ -159,7 +162,7 @@ export default function NotificationsPage() {
           <ul className="glass notif-list" aria-label="Notifications">
             {items.map((n) => {
               const d = describe(n)
-              const name = n.actor?.display_name || n.actor?.username || 'Someone'
+              const name = n.type === 'security_alert' ? 'Security alert' : n.actor?.display_name || n.actor?.username || 'Someone'
               return (
                 <li key={n.id} className={`notif ${n.is_read ? '' : 'notif--unread'}`}>
                   <button type="button" className="notif__main" onClick={() => void open(n)}>

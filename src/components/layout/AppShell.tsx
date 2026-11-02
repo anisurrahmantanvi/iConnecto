@@ -10,6 +10,7 @@ import { usePush } from '@/hooks/usePush'
 import { useBackButton } from '@/hooks/useBackButton'
 import { usePullToRefresh } from '@/hooks/usePullToRefresh'
 import { useT } from '@/lib/i18n'
+import { registerDevice } from '@/services/security'
 import { IncomingCallListener } from '@/components/calls/IncomingCall'
 import { Spinner } from '@/components/ui/Feedback'
 import { Logo } from '@/components/ui/Logo'
@@ -50,6 +51,7 @@ export function AppShell() {
   useBackButton()
   usePullToRefresh()
   useEffect(() => unlockAudioOnFirstTouch(), [])
+  useEffect(() => { if (profile) void registerDevice() }, [profile?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Hide the bottom bar only while the on-screen keyboard is really open (not just because a field still has focus).
   // The Android app reports this itself (data-kbd on <html>); in a normal browser the visual viewport shrinks instead.

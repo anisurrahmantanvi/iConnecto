@@ -41,6 +41,9 @@ const MessagePrivacyPage = lazy(() => import('@/pages/MessagePrivacy'))
 const ChatLookPage = lazy(() => import('@/pages/ChatLook'))
 const ArchivedChatsPage = lazy(() => import('@/pages/ArchivedChats'))
 const EditProfilePage = lazy(() => import('@/pages/settings/EditProfile'))
+const TwoFactorPage = lazy(() => import('@/pages/settings/TwoFactor'))
+const TrustedDevicesPage = lazy(() => import('@/pages/settings/TrustedDevices'))
+const SecurityAlertsPage = lazy(() => import('@/pages/settings/SecurityAlerts'))
 const ChangeEmailPage = lazy(() => import('@/pages/settings/ChangeEmail'))
 const ChangePasswordPage = lazy(() => import('@/pages/settings/ChangePassword'))
 const PrivacyPage = lazy(() => import('@/pages/settings/Privacy'))
@@ -117,6 +120,9 @@ export function App() {
                 <Route path="/settings/section/:slug" element={<SettingsSectionPage />} />
                 <Route path="/settings/profile" element={<EditProfilePage />} />
                 <Route path="/settings/privacy" element={<PrivacyPage />} />
+                <Route path="/settings/two-factor" element={<TwoFactorPage />} />
+                <Route path="/settings/devices" element={<TrustedDevicesPage />} />
+                <Route path="/settings/security-alerts" element={<SecurityAlertsPage />} />
                 <Route path="/settings/change-email" element={<ChangeEmailPage />} />
                 <Route path="/settings/change-password" element={<ChangePasswordPage />} />
                 <Route path="/settings/blocked" element={<BlockedPage />} />
