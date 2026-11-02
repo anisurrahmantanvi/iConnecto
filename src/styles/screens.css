@@ -256,3 +256,19 @@ a.list-row--link { text-decoration: none; }
 .chat-view .chat-scroll { background: var(--chat-wall, transparent); border-radius: var(--r-lg); }
 .chat-preview-box { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: var(--r-lg); background: var(--chat-wall, transparent); }
 .seen-line { text-align: right; font-size: 11px; color: var(--text-muted); margin: 2px 12px 0; }
+
+/* Full-width screens: Settings, Menu, Reels, Explore, Messages, Notifications, Saved. Panels run edge to edge like the Home feed. */
+.shell__main--bleed .glass:not(.glass .glass):not(.menu):not(.dialog):not(.toast):not(.chat-preview-box),
+.shell__main--bleed .settings-list {
+  margin-inline: calc(var(--space-4) * -1);
+  border-radius: 0;
+  border-inline-width: 0;
+  box-shadow: none;
+}
+/* Chat: header, messages and the message box use the whole screen. */
+.shell--chat .shell__main { padding: 0 0 var(--safe-bottom); }
+.shell--chat .chat-view { height: calc(100dvh - var(--safe-bottom)); gap: 0; }
+.shell--chat .chat-header { border-radius: 0; border-width: 0 0 1px; padding: calc(6px + var(--safe-top)) 8px 6px; }
+.shell--chat .chat-view .chat-scroll { border-radius: 0; padding: 8px 10px; }
+.shell--chat .composer { border-radius: 0; border-width: 1px 0 0; box-shadow: none; }
+.shell--chat .chat-view .banner { border-radius: 0; margin: 0; }

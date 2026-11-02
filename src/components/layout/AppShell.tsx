@@ -1,6 +1,6 @@
 import { Suspense, useEffect } from 'react'
 import { unlockAudioOnFirstTouch } from '@/lib/ringtone'
-import { NavLink, Outlet, useMatch } from 'react-router-dom'
+import { NavLink, Outlet, useLocation, useMatch } from 'react-router-dom'
 import { Bell, Bookmark, Clapperboard, Compass, Home, MessageCircle, Plus, Settings, User, Users, WifiOff, type LucideIcon } from 'lucide-react'
 import { useAuth } from '@/app/AuthProvider'
 import { useBadges } from '@/app/BadgesProvider'
@@ -83,10 +83,12 @@ export function AppShell() {
   const inChat = useMatch('/messages/:chatId')
   const inCall = useMatch('/call/:callId')
   const immersive = !!inChat || !!inCall
+  const { pathname } = useLocation()
+  const bleed = /^\/(settings|menu|message-settings|reels|discover|messages|saved|notifications|friend-requests|follow-requests)(\/|$)/.test(pathname) && !inChat
   const username = profile?.username ?? ''
 
   return (
-    <div className={`shell ${immersive ? 'shell--immersive' : ''}`}>
+    <div className={`shell ${immersive ? 'shell--immersive' : ''} ${inChat ? 'shell--chat' : ''}`}>
       <a href="#main" className="skip-link">Skip to content</a>
 
       <aside className="glass sidebar" aria-label="Main navigation">
@@ -104,7 +106,7 @@ export function AppShell() {
         <NavLink to="/create" className="btn btn--primary btn--block"><Plus size={18} aria-hidden /> {t('nav.create')}</NavLink>
       </aside>
 
-      <main className="shell__main" id="main" tabIndex={-1}>
+      <main className={`shell__main ${bleed ? 'shell__main--bleed' : ''}`} id="main" tabIndex={-1}>
         {/* Lazy pages suspend here, so the navigation stays on screen while a screen's code loads. */}
         <Suspense fallback={<Spinner />}>
           <Outlet />
