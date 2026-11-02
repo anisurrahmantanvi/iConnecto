@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ChevronRight, MailCheck, MailWarning, Trash2 } from 'lucide-react'
 import { useAuth, useMe } from '@/app/AuthProvider'
@@ -10,10 +10,8 @@ import { GlassPanel } from '@/components/ui/GlassPanel'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { useToast } from '@/components/ui/Toast'
 import { errorMessage } from '@/lib/supabase'
-import { deleteMyAccount, updateEmail } from '@/services/account'
+import { deleteMyAccount } from '@/services/account'
 import { SETTINGS_SECTIONS } from './settingsMenu'
-
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export default function AccountPage() {
   const me = useMe()
@@ -24,31 +22,12 @@ export default function AccountPage() {
   const email = user?.email ?? ''
   const verified = !!user?.email_confirmed_at
 
-  const [newEmail, setNewEmail] = useState('')
-  const [emailBusy, setEmailBusy] = useState(false)
-  const [emailError, setEmailError] = useState<string | null>(null)
   const [resendBusy, setResendBusy] = useState(false)
 
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [confirmText, setConfirmText] = useState('')
   const [deleteBusy, setDeleteBusy] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
-
-  const changeEmail = async (e: FormEvent) => {
-    e.preventDefault()
-    if (!EMAIL_RE.test(newEmail.trim())) return setEmailError('Enter a valid email address.')
-    setEmailBusy(true)
-    setEmailError(null)
-    try {
-      await updateEmail(newEmail)
-      setNewEmail('')
-      toast.show('Check your inbox to confirm the change')
-    } catch (err) {
-      setEmailError(errorMessage(err))
-    } finally {
-      setEmailBusy(false)
-    }
-  }
 
   const resend = async () => {
     if (!email) return
@@ -105,21 +84,9 @@ export default function AccountPage() {
             <div><Button variant="glass" size="sm" loading={resendBusy} onClick={() => void resend()}>Resend verification email</Button></div>
           ) : null}
 
-          <form className="col" onSubmit={(e) => void changeEmail(e)} noValidate>
-            {emailError ? <ErrorBanner>{emailError}</ErrorBanner> : null}
-            <TextField
-              label="New email address"
-              type="email"
-              autoComplete="email"
-              inputMode="email"
-              hint="We'll send a confirmation link. Your address changes only after you open it."
-              value={newEmail}
-              onChange={(e) => setNewEmail(e.target.value)}
-            />
-            <div className="form-actions">
-              <Button type="submit" variant="primary" loading={emailBusy} disabled={!newEmail.trim()}>Change email</Button>
-            </div>
-          </form>
+          <div className="form-actions">
+            <Button variant="primary" onClick={() => navigate('/settings/change-email')}>Change email</Button>
+          </div>
         </GlassPanel>
 
         <h2 className="section-title">Account Memorialization</h2>
