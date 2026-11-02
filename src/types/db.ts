@@ -46,6 +46,7 @@ export interface Post {
 }
 
 export interface PostView extends Post {
+  audio?: import('@/services/music').PostAudio | null
   liked: boolean
   saved: boolean
   reactions: ReactionSummary[]

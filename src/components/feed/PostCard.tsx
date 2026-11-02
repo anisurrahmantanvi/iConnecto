@@ -14,6 +14,7 @@ import { PhotoViewer } from '@/components/ui/PhotoViewer'
 import { RichText } from '@/components/ui/Emoji'
 import { EmojiButton } from '@/components/ui/EmojiButton'
 import { useToast } from '@/components/ui/Toast'
+import { PostMusic } from './PostMusic'
 import { ReactionBar, applyReaction } from './ReactionBar'
 import { deletePost, MAX_POST_LENGTH, recordShare, setLike, setPostVisibility, setReaction, setSaved, updatePost } from '@/services/posts'
 import { compactNumber, timeAgo } from '@/lib/format'
@@ -206,6 +207,8 @@ export const PostCard = memo(function PostCard({ post, onChange, onDeleted, canM
           ))}
         </div>
       ) : null}
+
+      {post.audio ? <PostMusic audio={post.audio} /> : null}
 
       <ReactionBar reactions={post.reactions} onToggle={(e, on) => void toggleReaction(e, on)} />
 
