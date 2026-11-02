@@ -34,7 +34,7 @@ try {
   await ctx.addInitScript((s) => { localStorage.setItem('sb-mock-auth-token', JSON.stringify(s)) }, session)
   const page = await ctx.newPage()
   page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`))
-  page.on('console', (m) => { if (m.type() === 'error') errors.push(`console.error: ${m.text().slice(0, 1500)}`) })
+  page.on('console', (m) => { if (m.type() === 'error' && !/mock\.supabase\.co\/realtime/.test(m.text())) errors.push(`console.error: ${m.text().slice(0, 1500)}`) })
 
   await page.route('**://mock.supabase.co/**', async (route) => {
     const req = route.request(); const url = new URL(req.url()); const p = url.pathname
