@@ -99,7 +99,7 @@ export default function CreatePage() {
     setMusicOpen(false)
   }
 
-  const canPost = (text.trim().length > 0 || files.length > 0 || !!audio) && text.length <= MAX_POST_LENGTH && !busy
+  const canPost = (text.trim().length > 0 || files.length > 0) && text.length <= MAX_POST_LENGTH && !busy
 
   const submit = async () => {
     if (!canPost) return
