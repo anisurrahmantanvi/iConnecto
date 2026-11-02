@@ -31,6 +31,8 @@ import {
   fetchReactions,
   reactToMessage,
   subscribeReactions,
+  acceptMessageRequest,
+  listMessageRequestIds,
   getChatPeer,
   markChatRead,
   MAX_MESSAGE_LENGTH,
@@ -81,6 +83,12 @@ export default function ChatPage() {
   const [forwarding, setForwarding] = useState<string | null>(null)
   const [editing, setEditing] = useState<Message | null>(null)
   const [reactions, setReactions] = useState<MessageReaction[]>([])
+  const [isRequest, setIsRequest] = useState(false)
+  useEffect(() => {
+    let on = true
+    void listMessageRequestIds().then((ids) => on && setIsRequest(ids.includes(chatId)))
+    return () => { on = false }
+  }, [chatId])
   const [, setNow] = useState(0)
   const [typingOn, setTypingOn] = useState(false)
   const [seenAt, setSeenAt] = useState<string | null>(null)
@@ -449,6 +457,15 @@ export default function ChatPage() {
           <IconButton label="Cancel editing" small onClick={cancelEdit}><X size={18} /></IconButton>
         </div>
       ) : null}
+      {isRequest ? (
+        <div className="glass col" style={{ padding: 12 }}>
+          <p className="small muted">{name} is not your friend yet. Accept to reply, or decline to move this chat out of your inbox.</p>
+          <div className="row" style={{ gap: 8 }}>
+            <Button variant="primary" onClick={() => void acceptMessageRequest(chatId).then(() => { setIsRequest(false); toast.show('Request accepted') })}>Accept</Button>
+            <Button variant="glass" onClick={() => void setArchived(chatId, true).then(() => navigate('/messages', { replace: true })).catch((e) => toast.error(errorMessage(e)))}>Decline</Button>
+          </div>
+        </div>
+      ) : (
       <form className="glass composer" onSubmit={submit}>
         <EmojiButton
           label="Add emoji"
@@ -476,6 +493,7 @@ export default function ChatPage() {
           <Send size={22} />
         </IconButton>
       </form>
+      )}
 
       <MessageSheet
         message={sheet}

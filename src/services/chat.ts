@@ -143,8 +143,21 @@ export function subscribeAnyMessage(userId: string, onMessage: (m: Message) => v
 }
 
 /** Chat ids that are message requests for me. Returns [] when the SQL has not been run yet. */
+const ACCEPT_KEY = 'iconnecto.acceptedRequests'
+function localAccepted(): string[] {
+  try { return JSON.parse(localStorage.getItem(ACCEPT_KEY) ?? '[]') as string[] } catch { return [] }
+}
+
 export async function listMessageRequestIds(): Promise<string[]> {
   const { data, error } = await supabase.rpc('my_message_requests')
   if (error || !Array.isArray(data)) return []
-  return data.map((x: unknown) => String(x))
+  const local = new Set(localAccepted())
+  return data.map((x: unknown) => String(x)).filter((id) => !local.has(id))
+}
+
+/** Accepts a message request. Falls back to this device only if the database function is not installed yet. */
+export async function acceptMessageRequest(chatId: string): Promise<void> {
+  const { error } = await supabase.rpc('accept_message_request', { p_chat: chatId })
+  if (!error) return
+  try { localStorage.setItem(ACCEPT_KEY, JSON.stringify([...localAccepted(), chatId])) } catch { /* ignore */ }
 }
