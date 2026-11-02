@@ -427,6 +427,13 @@ export const BN_APP: Record<string, string> = {
   'We sent a verification code to': 'আমরা একটি ভেরিফিকেশন কোড পাঠিয়েছি',
   'Enter the name you use in real life.': 'বাস্তব জীবনে যে নামে পরিচিত সেটি লিখুন।',
   'Name you use in real life': 'বাস্তব জীবনে ব্যবহার করা নাম',
+  'Buy & Sell': 'কেনা-বেচা',
+  'Search products and services': 'পণ্য ও সেবা খুঁজুন',
+  'Categories': 'ক্যাটাগরি',
+  'Latest listings': 'সর্বশেষ বিজ্ঞাপন',
+  'No listings yet': 'এখনো কোনো বিজ্ঞাপন নেই',
+  'Products will appear here once selling opens.': 'বিক্রি শুরু হলে পণ্য এখানে দেখা যাবে।',
+  'Sell something': 'কিছু বিক্রি করুন',
 }
 
 export const HI_APP: Record<string, string> = {
@@ -857,4 +864,11 @@ export const HI_APP: Record<string, string> = {
   'We sent a verification code to': 'हमने एक सत्यापन कोड भेजा है',
   'Enter the name you use in real life.': 'असल ज़िंदगी में जिस नाम से जाने जाते हैं वह लिखें।',
   'Name you use in real life': 'असल ज़िंदगी में इस्तेमाल होने वाला नाम',
+  'Buy & Sell': 'खरीद-बिक्री',
+  'Search products and services': 'उत्पाद और सेवाएँ खोजें',
+  'Categories': 'श्रेणियाँ',
+  'Latest listings': 'नवीनतम लिस्टिंग',
+  'No listings yet': 'अभी कोई लिस्टिंग नहीं',
+  'Products will appear here once selling opens.': 'बिक्री शुरू होने पर उत्पाद यहाँ दिखेंगे।',
+  'Sell something': 'कुछ बेचें',
 }

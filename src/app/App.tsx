@@ -41,6 +41,7 @@ const MessagePrivacyPage = lazy(() => import('@/pages/MessagePrivacy'))
 const ChatLookPage = lazy(() => import('@/pages/ChatLook'))
 const ArchivedChatsPage = lazy(() => import('@/pages/ArchivedChats'))
 const EditProfilePage = lazy(() => import('@/pages/settings/EditProfile'))
+const MarketHomePage = lazy(() => import('@/pages/market/MarketHome'))
 const TwoFactorPage = lazy(() => import('@/pages/settings/TwoFactor'))
 const TrustedDevicesPage = lazy(() => import('@/pages/settings/TrustedDevices'))
 const SecurityAlertsPage = lazy(() => import('@/pages/settings/SecurityAlerts'))
@@ -116,6 +117,7 @@ export function App() {
                 <Route path="/report/:targetType/:targetId" element={<ReportPage />} />
 
                 <Route path="/menu" element={<MenuPage />} />
+                <Route path="/market" element={<MarketHomePage />} />
                 <Route path="/settings" element={<SettingsHomePage />} />
                 <Route path="/settings/section/:slug" element={<SettingsSectionPage />} />
                 <Route path="/settings/profile" element={<EditProfilePage />} />
