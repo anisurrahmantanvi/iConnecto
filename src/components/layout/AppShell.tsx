@@ -86,7 +86,7 @@ export function AppShell() {
   const inCall = useMatch('/call/:callId')
   const immersive = !!inChat || !!inCall
   const { pathname } = useLocation()
-  const bleed = /^\/(settings|menu|message-settings|reels|discover|messages|saved|notifications|friend-requests|follow-requests)(\/|$)/.test(pathname) && !inChat
+  const bleed = !inChat // every normal screen runs edge to edge; chats and calls have their own full-screen layout
   const username = profile?.username ?? ''
 
   return (
