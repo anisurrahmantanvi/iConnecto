@@ -17,6 +17,8 @@ interface Push {
   tag: string
   channel: 'iconnecto' | 'calls_ring'
   ttl: string
+  /** Which notification preference decides whether this is sent. 'security' is always sent. */
+  category: 'message' | 'call' | 'like' | 'comment' | 'social' | 'security'
 }
 
 const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!)
@@ -63,6 +65,31 @@ async function accessToken(sa: { client_email: string; private_key: string }): P
   return cached.token
 }
 
+/** Drops recipients who turned this kind of alert off, paused notifications, or are in quiet hours. Never fails the push. */
+async function allowed(recipients: string[], category: Push['category']): Promise<string[]> {
+  if (category === 'security') return recipients
+  try {
+    const { data, error } = await admin.from('notification_prefs').select('*').in('user_id', recipients)
+    if (error || !data) return recipients
+    const byUser = new Map(data.map((r: Record<string, unknown>) => [r.user_id as string, r]))
+    const now = Date.now()
+    return recipients.filter((uid) => {
+      const p = byUser.get(uid)
+      if (!p) return true
+      const flag = category === 'message' ? p.push_messages : category === 'call' ? p.push_calls : category === 'like' ? p.push_likes : category === 'comment' ? p.push_comments : p.push_social
+      if (flag === false) return false
+      if (p.paused_until && new Date(p.paused_until as string).getTime() > now) return false
+      if (p.quiet_enabled) {
+        const local = (Math.floor(now / 60000) + Number(p.tz_offset ?? 0) + 1440 * 2) % 1440
+        const a = Number(p.quiet_start), b = Number(p.quiet_end)
+        const inQuiet = a === b ? false : a < b ? local >= a && local < b : local >= a || local < b
+        if (inQuiet) return false
+      }
+      return true
+    })
+  } catch { return recipients }
+}
+
 const nameOf = (p: { display_name: string | null; username: string } | null | undefined) => p?.display_name || p?.username || 'Someone'
 
 async function build(kind: string, id: string): Promise<Push | null> {
@@ -81,6 +108,7 @@ async function build(kind: string, id: string): Promise<Push | null> {
       tag: `chat-${m.chat_id}`,
       channel: 'iconnecto',
       ttl: '86400s',
+      category: 'message',
     }
   }
   if (kind === 'notification') {
@@ -107,6 +135,7 @@ async function build(kind: string, id: string): Promise<Push | null> {
       tag: `note-${n.id}`,
       channel: 'iconnecto',
       ttl: '86400s',
+      category: n.type === 'security_alert' ? 'security' : n.type === 'like' ? 'like' : n.type === 'comment' || n.type === 'reply' ? 'comment' : 'social',
     }
   }
   if (kind === 'call') {
@@ -121,6 +150,7 @@ async function build(kind: string, id: string): Promise<Push | null> {
       tag: `call-${c.id}`,
       channel: 'calls_ring',
       ttl: '30s',
+      category: 'call',
     }
   }
   return null
@@ -141,6 +171,7 @@ async function handle(req: Request): Promise<Response> {
   const sa = JSON.parse(saRaw)
 
   const push = await build(payload.kind, payload.id)
+  if (push) push.recipients = await allowed(push.recipients, push.category)
   if (!push || !push.recipients.length) return new Response('nothing to send', { status: 200 })
 
   const { data: rows } = await admin.from('push_tokens').select('token').in('user_id', push.recipients)

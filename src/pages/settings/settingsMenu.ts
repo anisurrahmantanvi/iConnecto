@@ -81,11 +81,11 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
   {
     title: 'Help & Legal',
     items: [
-      { title: 'Help Center' },
-      { title: 'Report a Problem' },
-      { title: 'Terms of Service' },
+      { title: 'Help Center', to: '/settings/help' },
+      { title: 'Report a Problem', to: '/settings/support/problem' },
+      { title: 'Terms of Service', to: '/terms' },
       { title: 'Privacy Policy', to: '/privacy-policy' },
-      { title: 'About iConnecto' },
+      { title: 'About iConnecto', to: '/settings/about' },
     ],
   },
   {
@@ -205,12 +205,12 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
   {
     title: 'Support & Feedback',
     items: [
-      { title: 'Contact Support' },
-      { title: 'Report a Bug' },
-      { title: 'Request a Feature' },
-      { title: 'Report Status' },
+      { title: 'Contact Support', to: '/settings/support/contact' },
+      { title: 'Report a Bug', to: '/settings/support/bug' },
+      { title: 'Request a Feature', to: '/settings/support/feature' },
+      { title: 'Report Status', to: '/settings/support/status' },
       { title: 'Frequently Asked Questions' },
-      { title: 'Help Center' },
+      { title: 'Help Center', to: '/settings/help' },
       { title: 'Community Guidelines' },
     ],
   },

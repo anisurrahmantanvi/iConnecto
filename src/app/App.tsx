@@ -44,6 +44,11 @@ const EditProfilePage = lazy(() => import('@/pages/settings/EditProfile'))
 const PagesHomePage = lazy(() => import('@/pages/pages/PagesHome'))
 const PageViewPage = lazy(() => import('@/pages/pages/PageView'))
 const PageFormPage = lazy(() => import('@/pages/pages/PageForm'))
+const FeedbackPage = lazy(() => import('@/pages/settings/Feedback'))
+const SupportStatusPage = lazy(() => import('@/pages/settings/SupportStatus'))
+const HelpCenterPage = lazy(() => import('@/pages/settings/HelpCenter'))
+const AboutPage = lazy(() => import('@/pages/settings/About'))
+const TermsPage = lazy(() => import('@/pages/Terms'))
 const MarketHomePage = lazy(() => import('@/pages/market/MarketHome'))
 const TwoFactorPage = lazy(() => import('@/pages/settings/TwoFactor'))
 const TrustedDevicesPage = lazy(() => import('@/pages/settings/TrustedDevices'))
@@ -78,6 +83,7 @@ export function App() {
 
             {/* Public pages */}
             <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+            <Route path="/terms" element={<TermsPage />} />
 
             {/* Email links: must work whatever the auth state is */}
             <Route path="/auth/callback" element={<AuthCallbackPage />} />
@@ -124,6 +130,13 @@ export function App() {
                 <Route path="/pages/new" element={<PageFormPage mode="create" />} />
                 <Route path="/page/:slug" element={<PageViewPage />} />
                 <Route path="/page/:slug/edit" element={<PageFormPage mode="edit" />} />
+                <Route path="/settings/help" element={<HelpCenterPage />} />
+                <Route path="/settings/about" element={<AboutPage />} />
+                <Route path="/settings/support/status" element={<SupportStatusPage />} />
+                <Route path="/settings/support/problem" element={<FeedbackPage kind="problem" />} />
+                <Route path="/settings/support/bug" element={<FeedbackPage kind="bug" />} />
+                <Route path="/settings/support/feature" element={<FeedbackPage kind="feature" />} />
+                <Route path="/settings/support/contact" element={<FeedbackPage kind="contact" />} />
                 <Route path="/market" element={<MarketHomePage />} />
                 <Route path="/settings" element={<SettingsHomePage />} />
                 <Route path="/settings/section/:slug" element={<SettingsSectionPage />} />
