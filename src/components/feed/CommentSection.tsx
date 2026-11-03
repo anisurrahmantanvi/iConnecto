@@ -1,7 +1,7 @@
 import { memo, useCallback, useRef, useState } from 'react'
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge'
 import { Link, useNavigate } from 'react-router-dom'
-import { CornerDownRight, Flag, Heart, Pencil, Trash2 } from 'lucide-react'
+import { CornerDownRight, Flag, Heart, Pencil, SendHorizontal, Trash2 } from 'lucide-react'
 import type { CommentView, PostView } from '@/types/db'
 import { useMe } from '@/app/AuthProvider'
 import { Avatar } from '@/components/ui/Avatar'
@@ -105,21 +105,14 @@ export function CommentSection({ post, onCountChange }: Props) {
 
   return (
     <section id="comments" className="col" aria-label="Comments">
-      <h2>Comments</h2>
-      <CommentComposer
-        key={replyTo ? `${replyTo.rootId}:${replyTo.username}` : 'top'}
-        replyTo={replyTo}
-        onCancelReply={() => setReplyTo(null)}
-        onSubmit={submit}
-      />
-
+      <h2>Comments{post.comment_count > 0 ? ` · ${compactNumber(post.comment_count)}` : ''}</h2>
       {loading ? <ListSkeleton rows={3} /> : null}
       {!loading && error && !items.length ? <ErrorState message={error} onRetry={reload} /> : null}
       {!loading && !error && !items.length ? (
         <EmptyState title="No comments yet" body="Be the first to say something." />
       ) : null}
 
-      <div className="glass comments-list" hidden={!items.length}>
+      <div className="comments-list" hidden={!items.length}>
         {items.map((c) => (
           <div key={c.id} className="comment-thread">
             <CommentRow
@@ -131,9 +124,9 @@ export function CommentSection({ post, onCountChange }: Props) {
             />
             {c.reply_count > 0 && !replies[c.id] ? (
               <div className="comment__replies">
-                <Button variant="ghost" size="sm" loading={loadingReplies.has(c.id)} onClick={() => void loadReplies(c.id)}>
-                  View {c.reply_count} {c.reply_count === 1 ? 'reply' : 'replies'}
-                </Button>
+                <button type="button" className="link-btn comment__viewReplies" disabled={loadingReplies.has(c.id)} onClick={() => void loadReplies(c.id)}>
+                  <CornerDownRight size={14} aria-hidden /> {loadingReplies.has(c.id) ? 'Loading…' : `View ${c.reply_count} ${c.reply_count === 1 ? 'reply' : 'replies'}`}
+                </button>
               </div>
             ) : null}
             {(replies[c.id] ?? []).map((r) => (
@@ -156,14 +149,22 @@ export function CommentSection({ post, onCountChange }: Props) {
       {error && items.length ? <ErrorState message={error} onRetry={loadMore} /> : null}
       {hasMore && !loadingMore && !error ? (
         <div ref={sentinel} className="center">
-          <Button variant="ghost" size="sm" onClick={loadMore}>Load more comments</Button>
+          <Button variant="ghost" size="sm" onClick={loadMore}>View more comments</Button>
         </div>
       ) : null}
+
+      <CommentComposer
+        key={replyTo ? `${replyTo.rootId}:${replyTo.username}` : 'top'}
+        replyTo={replyTo}
+        onCancelReply={() => setReplyTo(null)}
+        onSubmit={submit}
+      />
     </section>
   )
 }
 
 function CommentComposer({ replyTo, onCancelReply, onSubmit }: { replyTo: ReplyTarget | null; onCancelReply: () => void; onSubmit: (text: string) => Promise<void> }) {
+  const me = useMe()
   const toast = useToast()
   const [text, setText] = useState(replyTo?.username ? `@${replyTo.username} ` : '')
   const [busy, setBusy] = useState(false)
@@ -184,37 +185,42 @@ function CommentComposer({ replyTo, onCancelReply, onSubmit }: { replyTo: ReplyT
   }
 
   return (
-    <div className="glass composer composer--comment">
-      <div className="grow col" style={{ gap: 4 }}>
-        {replyTo ? (
-          <div className="row small muted">
-            <CornerDownRight size={14} aria-hidden /> Replying to @{replyTo.username}
-            <button type="button" className="link-btn" onClick={onCancelReply}>Cancel</button>
-          </div>
-        ) : null}
-        <textarea
-          ref={ref}
-          rows={1}
-          aria-label={replyTo ? 'Write a reply' : 'Write a comment'}
-          placeholder={replyTo ? 'Write a reply…' : 'Add a comment…'}
-          value={text}
-          maxLength={MAX_COMMENT_LENGTH}
-          onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) void send()
-          }}
-        />
+    <div className="composer--comment">
+      {replyTo ? (
+        <div className="row small muted" style={{ padding: '0 4px 6px' }}>
+          <CornerDownRight size={14} aria-hidden /> Replying to @{replyTo.username}
+          <button type="button" className="link-btn" onClick={onCancelReply}>Cancel</button>
+        </div>
+      ) : null}
+      <div className="comment-input">
+        <Avatar src={me.avatar_url} name={me.display_name ?? me.username} size="sm" />
+        <div className="comment-input__field">
+          <textarea
+            ref={ref}
+            rows={1}
+            aria-label={replyTo ? 'Write a reply' : 'Write a comment'}
+            placeholder={replyTo ? 'Write a reply…' : 'Write a comment…'}
+            value={text}
+            maxLength={MAX_COMMENT_LENGTH}
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) void send()
+            }}
+          />
+          <EmojiButton
+            placement="top"
+            align="end"
+            onPick={(emoji) => {
+              const r = insertAtCaret(ref.current, text, emoji, MAX_COMMENT_LENGTH)
+              setText(r.value)
+              restoreCaret(ref.current, r.caret)
+            }}
+          />
+        </div>
+        <IconButton label="Send comment" disabled={busy || !text.trim()} onClick={() => void send()}>
+          <SendHorizontal size={22} />
+        </IconButton>
       </div>
-      <EmojiButton
-        placement="top"
-        align="end"
-        onPick={(emoji) => {
-          const r = insertAtCaret(ref.current, text, emoji, MAX_COMMENT_LENGTH)
-          setText(r.value)
-          restoreCaret(ref.current, r.caret)
-        }}
-      />
-      <Button variant="primary" size="sm" loading={busy} disabled={!text.trim()} onClick={() => void send()}>Post</Button>
     </div>
   )
 }
@@ -287,10 +293,6 @@ const CommentRow = memo(function CommentRow({
         <Avatar src={a?.avatar_url} name={a?.display_name ?? a?.username} size={isReply ? 'sm' : 'md'} />
       </Link>
       <div className="grow">
-        <div className="comment__meta">
-          <Link to={a ? `/u/${a.username}` : '#'} className="post__name">{a?.display_name || a?.username || 'Deleted user'}<VerifiedBadge badge={a?.badge} size={14} /></Link>
-          <span className="faint small"> {timeAgo(comment.created_at)}{comment.edited_at ? ' · edited' : ''}</span>
-        </div>
         {editing ? (
           <div className="col" style={{ gap: 6 }}>
             <textarea
@@ -316,16 +318,23 @@ const CommentRow = memo(function CommentRow({
             </div>
           </div>
         ) : (
-          <div className="comment__text"><RichText text={comment.content} /></div>
+          <div className="comment__bubbleRow">
+            <div className="comment__bubble">
+              <Link to={a ? `/u/${a.username}` : '#'} className="post__name">{a?.display_name || a?.username || 'Deleted user'}<VerifiedBadge badge={a?.badge} size={14} /></Link>
+              <div className="comment__text"><RichText text={comment.content} /></div>
+              {comment.like_count > 0 ? (
+                <span className="comment__likes" aria-label={`${comment.like_count} likes`}><Heart size={12} fill="currentColor" /> {compactNumber(comment.like_count)}</span>
+              ) : null}
+            </div>
+            <ActionMenu items={menu} label="Comment options" />
+          </div>
         )}
         <div className="comment__actions">
-          <IconButton label={comment.liked ? 'Unlike comment' : 'Like comment'} small like active={comment.liked} aria-pressed={comment.liked} onClick={() => void toggleLike()}>
-            <Heart size={17} fill={comment.liked ? 'currentColor' : 'none'} />
-          </IconButton>
-          <span className="small muted" style={{ marginLeft: -4, minWidth: 12 }}>{comment.like_count > 0 ? compactNumber(comment.like_count) : ''}</span>
+          <span className="faint">{timeAgo(comment.created_at)}{comment.edited_at ? ' · edited' : ''}</span>
+          <button type="button" className={`link-btn comment__like ${comment.liked ? 'is-on' : ''}`} aria-pressed={comment.liked} onClick={() => void toggleLike()}>
+            {comment.liked ? 'Liked' : 'Like'}
+          </button>
           <button type="button" className="link-btn" onClick={onReply}>Reply</button>
-          <span className="spacer" />
-          <ActionMenu items={menu} label="Comment options" />
         </div>
       </div>
       <ConfirmDialog
