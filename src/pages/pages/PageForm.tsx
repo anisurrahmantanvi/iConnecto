@@ -51,6 +51,7 @@ export default function PageFormPage({ mode }: { mode: 'create' | 'edit' }) {
   const [loading, setLoading] = useState(mode === 'edit')
   const [err, setErr] = useState<string | null>(null)
   const [slug, setSlug] = useState('')
+  const [slugTouched, setSlugTouched] = useState(false)
   const [name, setName] = useState('')
   const [category, setCategory] = useState('creator')
   const [bio, setBio] = useState('')
@@ -93,9 +94,13 @@ export default function PageFormPage({ mode }: { mode: 'create' | 'edit' }) {
     setBusy(true)
     try {
       if (mode === 'create') {
-        await createPage({ slug, name: name.trim(), category, bio: bio.trim() })
+        const id = await createPage({ slug, name: name.trim(), category, bio: bio.trim() })
+        if (avatar || cover || site) {
+          try { await updatePage(id, { avatar_url: avatar, cover_url: cover, website: site || null }) }
+          catch (e) { toast.error(`Page created, but some details were not saved: ${errorMessage(e)}`) }
+        }
         toast.show('Page created')
-        navigate(`/page/${slug}/edit`, { replace: true })
+        navigate(`/page/${slug}`, { replace: true })
       } else if (page) {
         await updatePage(page.id, { name: name.trim(), category, bio: bio.trim(), website: site || null, avatar_url: avatar, cover_url: cover })
         toast.show('Page updated')
@@ -124,29 +129,29 @@ export default function PageFormPage({ mode }: { mode: 'create' | 'edit' }) {
           <>
             <h2 className="section-title"><BarChart3 size={16} aria-hidden /> Insights</h2>
             <Insights pageId={page.id} />
-            <h2 className="section-title">Photos</h2>
-            <GlassPanel padded>
-              <div className="row" style={{ gap: 14, alignItems: 'center' }}>
-                <Avatar src={avatar} name={name} size="xl" />
-                <label className="btn btn--glass">Change photo
-                  <input type="file" accept="image/jpeg,image/png,image/webp" hidden disabled={busy} onChange={(e) => void pickImage('avatar', e.target.files?.[0])} />
-                </label>
-              </div>
-              {cover ? <img src={cover} alt="" style={{ width: '100%', maxHeight: 140, objectFit: 'cover', borderRadius: 12, marginTop: 12 }} /> : null}
-              <label className="btn btn--glass" style={{ marginTop: 12 }}>{cover ? 'Change cover' : 'Add cover'}
-                <input type="file" accept="image/jpeg,image/png,image/webp" hidden disabled={busy} onChange={(e) => void pickImage('cover', e.target.files?.[0])} />
-              </label>
-            </GlassPanel>
           </>
         ) : null}
+        <h2 className="section-title">Photos</h2>
+        <GlassPanel padded>
+          <div className="row" style={{ gap: 14, alignItems: 'center' }}>
+            <Avatar src={avatar} name={name || 'Page'} size="xl" />
+            <label className="btn btn--glass">{avatar ? 'Change photo' : 'Add photo'}
+              <input type="file" accept="image/jpeg,image/png,image/webp" hidden disabled={busy} onChange={(e) => void pickImage('avatar', e.target.files?.[0])} />
+            </label>
+          </div>
+          {cover ? <img src={cover} alt="" style={{ width: '100%', maxHeight: 140, objectFit: 'cover', borderRadius: 12, marginTop: 12 }} /> : null}
+          <label className="btn btn--glass" style={{ marginTop: 12 }}>{cover ? 'Change cover' : 'Add cover'}
+            <input type="file" accept="image/jpeg,image/png,image/webp" hidden disabled={busy} onChange={(e) => void pickImage('cover', e.target.files?.[0])} />
+          </label>
+        </GlassPanel>
 
-        <h2 className="section-title">Details</h2>
+        <h2 className="section-title">Page name & details</h2>
         <GlassPanel padded>
           <div className="stack">
+            <TextField label="Page name" value={name} maxLength={60} onChange={(e) => { setName(e.target.value); if (mode === 'create' && !slugTouched) setSlug(cleanSlug(e.target.value.replace(/\s+/g, ''))) }} />
             {mode === 'create' ? (
-              <TextField label="Page link" value={slug} onChange={(e) => setSlug(cleanSlug(e.target.value))} placeholder="mypage" hint="3–30 letters, numbers, dot or underscore. Cannot be changed later." autoCapitalize="none" />
+              <TextField label="Page link" value={slug} onChange={(e) => { setSlugTouched(true); setSlug(cleanSlug(e.target.value)) }} placeholder="mypage" hint="3–30 letters, numbers, dot or underscore. Cannot be changed later." autoCapitalize="none" />
             ) : null}
-            <TextField label="Page name" value={name} maxLength={60} onChange={(e) => setName(e.target.value)} />
             <div className="field">
               <label htmlFor="page-cat">Category</label>
               <select id="page-cat" className="input" value={category} onChange={(e) => setCategory(e.target.value)}>
@@ -155,7 +160,7 @@ export default function PageFormPage({ mode }: { mode: 'create' | 'edit' }) {
               </select>
             </div>
             <TextAreaField label="About" value={bio} maxLength={500} onChange={(e) => setBio(e.target.value)} />
-            {mode === 'edit' ? <TextField label="Website" value={website} maxLength={200} onChange={(e) => setWebsite(e.target.value)} placeholder="https://" /> : null}
+            <TextField label="Website" value={website} maxLength={200} onChange={(e) => setWebsite(e.target.value)} placeholder="https://" />
             <Button variant="primary" loading={busy} disabled={!valid} onClick={() => void save()}>{mode === 'create' ? 'Create page' : 'Save'}</Button>
           </div>
         </GlassPanel>
