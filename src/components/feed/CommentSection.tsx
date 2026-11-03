@@ -217,9 +217,11 @@ function CommentComposer({ replyTo, onCancelReply, onSubmit }: { replyTo: ReplyT
             }}
           />
         </div>
+        <span className={`comment-send ${text.trim() ? "is-on" : ""}`}>
         <IconButton label="Send comment" disabled={busy || !text.trim()} onClick={() => void send()}>
           <SendHorizontal size={22} />
         </IconButton>
+        </span>
       </div>
     </div>
   )

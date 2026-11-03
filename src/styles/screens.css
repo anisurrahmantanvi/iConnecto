@@ -114,8 +114,10 @@ a.list-row--link { text-decoration: none; }
 .comment__meta { display: flex; align-items: baseline; gap: 8px; }
 .comment__text { overflow-wrap: anywhere; }
 .comment__actions { display: flex; align-items: center; gap: 14px; font-size: 13px; color: var(--text-muted); margin-top: 4px; }
-.composer--comment { position: sticky; bottom: calc(var(--nav-h) + 24px + var(--safe-bottom)); z-index: 15; padding: 8px 4px; background: var(--bg, transparent); }
-@media (min-width: 900px) { .composer--comment { bottom: 12px; } }
+.composer--comment { position: sticky; bottom: 0; z-index: 15; padding: 8px 8px calc(8px + var(--safe-bottom)); margin-inline: -8px; background: var(--surface, var(--bg, #fff)); border-top: 1px solid var(--glass-edge); }
+@media (min-width: 900px) { .composer--comment { bottom: 0; } }
+.comment-send button { color: var(--text-muted); }
+.comment-send.is-on button { color: var(--accent, #2f6bff); }
 .comment-input { display: flex; align-items: flex-end; gap: 8px; }
 .comment-input__field { flex: 1; display: flex; align-items: flex-end; gap: 4px; padding: 4px 6px 4px 14px; border-radius: 22px; background: var(--glass-bg, rgba(120,120,140,0.14)); border: 1px solid var(--glass-edge); min-width: 0; }
 .comment-input__field textarea { flex: 1; border: 0; background: transparent; outline: 0; resize: none; padding: 8px 0; font: inherit; color: inherit; min-width: 0; max-height: 120px; }
