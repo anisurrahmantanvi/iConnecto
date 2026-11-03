@@ -434,6 +434,8 @@ export const BN_APP: Record<string, string> = {
   'No listings yet': 'এখনো কোনো বিজ্ঞাপন নেই',
   'Products will appear here once selling opens.': 'বিক্রি শুরু হলে পণ্য এখানে দেখা যাবে।',
   'Sell something': 'কিছু বিক্রি করুন',
+  'All': 'সব',
+  'See all': 'সব দেখুন',
 }
 
 export const HI_APP: Record<string, string> = {
@@ -871,4 +873,6 @@ export const HI_APP: Record<string, string> = {
   'No listings yet': 'अभी कोई लिस्टिंग नहीं',
   'Products will appear here once selling opens.': 'बिक्री शुरू होने पर उत्पाद यहाँ दिखेंगे।',
   'Sell something': 'कुछ बेचें',
+  'All': 'सभी',
+  'See all': 'सभी देखें',
 }

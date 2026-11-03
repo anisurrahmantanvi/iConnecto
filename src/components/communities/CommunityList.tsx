@@ -8,7 +8,7 @@ import { listCommunities } from '@/services/communities'
 import { CommunityRow } from './CommunityRow'
 
 /** Paginated community directory with optional name search. */
-export function CommunityList({ query, emptyAction }: { query: string; emptyAction?: ReactNode }) {
+export function CommunityList({ query, emptyAction, limit }: { query: string; emptyAction?: ReactNode; limit?: number }) {
   const fetchPage = useCallback((cursor: string | null) => listCommunities(query, cursor), [query])
   const { items, loading, loadingMore, error, hasMore, loadMore, reload } = usePaged<Community>(fetchPage)
   const sentinel = useInfiniteSentinel(loadMore, hasMore && !loadingMore && !error)
@@ -28,11 +28,11 @@ export function CommunityList({ query, emptyAction }: { query: string; emptyActi
   return (
     <div className="col">
       <div className="glass">
-        {items.map((c) => <CommunityRow key={c.id} community={c} />)}
+        {(limit ? items.slice(0, limit) : items).map((c) => <CommunityRow key={c.id} community={c} />)}
       </div>
       {loadingMore ? <Spinner label="Loading more communities" /> : null}
       {error ? <ErrorState message={error} onRetry={loadMore} /> : null}
-      {hasMore && !loadingMore && !error ? (
+      {!limit && hasMore && !loadingMore && !error ? (
         <div ref={sentinel} className="center"><Button variant="ghost" size="sm" onClick={loadMore}>Load more</Button></div>
       ) : null}
     </div>

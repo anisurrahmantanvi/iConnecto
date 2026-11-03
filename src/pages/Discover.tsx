@@ -12,14 +12,14 @@ import { Tabs } from '@/components/ui/Tabs'
 import { useDebounce } from '@/hooks/common'
 import { searchProfiles, suggestedProfiles } from '@/services/profiles'
 
-type Tab = 'people' | 'posts' | 'communities'
+type Tab = 'all' | 'people' | 'posts' | 'communities'
 
 export default function DiscoverPage() {
   const me = useMe()
   const [params, setParams] = useSearchParams()
   const [q, setQ] = useState(params.get('q') ?? '')
   const rawTab = params.get('tab')
-  const tab: Tab = rawTab === 'posts' || rawTab === 'communities' ? rawTab : 'people'
+  const tab: Tab = rawTab === 'posts' || rawTab === 'communities' || rawTab === 'people' ? rawTab : 'all'
   const dq = useDebounce(q, 350)
   const searching = dq.trim().length >= 2
 
@@ -43,12 +43,20 @@ export default function DiscoverPage() {
     setParams(
       (prev) => {
         const p = new URLSearchParams(prev)
-        if (next === 'people') p.delete('tab')
+        if (next === 'all') p.delete('tab')
         else p.set('tab', next)
         return p
       },
       { replace: true },
     )
+
+  const topPeoplePage = useCallback(
+    async (cursor: string | null): Promise<Page<ProfileLite>> => {
+      const r = searching ? await searchProfiles(dq, cursor) : { items: await suggestedProfiles(me.id, 12), nextCursor: null }
+      return { items: r.items.slice(0, 5), nextCursor: null }
+    },
+    [searching, dq, me.id],
+  )
 
   const peoplePage = useCallback(
     async (cursor: string | null): Promise<Page<ProfileLite>> => {
@@ -73,11 +81,43 @@ export default function DiscoverPage() {
           value={tab}
           onChange={setTab}
           tabs={[
+            { value: 'all', label: 'All' },
             { value: 'people', label: 'People' },
             { value: 'posts', label: 'Posts' },
             { value: 'communities', label: 'Communities' },
           ]}
         />
+
+        {tab === 'all' ? (
+          <>
+            <div className="row">
+              <h2 className="section-title grow">{searching ? 'People' : 'Suggested for you'}</h2>
+              <button type="button" className="btn btn--ghost" onClick={() => setTab('people')}>See all</button>
+            </div>
+            <UserList
+              fetchPage={topPeoplePage}
+              empty={{
+                icon: <Users size={28} />,
+                title: searching ? 'No people found' : 'No suggestions yet',
+                body: searching ? 'Check the spelling or try a different name.' : 'Invite friends to join, or search for someone by name.',
+              }}
+            />
+            <div className="row">
+              <h2 className="section-title grow">Communities</h2>
+              <button type="button" className="btn btn--ghost" onClick={() => setTab('communities')}>See all</button>
+            </div>
+            <CommunityList query={dq} limit={4} />
+            <h2 className="section-title">Posts</h2>
+            <PostFeed
+              source={searching ? { kind: 'search', query: dq } : { kind: 'discover' }}
+              empty={{
+                icon: <Sparkles size={28} />,
+                title: searching ? 'No posts found' : 'Nothing to discover yet',
+                body: searching ? 'Try different words.' : 'New posts from the community will show up here.',
+              }}
+            />
+          </>
+        ) : null}
 
         {tab === 'people' ? (
           <>
