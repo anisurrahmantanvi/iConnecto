@@ -15,6 +15,9 @@ const ROWS: { key: keyof NotifPrefs; label: string; hint: string }[] = [
   { key: 'push_social', label: 'Friends & followers', hint: 'Friend requests, new followers, community joins' },
 ]
 
+const toTime = (m: number) => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`
+const fromTime = (v: string) => { const [h, m] = v.split(':').map(Number); return (h || 0) * 60 + (m || 0) }
+
 export default function NotificationPrefsPage() {
   const me = useMe()
   const toast = useToast()
@@ -27,7 +30,9 @@ export default function NotificationPrefsPage() {
     return () => { off = true }
   }, [me.id])
 
-  const toggle = async (key: keyof NotifPrefs, value: boolean) => {
+  const paused = !!prefs?.paused_until && new Date(prefs.paused_until).getTime() > Date.now()
+
+  const toggle = async (key: keyof NotifPrefs, value: boolean | number | string | null) => {
     if (!prefs) return
     const before = prefs
     setPrefs({ ...prefs, [key]: value })
@@ -50,6 +55,36 @@ export default function NotificationPrefsPage() {
                   <span className="switch"><input type="checkbox" role="switch" aria-label={r.label} checked={prefs[r.key] as boolean} onChange={(e) => void toggle(r.key, e.target.checked)} /><span className="switch__track" aria-hidden /></span>
                 </div>
               ))}
+            </GlassPanel>
+            <h2 className="section-title">Pause notifications</h2>
+            <GlassPanel className="settings-list">
+              {paused ? (
+                <div className="list-row">
+                  <span className="grow"><strong style={{ display: 'block' }}>Paused</strong><span className="small muted">Until {new Date(prefs.paused_until as string).toLocaleString()}</span></span>
+                  <button type="button" className="link-btn" onClick={() => void toggle('paused_until', null)}>Resume</button>
+                </div>
+              ) : (
+                <div className="list-row" style={{ flexWrap: 'wrap', gap: 8 }}>
+                  <span className="grow"><strong style={{ display: 'block' }}>Pause phone alerts</strong><span className="small muted">Security alerts still come through</span></span>
+                  {[1, 8, 24].map((h) => (
+                    <button key={h} type="button" className="btn btn--glass btn--sm" onClick={() => void toggle('paused_until', new Date(Date.now() + h * 3600_000).toISOString())}>{h} h</button>
+                  ))}
+                </div>
+              )}
+            </GlassPanel>
+
+            <h2 className="section-title">Quiet hours</h2>
+            <GlassPanel className="settings-list">
+              <div className="list-row">
+                <span className="grow"><strong style={{ display: 'block' }}>Quiet hours</strong><span className="small muted">No phone alerts during this time</span></span>
+                <span className="switch"><input type="checkbox" role="switch" aria-label="Quiet hours" checked={prefs.quiet_enabled} onChange={(e) => void toggle('quiet_enabled', e.target.checked)} /><span className="switch__track" aria-hidden /></span>
+              </div>
+              {prefs.quiet_enabled ? (
+                <div className="list-row" style={{ gap: 12 }}>
+                  <label className="grow small">From <input type="time" className="input" value={toTime(prefs.quiet_start)} onChange={(e) => void toggle('quiet_start', fromTime(e.target.value))} /></label>
+                  <label className="grow small">To <input type="time" className="input" value={toTime(prefs.quiet_end)} onChange={(e) => void toggle('quiet_end', fromTime(e.target.value))} /></label>
+                </div>
+              ) : null}
             </GlassPanel>
             <p className="small faint" style={{ padding: '0 16px' }}>Security alerts about new sign-ins are always sent. These choices control phone alerts; you will still see everything inside the app.</p>
           </>
