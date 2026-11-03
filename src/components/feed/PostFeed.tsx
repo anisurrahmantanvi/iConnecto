@@ -13,12 +13,14 @@ import {
   fetchUserPosts,
   searchPosts,
 } from '@/services/posts'
+import { fetchPagePosts } from '@/services/pages'
 
 export type PostSource =
   | { kind: 'home' }
   | { kind: 'explore' }
   | { kind: 'author'; authorId: string }
   | { kind: 'community'; communityId: string }
+  | { kind: 'page'; pageId: string }
   | { kind: 'saved' }
   | { kind: 'search'; query: string }
   | { kind: 'discover' }
@@ -45,6 +47,7 @@ export function PostFeed({ source, empty, refreshKey = 0, canModerate = false, r
         case 'explore': return fetchFeed(me.id, 'all', cursor)
         case 'author': return fetchUserPosts(me.id, source.authorId, cursor)
         case 'community': return fetchCommunityPosts(me.id, source.communityId, cursor)
+        case 'page': return fetchPagePosts(me.id, source.pageId, cursor)
         case 'saved': return fetchSavedPosts(me.id, cursor)
         case 'search': return searchPosts(me.id, source.query, cursor)
         case 'discover': return discoverPosts(me.id, cursor)

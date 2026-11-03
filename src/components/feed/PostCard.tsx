@@ -37,6 +37,8 @@ export const PostCard = memo(function PostCard({ post, onChange, onDeleted, canM
   const navigate = useNavigate()
   const mine = post.author_id === me.id
   const author = post.author
+  const pg = post.page
+  const headTo = pg ? `/page/${pg.slug}` : author ? `/u/${author.username}` : '#'
   const busy = useRef(false)
 
   const [editing, setEditing] = useState(false)
@@ -153,15 +155,15 @@ export const PostCard = memo(function PostCard({ post, onChange, onDeleted, canM
   return (
     <article className="glass post" aria-label={`Post by ${author?.display_name ?? author?.username ?? 'unknown'}`}>
       <div className="post__head">
-        <Link to={author ? `/u/${author.username}` : '#'} aria-label="Open profile">
-          <Avatar src={author?.avatar_url} name={author?.display_name ?? author?.username} />
+        <Link to={headTo} aria-label={pg ? 'Open page' : 'Open profile'}>
+          <Avatar src={pg ? pg.avatar_url : author?.avatar_url} name={pg ? pg.name : author?.display_name ?? author?.username} />
         </Link>
         <div className="grow">
-          <Link to={author ? `/u/${author.username}` : '#'} className="post__name truncate">
-            {author?.display_name || author?.username || 'Deleted user'}<VerifiedBadge badge={author?.badge} size={15} />
+          <Link to={headTo} className="post__name truncate">
+            {pg ? pg.name : author?.display_name || author?.username || 'Deleted user'}{pg ? null : <VerifiedBadge badge={author?.badge} size={15} />}
           </Link>
           <div className="post__sub truncate">
-            @{author?.username ?? 'unknown'} · <Link to={`/p/${post.id}`} className="muted">{timeAgo(post.created_at)}</Link>
+            {pg ? 'Page' : `@${author?.username ?? 'unknown'}`} · <Link to={`/p/${post.id}`} className="muted">{timeAgo(post.created_at)}</Link>
             {post.visibility === 'followers' ? <span title="Friends only"> · <Users size={12} aria-label="Friends only" style={{ verticalAlign: '-1px' }} /></span> : null}
             {post.visibility === 'only_me' ? <span title="Only me"> · <Lock size={12} aria-label="Only me" style={{ verticalAlign: '-1px' }} /></span> : null}
             {post.edited_at ? <span> · edited</span> : null}

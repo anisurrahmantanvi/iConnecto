@@ -16,6 +16,7 @@ import { validateImage } from '@/lib/image'
 import { errorMessage } from '@/lib/supabase'
 import { myCommunities } from '@/services/communities'
 import { attachPostAudio, listLibrary, removeUploadedAudio, uploadAudio, validateAudio, type AudioDraft, type MusicTrack } from '@/services/music'
+import { getPageBySlug, linkPagePost, myPageRole, type PageRow } from '@/services/pages'
 import { createPost, MAX_POST_IMAGES, MAX_POST_LENGTH } from '@/services/posts'
 import type { PostVisibility } from '@/types/db'
 
@@ -27,6 +28,21 @@ export default function CreatePage() {
   const toast = useToast()
   const [params] = useSearchParams()
   const wantedCommunity = params.get('community') ?? ''
+  const wantedPage = params.get('page') ?? ''
+  const [asPage, setAsPage] = useState<PageRow | null>(null)
+  useEffect(() => {
+    if (!wantedPage) return
+    let off = false
+    void (async () => {
+      try {
+        const p = await getPageBySlug(wantedPage)
+        if (!p || off) return
+        const role = await myPageRole(p.id, me.id)
+        if (role && !off) setAsPage(p)
+      } catch { /* ignore */ }
+    })()
+    return () => { off = true }
+  }, [wantedPage, me.id])
 
   const [text, setText] = useState('')
   const [files, setFiles] = useState<File[]>([])
@@ -110,10 +126,17 @@ export default function CreatePage() {
       if (draft && audioFile) draft = { ...(await uploadAudio(me.id, audioFile)), title: draft.title }
       let id: string
       try {
-        id = await createPost(me.id, { content: text, files, communityId: communityId || null, visibility })
+        id = await createPost(me.id, { content: text, files, communityId: asPage ? null : communityId || null, visibility: asPage ? 'public' : visibility })
       } catch (err) {
         if (draft) void removeUploadedAudio(draft)
         throw err
+      }
+      if (asPage) {
+        try {
+          await linkPagePost(id, asPage.id)
+        } catch (err) {
+          toast.error(`Your post is published on your profile, but could not be posted as the page: ${errorMessage(err)}`)
+        }
       }
       if (draft) {
         try {
@@ -122,7 +145,7 @@ export default function CreatePage() {
           toast.error(`Your post is published, but the music could not be added: ${errorMessage(err)}`)
         }
       }
-      navigate(`/p/${id}`, { replace: true })
+      navigate(asPage ? `/page/${asPage.slug}` : `/p/${id}`, { replace: true })
     } catch (e) {
       setError(errorMessage(e))
       setBusy(false)
@@ -163,7 +186,9 @@ export default function CreatePage() {
           </div>
         ) : null}
 
-        {communities.data && communities.data.length ? (
+        {asPage ? <p className="small muted">Posting as <strong>{asPage.name}</strong> (public, shown to the page's followers).</p> : null}
+
+        {!asPage && communities.data && communities.data.length ? (
           <div className="field">
             <label htmlFor="post-audience">Post to</label>
             <select id="post-audience" className="input" value={communityId} disabled={busy} onChange={(e) => setCommunityId(e.target.value)}>
@@ -175,7 +200,7 @@ export default function CreatePage() {
           </div>
         ) : null}
 
-        {!communityId ? (
+        {!communityId && !asPage ? (
           <div className="field">
             <label htmlFor="post-privacy">Who can see this post?</label>
             <select id="post-privacy" className="input" value={visibility} disabled={busy} onChange={(e) => setVisibility(e.target.value as PostVisibility)}>

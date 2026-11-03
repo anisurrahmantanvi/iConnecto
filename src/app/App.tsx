@@ -41,6 +41,9 @@ const MessagePrivacyPage = lazy(() => import('@/pages/MessagePrivacy'))
 const ChatLookPage = lazy(() => import('@/pages/ChatLook'))
 const ArchivedChatsPage = lazy(() => import('@/pages/ArchivedChats'))
 const EditProfilePage = lazy(() => import('@/pages/settings/EditProfile'))
+const PagesHomePage = lazy(() => import('@/pages/pages/PagesHome'))
+const PageViewPage = lazy(() => import('@/pages/pages/PageView'))
+const PageFormPage = lazy(() => import('@/pages/pages/PageForm'))
 const MarketHomePage = lazy(() => import('@/pages/market/MarketHome'))
 const TwoFactorPage = lazy(() => import('@/pages/settings/TwoFactor'))
 const TrustedDevicesPage = lazy(() => import('@/pages/settings/TrustedDevices'))
@@ -117,6 +120,10 @@ export function App() {
                 <Route path="/report/:targetType/:targetId" element={<ReportPage />} />
 
                 <Route path="/menu" element={<MenuPage />} />
+                <Route path="/pages" element={<PagesHomePage />} />
+                <Route path="/pages/new" element={<PageFormPage mode="create" />} />
+                <Route path="/page/:slug" element={<PageViewPage />} />
+                <Route path="/page/:slug/edit" element={<PageFormPage mode="edit" />} />
                 <Route path="/market" element={<MarketHomePage />} />
                 <Route path="/settings" element={<SettingsHomePage />} />
                 <Route path="/settings/section/:slug" element={<SettingsSectionPage />} />

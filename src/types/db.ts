@@ -47,6 +47,8 @@ export interface Post {
 
 export interface PostView extends Post {
   audio?: import('@/services/music').PostAudio | null
+  /** Set when the post was written as a Page. */
+  page?: import('@/services/pageLinks').PageLite | null
   liked: boolean
   saved: boolean
   reactions: ReactionSummary[]

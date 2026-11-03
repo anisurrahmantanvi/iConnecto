@@ -4,6 +4,7 @@ import { sanitizeSearch } from '@/lib/format'
 import type { Page, Post, PostView, PostVisibility, ReactionSummary } from '@/types/db'
 import { removeImages, uploadImage } from './storage'
 import { fetchPostAudio } from './music'
+import { fetchPageLinks } from './pageLinks'
 
 export const POST_SELECT =
   `id, author_id, content, media_urls, community_id, visibility, like_count, comment_count, share_count, created_at, updated_at, edited_at, author:profiles!author_id(${PROFILE_LITE}), community:communities!community_id(slug, name)`
@@ -15,11 +16,12 @@ export const MAX_POST_LENGTH = 5000
 export async function hydratePosts(posts: Post[], userId: string): Promise<PostView[]> {
   if (!posts.length) return []
   const ids = posts.map((p) => p.id)
-  const [likes, saves, reacts, audio] = await Promise.all([
+  const [likes, saves, reacts, audio, pageLinks] = await Promise.all([
     supabase.from('post_likes').select('post_id').eq('user_id', userId).in('post_id', ids),
     supabase.from('saved_posts').select('post_id').eq('user_id', userId).in('post_id', ids),
     supabase.rpc('post_reaction_summary', { p_post_ids: ids }),
     fetchPostAudio(ids),
+    fetchPageLinks(ids),
   ])
   const liked = new Set((check(likes) as { post_id: string }[]).map((r) => r.post_id))
   const saved = new Set((check(saves) as { post_id: string }[]).map((r) => r.post_id))
@@ -31,7 +33,7 @@ export async function hydratePosts(posts: Post[], userId: string): Promise<PostV
     list.push({ emoji: r.emoji, count: Number(r.reaction_count), reacted: r.reacted })
     byPost.set(r.post_id, list)
   }
-  return posts.map((p) => ({ ...p, liked: liked.has(p.id), saved: saved.has(p.id), reactions: byPost.get(p.id) ?? [], audio: audio.get(p.id) ?? null }))
+  return posts.map((p) => ({ ...p, liked: liked.has(p.id), saved: saved.has(p.id), reactions: byPost.get(p.id) ?? [], audio: audio.get(p.id) ?? null, page: pageLinks.get(p.id) ?? null }))
 }
 
 function page(items: PostView[]): Page<PostView> {
@@ -55,7 +57,9 @@ export async function fetchFeed(userId: string, mode: 'all' | 'following', curso
 export async function fetchUserPosts(userId: string, authorId: string, cursor: string | null): Promise<Page<PostView>> {
   let q = supabase.from('posts').select(POST_SELECT).eq('author_id', authorId).order('created_at', { ascending: false }).limit(PAGE_SIZE)
   if (cursor) q = q.lt('created_at', cursor)
-  return page(await hydratePosts(check(await q) as unknown as Post[], userId))
+  const res = await hydratePosts(check(await q) as unknown as Post[], userId)
+  // Posts written as a Page belong on the Page, not on the writer's personal profile.
+  return { items: res.filter((p) => !p.page), nextCursor: res.length === PAGE_SIZE ? res[res.length - 1].created_at : null }
 }
 
 export async function fetchCommunityPosts(userId: string, communityId: string, cursor: string | null): Promise<Page<PostView>> {

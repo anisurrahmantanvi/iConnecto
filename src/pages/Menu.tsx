@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Bell, Bookmark, ChevronDown, Compass, Film, HelpCircle, LogOut, MessageCircle, Pencil, Settings, ShoppingBag, SquarePlus, UserPlus, Users } from 'lucide-react'
+import { Bell, Bookmark, ChevronDown, Compass, Film, Flag, HelpCircle, LogOut, MessageCircle, Pencil, Settings, ShoppingBag, SquarePlus, UserPlus, Users } from 'lucide-react'
 import { useAuth, useMe } from '@/app/AuthProvider'
 import { Avatar } from '@/components/ui/Avatar'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
@@ -72,6 +72,7 @@ export default function MenuPage() {
           <Tile to="/saved" icon={<Bookmark size={28} />} label="Collections" color="#a35cff" />
           <Tile to="/discover" icon={<Compass size={28} />} label="Discover" color="#1db8a6" />
           <Tile to="/notifications" icon={<Bell size={28} />} label="Activity" color="#f5a524" />
+          <Tile to="/pages" icon={<Flag size={28} />} label="Pages" color="#7a5af8" />
           <Tile to="/market" icon={<ShoppingBag size={28} />} label="Buy & Sell" color="#e0457b" />
           <Tile to="/create" icon={<SquarePlus size={28} />} label="Create" color="#0a84ff" />
           <Tile to="/settings/profile" icon={<Pencil size={28} />} label={tx('Edit profile')} color="#34c759" />
