@@ -1,25 +1,19 @@
 import { supabase } from '@/lib/supabase'
 import { check } from '@/lib/api'
+import { NOT_INSTALLED, sendSupportRequest as send, type SupportKind } from './settingsData'
 
-export type SupportKind = 'problem' | 'bug' | 'feature' | 'contact'
-export interface SupportRequest { id: string; kind: SupportKind; subject: string; message: string; status: 'open' | 'in_review' | 'resolved' | 'closed'; reply: string | null; created_at: string }
+export type { SupportKind }
+export interface SupportRequest { id: string; kind: SupportKind; message: string; status: 'new' | 'seen' | 'done'; created_at: string }
 
-export const KIND_LABEL: Record<SupportKind, string> = { problem: 'Problem', bug: 'Bug', feature: 'Feature request', contact: 'Support' }
-export const STATUS_LABEL: Record<SupportRequest['status'], string> = { open: 'Received', in_review: 'In review', resolved: 'Resolved', closed: 'Closed' }
+export const KIND_LABEL: Record<SupportKind, string> = { problem: 'Problem', bug: 'Bug', feature: 'Feature request', support: 'Support' }
+export const STATUS_LABEL: Record<SupportRequest['status'], string> = { new: 'Received', seen: 'Seen by the team', done: 'Done' }
 
-function missing(err: { message?: string; code?: string } | null): boolean {
-  return !!err && (err.code === 'PGRST205' || err.code === '42P01' || /could not find the table|does not exist|schema cache/i.test(err.message ?? ''))
-}
-
-export async function sendSupportRequest(kind: SupportKind, subject: string, message: string): Promise<void> {
-  const { error } = await supabase.from('support_requests').insert({ kind, subject: subject.trim(), message: message.trim() })
-  if (missing(error)) throw new Error('Support requests will be available after the next database update.')
-  if (error) throw new Error(error.message)
-}
+export const sendSupportRequest = (kind: SupportKind, subject: string, message: string) => send(kind, `${subject.trim()}\n\n${message.trim()}`)
 
 /** My requests, newest first. null = not installed yet. */
 export async function listMyRequests(): Promise<SupportRequest[] | null> {
-  const res = await supabase.from('support_requests').select('id, kind, subject, message, status, reply, created_at').order('created_at', { ascending: false }).limit(50)
-  if (missing(res.error)) return null
+  const res = await supabase.from('support_requests').select('id, kind, message, status, created_at').order('created_at', { ascending: false }).limit(50)
+  if (res.error && (res.error.code === 'PGRST205' || res.error.code === '42P01' || /schema cache|does not exist/i.test(res.error.message))) return null
   return check(res) as unknown as SupportRequest[]
 }
+export { NOT_INSTALLED }

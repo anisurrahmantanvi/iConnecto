@@ -3,7 +3,6 @@ import { useMe } from '@/app/AuthProvider'
 import { GlassPanel } from '@/components/ui/GlassPanel'
 import { ErrorState, ListSkeleton } from '@/components/ui/Feedback'
 import { PageHeader } from '@/components/ui/PageHeader'
-import { Switch } from '@/components/ui/Switch'
 import { useToast } from '@/components/ui/Toast'
 import { errorMessage } from '@/lib/supabase'
 import { getNotifPrefs, NOT_INSTALLED, saveNotifPrefs, type NotifPrefs } from '@/services/settingsData'
@@ -48,7 +47,7 @@ export default function NotificationPrefsPage() {
               {ROWS.map((r) => (
                 <div key={r.key} className="list-row">
                   <span className="grow"><strong style={{ display: 'block' }}>{r.label}</strong><span className="small muted">{r.hint}</span></span>
-                  <Switch checked={prefs[r.key] as boolean} onChange={(v: boolean) => void toggle(r.key, v)} label={r.label} />
+                  <span className="switch"><input type="checkbox" role="switch" aria-label={r.label} checked={prefs[r.key] as boolean} onChange={(e) => void toggle(r.key, e.target.checked)} /><span className="switch__track" aria-hidden /></span>
                 </div>
               ))}
             </GlassPanel>

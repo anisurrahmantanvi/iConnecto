@@ -19,7 +19,7 @@ export default function AboutPage() {
           <Link to="/privacy-policy" className="list-row list-row--link">Privacy Policy</Link>
           <Link to="/terms" className="list-row list-row--link">Terms of Service</Link>
           <Link to="/settings/help" className="list-row list-row--link">Help Center</Link>
-          <Link to="/settings/support/contact" className="list-row list-row--link">Contact Support</Link>
+          <Link to="/settings/support/support" className="list-row list-row--link">Contact Support</Link>
         </GlassPanel>
       </div>
     </>

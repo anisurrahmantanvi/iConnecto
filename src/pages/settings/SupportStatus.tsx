@@ -18,10 +18,9 @@ export default function SupportStatusPage() {
         {data && !data.length ? <EmptyState icon={<LifeBuoy size={28} />} title="Nothing sent yet" body="Reports, bugs and requests you send will show up here with their status." action={<Link to="/settings/support/problem" className="btn btn--primary">Report a problem</Link>} /> : null}
         {data?.map((r) => (
           <GlassPanel key={r.id} padded>
-            <div className="row"><strong className="grow">{r.subject}</strong><span className="small muted">{STATUS_LABEL[r.status]}</span></div>
+            <div className="row"><strong className="grow">{r.message.split('\n')[0].slice(0, 80)}</strong><span className="small muted">{STATUS_LABEL[r.status]}</span></div>
             <div className="small faint">{KIND_LABEL[r.kind]} · {timeAgo(r.created_at)}</div>
-            <p style={{ marginTop: 8, whiteSpace: 'pre-wrap' }}>{r.message}</p>
-            {r.reply ? <p className="small" style={{ marginTop: 8 }}><strong>Reply:</strong> {r.reply}</p> : null}
+            <p style={{ marginTop: 8, whiteSpace: 'pre-wrap' }}>{r.message.split('\n').slice(1).join('\n').trim()}</p>
           </GlassPanel>
         ))}
       </div>

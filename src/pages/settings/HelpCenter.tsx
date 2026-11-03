@@ -30,7 +30,7 @@ export default function HelpCenterPage() {
           </div>
         </GlassPanel>
         <GlassPanel padded>
-          <p>Still stuck? <Link to="/settings/support/contact">Contact Support</Link> or <Link to="/settings/support/problem">report a problem</Link>.</p>
+          <p>Still stuck? <Link to="/settings/support/support">Contact Support</Link> or <Link to="/settings/support/problem">report a problem</Link>.</p>
         </GlassPanel>
       </div>
     </>

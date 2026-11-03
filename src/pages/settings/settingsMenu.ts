@@ -75,7 +75,7 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
       { title: 'In-App Notifications' },
       { title: 'Email Notifications' },
       { title: 'Notification Sounds' },
-      { title: 'Notification Preferences' },
+      { title: 'Notification Preferences', to: '/settings/notification-prefs' },
     ],
   },
   {
@@ -205,7 +205,7 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
   {
     title: 'Support & Feedback',
     items: [
-      { title: 'Contact Support', to: '/settings/support/contact' },
+      { title: 'Contact Support', to: '/settings/support/support' },
       { title: 'Report a Bug', to: '/settings/support/bug' },
       { title: 'Request a Feature', to: '/settings/support/feature' },
       { title: 'Report Status', to: '/settings/support/status' },
