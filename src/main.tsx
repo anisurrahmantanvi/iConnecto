@@ -13,6 +13,13 @@ import { ROUTER_BASENAME } from './lib/base'
 const rootEl = document.getElementById('root')
 if (!rootEl) throw new Error('Missing #root element in index.html')
 
+// Long-press on an in-app link/button should not open the browser's link menu/preview.
+document.addEventListener('contextmenu', (e) => {
+  const el = e.target as HTMLElement | null
+  if (!el || el.closest('input, textarea, [contenteditable="true"]')) return
+  if (el.closest('a, button, img, video')) e.preventDefault()
+})
+
 createRoot(rootEl).render(
   <StrictMode>
     <ErrorBoundary>

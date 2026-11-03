@@ -121,3 +121,5 @@ img {
     scroll-behavior: auto !important;
   }
 }
+
+a, button, img { -webkit-touch-callout: none; }
