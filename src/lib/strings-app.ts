@@ -436,6 +436,7 @@ export const BN_APP: Record<string, string> = {
   'Sell something': 'কিছু বিক্রি করুন',
   'All': 'সব',
   'See all': 'সব দেখুন',
+  "What's on your mind?": 'আপনার মনে কী আছে?',
 }
 
 export const HI_APP: Record<string, string> = {
@@ -875,4 +876,5 @@ export const HI_APP: Record<string, string> = {
   'Sell something': 'कुछ बेचें',
   'All': 'सभी',
   'See all': 'सभी देखें',
+  "What's on your mind?": 'आपके मन में क्या है?',
 }

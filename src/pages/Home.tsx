@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ArrowUp, MessageCircle, Search, Sparkles, SquarePlus } from 'lucide-react'
 import { useAuth } from '@/app/AuthProvider'
 import { useBadges } from '@/app/BadgesProvider'
+import { ComposerBar } from '@/components/feed/ComposerBar'
 import { PostFeed } from '@/components/feed/PostFeed'
 import { Button } from '@/components/ui/Button'
 import { GlassPanel } from '@/components/ui/GlassPanel'
@@ -72,6 +73,7 @@ export default function HomePage() {
       />
 
       <div className="stack feed-bleed">
+        <ComposerBar />
         {showNudge ? (
           <GlassPanel padded sheen>
             <div className="row">
