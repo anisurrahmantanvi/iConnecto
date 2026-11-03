@@ -183,12 +183,12 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
   {
     title: 'Your Information',
     items: [
-      { title: 'Download Your Information' },
-      { title: 'Export Account Data' },
-      { title: 'Account Deactivation' },
+      { title: 'Download Your Information', to: '/settings/your-data' },
+      { title: 'Export Account Data', to: '/settings/your-data' },
+      { title: 'Account Deactivation', to: '/settings/deactivate' },
       { title: 'Account Deletion', to: '/settings/account' },
-      { title: 'Data Management' },
-      { title: 'Manage Uploaded Media' },
+      { title: 'Data Management', to: '/settings/your-data' },
+      { title: 'Manage Uploaded Media', to: '/settings/media' },
     ],
   },
   {

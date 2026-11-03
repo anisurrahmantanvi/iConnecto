@@ -1,3 +1,4 @@
+import { amIDeactivated, reactivateAccount } from '@/services/deactivation'
 import { useEffect, useState } from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { ShieldAlert } from 'lucide-react'
@@ -69,6 +70,7 @@ export function ProtectedRoute() {
   const uid = session?.user.id ?? ''
   const sid = sessionIdOf(session)
   const [emailDone, setEmailDone] = useState(0)
+  const [off, setOff] = useState<boolean | null>(null)
   const needEmail = !!session && emailStepOn(session.user) && !isSessionChecked(sid) && !!session.user.email
   useEffect(() => {
     if (!uid) { setMfa(null); return }
@@ -78,10 +80,30 @@ export function ProtectedRoute() {
     return () => { on = false }
   }, [uid, sid])
 
+  useEffect(() => {
+    if (!uid) { setOff(null); return }
+    if (mfa !== '') return
+    let on = true
+    void amIDeactivated(uid).then((d) => on && setOff(d))
+    return () => { on = false }
+  }, [uid, mfa])
+
   if (loading) return <Splash />
   if (session && needEmail) return <EmailChallenge key={emailDone} email={session.user.email as string} onDone={() => setEmailDone((n) => n + 1)} />
   if (session && mfa === null) return <Splash />
   if (session && mfa) return <MfaChallenge factorId={mfa} onDone={() => setMfa('')} />
+  if (session && off) {
+    return (
+      <div className="auth">
+        <GlassPanel className="auth__card" role="alert">
+          <h1>Your account is deactivated</h1>
+          <p className="muted">Reactivate to show your profile again and use iConnecto.</p>
+          <Button variant="primary" onClick={() => void reactivateAccount().then(() => setOff(false)).catch(() => undefined)}>Reactivate</Button>
+          <Button variant="ghost" onClick={() => void signOut()}>Sign out</Button>
+        </GlassPanel>
+      </div>
+    )
+  }
   if (!session) return <Navigate to="/login" replace state={{ from: location.pathname + location.search }} />
   if (profileError) {
     return (

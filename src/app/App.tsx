@@ -50,6 +50,9 @@ const HelpCenterPage = lazy(() => import('@/pages/settings/HelpCenter'))
 const AboutPage = lazy(() => import('@/pages/settings/About'))
 const TermsPage = lazy(() => import('@/pages/Terms'))
 const NotificationPrefsPage = lazy(() => import('@/pages/settings/NotificationPrefs'))
+const YourDataPage = lazy(() => import('@/pages/settings/YourData'))
+const DeactivatePage = lazy(() => import('@/pages/settings/Deactivate'))
+const MyMediaPage = lazy(() => import('@/pages/settings/MyMedia'))
 const MarketHomePage = lazy(() => import('@/pages/market/MarketHome'))
 const TwoFactorPage = lazy(() => import('@/pages/settings/TwoFactor'))
 const TrustedDevicesPage = lazy(() => import('@/pages/settings/TrustedDevices'))
@@ -132,6 +135,9 @@ export function App() {
                 <Route path="/page/:slug" element={<PageViewPage />} />
                 <Route path="/page/:slug/edit" element={<PageFormPage mode="edit" />} />
                 <Route path="/settings/notification-prefs" element={<NotificationPrefsPage />} />
+                <Route path="/settings/your-data" element={<YourDataPage />} />
+                <Route path="/settings/deactivate" element={<DeactivatePage />} />
+                <Route path="/settings/media" element={<MyMediaPage />} />
                 <Route path="/settings/help" element={<HelpCenterPage />} />
                 <Route path="/settings/about" element={<AboutPage />} />
                 <Route path="/settings/support/status" element={<SupportStatusPage />} />
