@@ -1,3 +1,4 @@
+import { PeerBadge } from '@/components/ui/PeerBadge'
 import { useState } from 'react'
 import { Dialog } from '@/components/ui/Dialog'
 import { EmptyState, ErrorState, ListSkeleton } from '@/components/ui/Feedback'
@@ -43,7 +44,7 @@ export function ForwardDialog({ content, onClose }: { content: string | null; on
             return (
               <button key={c.chat_id} type="button" role="listitem" className="list-row" disabled={busy !== null} onClick={() => void forward(c.chat_id, name)} style={{ width: '100%', textAlign: 'left' }}>
                 <Avatar src={c.other_avatar_url} name={name} />
-                <strong className="grow truncate">{name}</strong>
+                <strong className="truncate">{name}</strong><PeerBadge userId={c.other_id} /><span className="grow" />
                 <span className="small muted">{busy === c.chat_id ? 'Sending…' : 'Send'}</span>
               </button>
             )

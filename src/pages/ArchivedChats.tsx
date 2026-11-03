@@ -1,3 +1,4 @@
+import { PeerBadge } from '@/components/ui/PeerBadge'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Archive } from 'lucide-react'
@@ -50,7 +51,7 @@ export default function ArchivedChatsPage() {
               <div key={c.chat_id} role="listitem" className="list-row">
                 <Link to={`/messages/${c.chat_id}`} className="row grow" style={{ minWidth: 0 }}>
                   <Avatar src={c.other_avatar_url} name={name} />
-                  <strong className="truncate">{name}</strong>
+                  <strong className="truncate">{name}</strong><PeerBadge userId={c.other_id} />
                 </Link>
                 <Button size="sm" variant="glass" loading={busy === c.chat_id} onClick={() => void restore(c.chat_id)}>Unarchive</Button>
               </div>

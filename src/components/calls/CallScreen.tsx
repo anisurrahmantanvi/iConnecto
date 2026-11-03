@@ -1,3 +1,4 @@
+import { PeerBadge } from '@/components/ui/PeerBadge'
 import { useEffect, useRef, useState } from 'react'
 import { startRing, stopRing } from '@/lib/ringtone'
 import { Loader2, Mic, MicOff, Phone, PhoneOff, Video, VideoOff, TriangleAlert } from 'lucide-react'
@@ -76,7 +77,7 @@ export function CallScreen({ api, onClose }: { api: CallApi; onClose: () => void
 
       <div className="call-screen__who">
         <Avatar src={api.peer?.avatar_url} name={name} size="xl" />
-        <h1>{name}</h1>
+        <h1>{name}<PeerBadge userId={api.peer?.id} size={22} /></h1>
         <p className="call-screen__status" role="status" aria-live="polite">
           {phase === 'loading' ? <Loader2 size={18} className="spin" aria-hidden /> : null} {statusLabel(api)}
         </p>

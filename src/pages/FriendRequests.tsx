@@ -1,3 +1,4 @@
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Lock } from 'lucide-react'
@@ -49,7 +50,7 @@ export default function FriendRequestsPage() {
                 <Avatar src={requester.avatar_url} name={requester.display_name ?? requester.username} />
               </Link>
               <span className="grow" style={{ minWidth: 0 }}>
-                <strong className="truncate" style={{ display: 'block' }}>{requester.display_name || requester.username}</strong>
+                <strong className="truncate" style={{ display: 'block' }}>{requester.display_name || requester.username}<VerifiedBadge badge={requester.badge} size={14} /></strong>
                 <span className="small muted truncate" style={{ display: 'block' }}>@{requester.username}</span>
               </span>
               <Button variant="primary" size="sm" loading={busy === requester.id} onClick={() => void answer(requester.id, true)}>Accept</Button>

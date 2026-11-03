@@ -1,3 +1,4 @@
+import { PeerBadge } from '@/components/ui/PeerBadge'
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { AlertCircle, Archive, ArrowLeft, Flag, MessageCircle, Phone, PhoneMissed, Send, UserRound, Video, WifiOff, X } from 'lucide-react'
@@ -330,7 +331,7 @@ export default function ChatPage() {
         <Link to={`/u/${peer.other_username}`} className="row grow chat-header__who" aria-label={`Open ${name}'s profile`}>
           <PresenceAvatar online={!!presence?.online} src={peer.other_avatar_url} name={name} />
           <span style={{ minWidth: 0 }}>
-            <strong className="truncate" style={{ display: 'block' }}>{name}</strong>
+            <strong className="truncate" style={{ display: 'block' }}>{name}<PeerBadge userId={peer.other_id} /></strong>
             <span className={`small truncate presence-line ${peerTyping || presence?.online ? 'presence-line--online' : 'muted'}`} style={{ display: 'flex' }}>
               {peerTyping ? 'typing…' : presence ? presence.label : `@${peer.other_username}`}
             </span>

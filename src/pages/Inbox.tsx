@@ -1,3 +1,4 @@
+import { PeerBadge } from '@/components/ui/PeerBadge'
 import { useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { MessageCircle, Plus, Settings } from 'lucide-react'
@@ -90,7 +91,8 @@ export default function InboxPage() {
                 <PresenceAvatar online={!!describePresence(presenceMap.get(c.other_id))?.online} src={c.other_avatar_url} name={name} size="lg" />
                 <div className="grow" style={{ minWidth: 0 }}>
                   <div className="row">
-                    <strong className="truncate grow">{name}</strong>
+                    <strong className="truncate">{name}</strong><PeerBadge userId={c.other_id} />
+                    <span className="grow" />
                     <span className="small faint">{timeAgo(c.last_message_at)}</span>
                   </div>
                   <div className="row">

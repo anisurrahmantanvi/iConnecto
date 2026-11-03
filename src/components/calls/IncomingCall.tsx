@@ -1,3 +1,4 @@
+import { PeerBadge } from '@/components/ui/PeerBadge'
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Phone, PhoneOff, Video } from 'lucide-react'
@@ -67,7 +68,7 @@ export function IncomingCallListener() {
     <div className="glass glass--strong incoming-call" role="alertdialog" aria-label={`Incoming ${call.call_type} call from ${name}`}>
       <Avatar src={caller?.avatar_url} name={name} size="lg" />
       <div className="grow">
-        <strong className="truncate" style={{ display: 'block' }}>{name}</strong>
+        <strong className="truncate" style={{ display: 'block' }}>{name}<PeerBadge userId={caller?.id} /></strong>
         <span className="small muted">Incoming {call.call_type} call…</span>
       </div>
       <button
