@@ -23,4 +23,4 @@ jobs:
         with:
           version: latest
       - name: Deploy send-push (called by database triggers, checked by a shared secret)
-        run: supabase functions deploy send-push --no-verify-jwt --project-ref "${{ inputs.project_ref }}"
+        run: supabase functions deploy send-push --no-verify-jwt --yes --project-ref "${{ inputs.project_ref }}"
