@@ -285,3 +285,23 @@ a.list-row--link { text-decoration: none; }
 .shell--chat .chat-view .chat-scroll { border-radius: 0; padding: 8px 10px; }
 .shell--chat .composer { border-radius: 0; border-width: 1px 0 0; box-shadow: none; }
 .shell--chat .chat-view .banner { border-radius: 0; margin: 0; }
+
+/* Verification code boxes */
+.codebox { position: relative; display: flex; justify-content: center; gap: 8px; margin: 6px 0 10px; }
+.codebox__cell { width: 44px; height: 54px; display: grid; place-items: center; font-size: 1.5rem; font-weight: 600; border-radius: 14px; background: var(--glass-bg, rgba(120,120,140,0.14)); border: 1.5px solid var(--glass-edge); transition: border-color .15s, transform .15s, background .15s; animation: codePop .35s ease both; }
+.codebox__cell.is-filled { border-color: var(--accent); transform: scale(1.04); }
+.codebox__cell.is-active { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+.codebox__cell.is-active:not(.is-filled)::after { content: ''; width: 2px; height: 24px; background: var(--accent); animation: codeCaret 1s steps(1) infinite; }
+.codebox__input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; border: 0; font-size: 16px; }
+.codebox.is-busy .codebox__cell { animation: codeWave .9s ease-in-out infinite; }
+.codebox.is-error .codebox__cell { border-color: var(--danger, #e5484d); }
+.codebox.is-shake { animation: codeShake .4s ease; }
+.codebox.is-done .codebox__cell { border-color: #22b455; color: #22b455; background: color-mix(in srgb, #22b455 14%, transparent); animation: codeDone .5s ease both; }
+.codebox__ok { display: inline-flex; align-items: center; justify-content: center; gap: 6px; color: #22b455; font-weight: 600; animation: codePop .4s ease both; }
+@keyframes codePop { from { opacity: 0; transform: translateY(8px) scale(.9); } to { opacity: 1; transform: none; } }
+@keyframes codeCaret { 50% { opacity: 0; } }
+@keyframes codeWave { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes codeShake { 20% { transform: translateX(-8px); } 40% { transform: translateX(8px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(5px); } }
+@keyframes codeDone { 0% { transform: scale(1); } 50% { transform: scale(1.18); } 100% { transform: scale(1); } }
+@media (max-width: 400px) { .codebox { gap: 5px; } .codebox__cell { width: 38px; height: 50px; } }
+@media (prefers-reduced-motion: reduce) { .codebox *, .codebox, .codebox__ok { animation: none !important; } }
