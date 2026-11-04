@@ -5,7 +5,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 
 const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!)
-const BUCKETS = ['avatars', 'covers', 'post-media', 'post-audio', 'community-images', 'market-media']
+const BUCKETS = ['avatars', 'covers', 'post-media', 'post-audio', 'community-images', 'market-media', 'reel-videos']
 
 async function removeFolder(bucket: string, folder: string): Promise<void> {
   for (let i = 0; i < 20; i++) {

@@ -31,6 +31,7 @@ const ReportPage = lazy(() => import('@/pages/Report'))
 const NotFoundPage = lazy(() => import('@/pages/NotFound'))
 
 const ReelsPage = lazy(() => import('@/pages/Reels'))
+const ReelCreatePage = lazy(() => import('@/pages/reels/ReelCreate'))
 const MessageSettingsPage = lazy(() => import('@/pages/MessageSettings'))
 const SettingsSectionPage = lazy(() => import('@/pages/settings/SettingsSection'))
 const MenuPage = lazy(() => import('@/pages/Menu'))
@@ -121,6 +122,7 @@ export function App() {
                 <Route path="/messages/:chatId" element={<ChatPage />} />
 
                 <Route path="/reels" element={<ReelsPage />} />
+                <Route path="/reels/new" element={<ReelCreatePage />} />
                 <Route path="/communities" element={<CommunitiesPage />} />
                 <Route path="/communities/new" element={<CommunityFormPage mode="create" />} />
                 <Route path="/c/:slug" element={<CommunityDetailPage />} />
