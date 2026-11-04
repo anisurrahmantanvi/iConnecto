@@ -2,11 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Loader2, TriangleAlert } from 'lucide-react'
 import { useMe } from '@/app/AuthProvider'
-import { CallScreen } from '@/components/calls/CallScreen'
+import { useCallControl } from '@/app/CallProvider'
 import { Button } from '@/components/ui/Button'
-import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { setBackGuard } from '@/hooks/useBackButton'
-import { useCall } from '@/hooks/useCall'
 import { errorMessage } from '@/lib/supabase'
 import { createCall } from '@/services/calls'
 import type { CallType } from '@/types/db'
@@ -23,12 +20,17 @@ function NewCall() {
   const [params] = useSearchParams()
   const to = params.get('to') ?? ''
   const type: CallType = params.get('type') === 'video' ? 'video' : 'audio'
+  const { inCall } = useCallControl()
   const started = useRef(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (started.current) return // StrictMode runs effects twice in development; create the call only once
     started.current = true
+    if (inCall) {
+      setError('You are already in a call. End it first.')
+      return
+    }
     if (!UUID_RE.test(to) || to === me.id) {
       setError('That call can’t be started.')
       return
@@ -58,36 +60,13 @@ function NewCall() {
   )
 }
 
+/** The call itself lives in CallProvider; this page only opens it. */
 function ActiveCall({ callId }: { callId: string }) {
-  const me = useMe()
-  const navigate = useNavigate()
   const location = useLocation()
-  const autoAccept = (location.state as { accept?: boolean } | null)?.accept === true
-  const api = useCall({ callId, myId: me.id, autoAccept })
-  const [askEnd, setAskEnd] = useState(false)
-  const over = api.phase === 'ended' || api.phase === 'error'
-
-  // The phone's back button must not drop the call by accident. While the call is on, it asks first.
-  useEffect(() => {
-    if (over) { setBackGuard(null); return }
-    setBackGuard(() => { setAskEnd(true); return true })
-    return () => setBackGuard(null)
-  }, [over])
-
-  return (
-    <>
-      <CallScreen api={api} onClose={() => navigate('/messages', { replace: true })} />
-      <ConfirmDialog
-        open={askEnd && !over}
-        title="End this call?"
-        message="Going back will hang up. Tap Cancel to stay in the call."
-        confirmLabel="End call"
-        danger
-        onClose={() => setAskEnd(false)}
-        onConfirm={async () => { await api.hangUp() }}
-      />
-    </>
-  )
+  const { open } = useCallControl()
+  const accept = (location.state as { accept?: boolean } | null)?.accept === true
+  useEffect(() => { open(callId, accept) }, [callId, accept, open])
+  return null
 }
 
 export default function CallPage() {

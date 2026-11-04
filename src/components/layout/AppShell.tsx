@@ -12,6 +12,7 @@ import { usePullToRefresh } from '@/hooks/usePullToRefresh'
 import { useT } from '@/lib/i18n'
 import { registerDevice } from '@/services/security'
 import { IncomingCallListener } from '@/components/calls/IncomingCall'
+import { CallProvider } from '@/app/CallProvider'
 import { Spinner } from '@/components/ui/Feedback'
 import { Logo } from '@/components/ui/Logo'
 
@@ -90,6 +91,7 @@ export function AppShell() {
   const username = profile?.username ?? ''
 
   return (
+    <CallProvider>
     <div className={`shell ${immersive ? 'shell--immersive' : ''} ${inChat ? 'shell--chat' : ''}`}>
       <a href="#main" className="skip-link">Skip to content</a>
 
@@ -133,5 +135,6 @@ export function AppShell() {
 
       <IncomingCallListener />
     </div>
+    </CallProvider>
   )
 }

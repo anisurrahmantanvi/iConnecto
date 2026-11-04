@@ -327,3 +327,12 @@ html { overflow-x: hidden; max-width: 100%; }
 /* Tap the empty cover area above the name to open the cover photo. */
 .profile-cover__hit { position: absolute; left: 0; right: 0; top: 0; height: 90px; background: transparent; border: 0; padding: 0; z-index: 1; cursor: pointer; }
 .profile-top .profile-id, .profile-top .profile-ring { position: relative; z-index: 2; }
+
+/* Minimised call: green bar at the top of every screen. Tap it to return to the call. */
+.callbar { position: fixed; top: 0; left: 0; right: 0; z-index: 90; display: flex; align-items: center; background: #1fa971; color: #fff; padding-top: var(--safe-top); }
+.callbar__main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; background: none; border: 0; color: inherit; font: inherit; text-align: left; }
+.callbar__time { font-variant-numeric: tabular-nums; opacity: .95; }
+.callbar__hint { margin-left: auto; font-size: 12px; opacity: .85; white-space: nowrap; }
+.callbar__end { width: 40px; height: 40px; border: 0; background: rgba(0,0,0,.25); color: #fff; display: grid; place-items: center; }
+html.has-callbar .shell { padding-top: calc(40px + var(--safe-top)); }
+html.has-callbar .page-header { top: calc(40px + var(--safe-top)); }

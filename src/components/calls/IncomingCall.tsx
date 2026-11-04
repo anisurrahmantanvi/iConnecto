@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { Phone, PhoneOff, Video } from 'lucide-react'
 import type { CallSession, ProfileLite } from '@/types/db'
 import { useAuth } from '@/app/AuthProvider'
+import { useCallControl } from '@/app/CallProvider'
 import { Avatar } from '@/components/ui/Avatar'
 import { getProfileById } from '@/services/profiles'
 import { startRing, stopRing } from '@/lib/ringtone'
@@ -22,6 +23,7 @@ interface Incoming {
  */
 export function IncomingCallListener() {
   const { user } = useAuth()
+  const { inCall } = useCallControl() // already talking: do not ring over the current call
   const navigate = useNavigate()
   const location = useLocation()
   const [incoming, setIncoming] = useState<Incoming | null>(null)
@@ -53,14 +55,14 @@ export function IncomingCallListener() {
   }, [callId])
 
   // Ring while the answer / decline sheet is showing.
-  const ringing = !!incoming && !location.pathname.startsWith('/call/')
+  const ringing = !!incoming && !inCall && !location.pathname.startsWith('/call/')
   useEffect(() => {
     if (!ringing) return
     startRing('incoming')
     return () => stopRing()
   }, [ringing])
 
-  if (!incoming || location.pathname.startsWith('/call/')) return null
+  if (!incoming || inCall || location.pathname.startsWith('/call/')) return null
   const { call, caller } = incoming
   const name = caller?.display_name || caller?.username || 'Someone'
 
