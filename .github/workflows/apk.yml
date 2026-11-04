@@ -51,6 +51,12 @@ jobs:
           s=s.replace('</application>',meta+svc+msg+'</application>')
           open(p,'w').write(s)
           PY
+          python3 - <<'PY2'
+          p='android/app/build.gradle'
+          s=open(p).read()
+          s=s.replace('dependencies {',"dependencies {\n    implementation 'com.google.firebase:firebase-messaging:23.4.1'",1)
+          open(p,'w').write(s)
+          PY2
           mkdir -p assets && cp design/logo-source.png assets/icon-only.png && cp design/logo-source.png assets/icon-foreground.png
           npx capacitor-assets generate --android --iconBackgroundColor '#ffffff' || echo "icon generation failed, default icon kept"
           grep -rl '@mipmap/ic_launcher_background' android/app/src/main/res | xargs -r sed -i 's#@mipmap/ic_launcher_background#@color/ic_launcher_background#g'
