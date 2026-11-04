@@ -23,6 +23,7 @@ jobs:
         run: |
           npm run build
           cp dist/index.html dist/404.html   # deep links (e.g. /iconnecto/login) fall back to the app
+          node scripts/build-site.mjs dist   # static About / Privacy / Terms / Delete-account pages (real HTTP 200)
         env:
           VITE_BASE: /${{ github.event.repository.name }}/
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL || 'https://hcfehacsfirzwjqqcabb.supabase.co' }}
