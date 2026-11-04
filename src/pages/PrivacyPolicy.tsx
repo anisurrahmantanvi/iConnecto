@@ -64,8 +64,9 @@ export default function PrivacyPolicyPage() {
 
           <h2 className="section-title">Deleting your data</h2>
           <p>
-            You can delete your account yourself: sign in, then go to Settings → Account Center → Delete account. This
-            permanently removes your profile, posts, comments, messages and uploaded files from iConnecto. You can also edit or
+            You can delete your account yourself: sign in, then go to Settings → Account Center → Delete account, or use the
+            delete page on our website. Your profile is hidden at once, and after a 30-day waiting period (during which you can
+            cancel by signing in) your profile, posts, comments, messages and uploaded files are permanently removed from iConnecto. You can also edit or
             delete individual posts and comments at any time.
           </p>
 
