@@ -25,15 +25,11 @@ body {
   -webkit-touch-callout: none;
 }
 
-/* Real content stays selectable: things people type and things people write. */
+/* Only text fields (so people can type) and post captions can be selected or copied. Everything else is locked. */
 input,
 textarea,
 [contenteditable='true'],
-.post__body,
-.bubble,
-.comment__text,
-.profile-bio,
-.selectable {
+.post__body {
   -webkit-user-select: text;
   user-select: text;
   -webkit-touch-callout: default;
