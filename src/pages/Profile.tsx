@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Ban, Copy, Flag, Lock, LogOut, Menu, Phone, Settings, UserPlus, UserX, Video } from 'lucide-react'
 import { useAuth, useMe } from '@/app/AuthProvider'
 import { ComposerBar } from '@/components/feed/ComposerBar'
+import { ReelStrip } from '@/components/feed/ReelStrip'
 import { PostFeed } from '@/components/feed/PostFeed'
 import { ProfileAbout } from '@/components/profile/ProfileAbout'
 import { ProfileHeader } from '@/components/profile/ProfileHeader'
@@ -217,6 +218,7 @@ export default function ProfilePage() {
         ) : (
           <div>
           {isMe ? <ComposerBar /> : null}
+          <ReelStrip authorId={profile.id} title={isMe ? 'Your reels' : 'Reels'} />
           <PostFeed
             source={{ kind: 'author', authorId: profile.id }}
             empty={

@@ -31,6 +31,7 @@ const ReportPage = lazy(() => import('@/pages/Report'))
 const NotFoundPage = lazy(() => import('@/pages/NotFound'))
 
 const ReelsPage = lazy(() => import('@/pages/Reels'))
+const ReelPlayerPage = lazy(() => import('@/pages/Reels').then((m) => ({ default: m.ReelPlayerPage })))
 const ReelCreatePage = lazy(() => import('@/pages/reels/ReelCreate'))
 const MessageSettingsPage = lazy(() => import('@/pages/MessageSettings'))
 const SettingsSectionPage = lazy(() => import('@/pages/settings/SettingsSection'))
@@ -123,6 +124,7 @@ export function App() {
 
                 <Route path="/reels" element={<ReelsPage />} />
                 <Route path="/reels/new" element={<ReelCreatePage />} />
+                <Route path="/reels/:id" element={<ReelPlayerPage />} />
                 <Route path="/communities" element={<CommunitiesPage />} />
                 <Route path="/communities/new" element={<CommunityFormPage mode="create" />} />
                 <Route path="/c/:slug" element={<CommunityDetailPage />} />

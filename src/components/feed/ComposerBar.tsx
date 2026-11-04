@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ImagePlus } from 'lucide-react'
+import { Clapperboard, ImagePlus } from 'lucide-react'
 import { useMe } from '@/app/AuthProvider'
 import { Avatar } from '@/components/ui/Avatar'
 
@@ -13,6 +13,7 @@ export function ComposerBar() {
         What's on your mind?
       </Link>
       <Link to="/create" className="icon-btn" aria-label="Add photo"><ImagePlus size={22} /></Link>
+      <Link to="/reels/new" className="icon-btn" aria-label="Create reel"><Clapperboard size={22} /></Link>
     </div>
   )
 }

@@ -4,6 +4,7 @@ import { ArrowUp, MessageCircle, Search, Sparkles, SquarePlus } from 'lucide-rea
 import { useAuth } from '@/app/AuthProvider'
 import { useBadges } from '@/app/BadgesProvider'
 import { ComposerBar } from '@/components/feed/ComposerBar'
+import { ReelStrip } from '@/components/feed/ReelStrip'
 import { PostFeed } from '@/components/feed/PostFeed'
 import { Button } from '@/components/ui/Button'
 import { GlassPanel } from '@/components/ui/GlassPanel'
@@ -74,6 +75,7 @@ export default function HomePage() {
 
       <div className="stack feed-bleed">
         <ComposerBar />
+        <ReelStrip />
         {showNudge ? (
           <GlassPanel padded sheen>
             <div className="row">

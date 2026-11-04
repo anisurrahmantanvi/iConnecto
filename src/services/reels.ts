@@ -110,3 +110,22 @@ export async function deleteReelComment(id: string): Promise<void> {
 export function countView(reelId: string): void {
   void supabase.rpc('reel_view', { p_reel: reelId }).then(() => undefined, () => undefined)
 }
+
+/** A few reels for a strip (home or a profile). Empty list when reels are not installed or none exist. */
+export async function fetchReelStrip(authorId: string | null, limit = 10): Promise<Pick<Reel, 'id' | 'video_url' | 'caption' | 'view_count'>[]> {
+  try {
+    let q = supabase.from('reels').select('id, video_url, caption, view_count').order('created_at', { ascending: false }).limit(limit)
+    if (authorId) q = q.eq('author_id', authorId)
+    const { data, error } = await q
+    return error ? [] : ((data ?? []) as Pick<Reel, 'id' | 'video_url' | 'caption' | 'view_count'>[])
+  } catch { return [] }
+}
+
+export async function fetchReel(userId: string, id: string): Promise<Reel | null> {
+  const res = await supabase.from('reels').select(COLS).eq('id', id).maybeSingle()
+  if (missing(res.error)) throw new Error(NOT_READY)
+  const row = check(res) as unknown as Omit<Reel, 'liked'> | null
+  if (!row) return null
+  const l = await supabase.from('reel_likes').select('reel_id').eq('user_id', userId).eq('reel_id', id).maybeSingle()
+  return { ...row, liked: !!l.data }
+}

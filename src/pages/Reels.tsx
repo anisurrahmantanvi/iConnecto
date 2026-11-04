@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Clapperboard, Heart, MessageCircle, Plus, Send, Share2, Trash2, Volume2, VolumeX } from 'lucide-react'
 import { useMe } from '@/app/AuthProvider'
 import { Avatar } from '@/components/ui/Avatar'
@@ -16,7 +16,7 @@ import { compactNumber, timeAgo } from '@/lib/format'
 import { errorMessage } from '@/lib/supabase'
 import {
   addReelComment, countView, deleteReel, deleteReelComment, fetchReels, listReelComments, setReelLike,
-  type Reel, type ReelComment,
+  fetchReel, type Reel, type ReelComment,
 } from '@/services/reels'
 
 function Comments({ reel, onClose, onCount }: { reel: Reel; onClose: () => void; onCount: (d: number) => void }) {
@@ -61,7 +61,7 @@ function Comments({ reel, onClose, onCount }: { reel: Reel; onClose: () => void;
   )
 }
 
-function ReelItem({ reel, muted, onToggleMute, patch, onDeleted }: { reel: Reel; muted: boolean; onToggleMute: () => void; patch: (r: Reel) => void; onDeleted: () => void }) {
+export function ReelItem({ reel, muted, onToggleMute, patch, onDeleted }: { reel: Reel; muted: boolean; onToggleMute: () => void; patch: (r: Reel) => void; onDeleted: () => void }) {
   const me = useMe()
   const toast = useToast()
   const box = useRef<HTMLElement>(null)
@@ -155,6 +155,30 @@ export default function ReelsPage() {
               onDeleted={() => setItems((prev) => prev.filter((x) => x.id !== r.id))} />
           ))}
           <div ref={end} style={{ height: 1 }} />
+        </div>
+      ) : null}
+    </>
+  )
+}
+
+/** One reel opened from a profile or the home strip. */
+export function ReelPlayerPage() {
+  const { id = '' } = useParams()
+  const me = useMe()
+  const navigate = useNavigate()
+  const [reel, setReel] = useState<Reel | null | undefined>(undefined)
+  const [err, setErr] = useState<string | null>(null)
+  const [muted, setMuted] = useState(false)
+  useEffect(() => { void fetchReel(me.id, id).then(setReel).catch((e) => setErr(errorMessage(e))) }, [id, me.id])
+  return (
+    <>
+      <PageHeader title="Reel" back="/reels" />
+      {err ? <ErrorState message={err} /> : null}
+      {reel === undefined && !err ? <ListSkeleton rows={2} /> : null}
+      {reel === null ? <EmptyState icon={<Clapperboard size={28} />} title="Reel not found" body="It may have been deleted." action={<Link to="/reels" className="btn btn--primary">Watch reels</Link>} /> : null}
+      {reel ? (
+        <div className="reels">
+          <ReelItem reel={reel} muted={muted} onToggleMute={() => setMuted((m) => !m)} patch={setReel as (r: Reel) => void} onDeleted={() => navigate('/reels', { replace: true })} />
         </div>
       ) : null}
     </>
