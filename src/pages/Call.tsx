@@ -4,6 +4,8 @@ import { Loader2, TriangleAlert } from 'lucide-react'
 import { useMe } from '@/app/AuthProvider'
 import { CallScreen } from '@/components/calls/CallScreen'
 import { Button } from '@/components/ui/Button'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import { setBackGuard } from '@/hooks/useBackButton'
 import { useCall } from '@/hooks/useCall'
 import { errorMessage } from '@/lib/supabase'
 import { createCall } from '@/services/calls'
@@ -62,7 +64,30 @@ function ActiveCall({ callId }: { callId: string }) {
   const location = useLocation()
   const autoAccept = (location.state as { accept?: boolean } | null)?.accept === true
   const api = useCall({ callId, myId: me.id, autoAccept })
-  return <CallScreen api={api} onClose={() => navigate('/messages', { replace: true })} />
+  const [askEnd, setAskEnd] = useState(false)
+  const over = api.phase === 'ended' || api.phase === 'error'
+
+  // The phone's back button must not drop the call by accident. While the call is on, it asks first.
+  useEffect(() => {
+    if (over) { setBackGuard(null); return }
+    setBackGuard(() => { setAskEnd(true); return true })
+    return () => setBackGuard(null)
+  }, [over])
+
+  return (
+    <>
+      <CallScreen api={api} onClose={() => navigate('/messages', { replace: true })} />
+      <ConfirmDialog
+        open={askEnd && !over}
+        title="End this call?"
+        message="Going back will hang up. Tap Cancel to stay in the call."
+        confirmLabel="End call"
+        danger
+        onClose={() => setAskEnd(false)}
+        onConfirm={async () => { await api.hangUp() }}
+      />
+    </>
+  )
 }
 
 export default function CallPage() {
