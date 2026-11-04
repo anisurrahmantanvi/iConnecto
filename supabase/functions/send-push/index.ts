@@ -15,7 +15,7 @@ interface Push {
   body: string
   url: string
   tag: string
-  channel: 'iconnecto' | 'calls_ring'
+  channel: 'iconnecto' | 'calls_ring_v2'
   ttl: string
   /** Which notification preference decides whether this is sent. 'security' is always sent. */
   category: 'message' | 'call' | 'like' | 'comment' | 'social' | 'security'
@@ -148,7 +148,7 @@ async function build(kind: string, id: string): Promise<Push | null> {
       body: c.call_type === 'video' ? 'Incoming video call' : 'Incoming voice call',
       url: `/call/${c.id}`,
       tag: `call-${c.id}`,
-      channel: 'calls_ring',
+      channel: 'calls_ring_v2',
       ttl: '30s',
       category: 'call',
     }

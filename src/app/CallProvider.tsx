@@ -6,6 +6,7 @@ import { CallScreen } from '@/components/calls/CallScreen'
 import { useCall } from '@/hooks/useCall'
 import { setBackGuard } from '@/hooks/useBackButton'
 import { formatDuration } from '@/lib/format'
+import { startCallKeeper, stopCallKeeper } from '@/lib/callKeeper'
 
 interface Active { id: string; accept: boolean }
 interface CallCtx {
@@ -30,6 +31,15 @@ function Runner({ active, myId, onFinished, onLive }: { active: Active; myId: st
   const name = api.peer?.display_name || api.peer?.username || 'Call'
 
   useEffect(() => { onLive(!over) }, [over, onLive])
+
+  // Android app: keep the call running while the user is in another app.
+  const keep = !over && (api.phase === 'ringing' || api.phase === 'connecting' || api.phase === 'connected')
+  const isVideo = api.call?.call_type === 'video'
+  useEffect(() => {
+    if (!keep) return
+    startCallKeeper(name, isVideo)
+    return () => stopCallKeeper()
+  }, [keep, name, isVideo])
 
   // Phone back button on the call screen minimises the call (it keeps running) instead of ending it.
   useEffect(() => {

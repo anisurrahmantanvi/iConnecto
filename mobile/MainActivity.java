@@ -28,6 +28,7 @@ public class MainActivity extends BridgeActivity {
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
+    registerPlugin(CallKeeperPlugin.class);
     super.onCreate(savedInstanceState);
 
     WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
@@ -70,6 +71,17 @@ public class MainActivity extends BridgeActivity {
   public void onResume() {
     super.onResume();
     inject();
+  }
+
+  @Override
+  public void onPause() {
+    super.onPause();
+    // During a call keep the web page (and its microphone/WebRTC connection) running in the background.
+    if (CallService.active && getBridge() != null && getBridge().getWebView() != null) {
+      WebView web = getBridge().getWebView();
+      web.onResume();
+      web.resumeTimers();
+    }
   }
 
   private void inject() {
