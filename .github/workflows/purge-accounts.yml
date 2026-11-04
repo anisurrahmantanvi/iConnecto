@@ -1,0 +1,14 @@
+name: Purge deleted accounts
+on:
+  schedule:
+    - cron: '17 21 * * *'   # every day, 03:17 Bangladesh time
+  workflow_dispatch:
+jobs:
+  purge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call purge-accounts
+        run: |
+          out=$(curl -sS -m 120 -X POST "https://hcfehacsfirzwjqqcabb.supabase.co/functions/v1/purge-accounts" -H 'content-type: application/json' -d '{}')
+          echo "$out"
+          echo "$out" | grep -q '"ok":true' || { echo "::error::purge-accounts did not finish cleanly"; exit 1; }

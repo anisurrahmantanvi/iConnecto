@@ -1,4 +1,4 @@
-import { amIDeactivated, reactivateAccount } from '@/services/deactivation'
+import { amIDeactivated, cancelAccountDeletion, myDeletionDate, reactivateAccount } from '@/services/deactivation'
 import { useEffect, useState } from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { ShieldAlert } from 'lucide-react'
@@ -71,6 +71,7 @@ export function ProtectedRoute() {
   const sid = sessionIdOf(session)
   const [emailDone, setEmailDone] = useState(0)
   const [off, setOff] = useState<boolean | null>(null)
+  const [delDate, setDelDate] = useState<string | null>(null)
   const needEmail = !!session && emailStepOn(session.user) && !isSessionChecked(sid) && !!session.user.email
   useEffect(() => {
     if (!uid) { setMfa(null); return }
@@ -81,10 +82,11 @@ export function ProtectedRoute() {
   }, [uid, sid])
 
   useEffect(() => {
-    if (!uid) { setOff(null); return }
+    if (!uid) { setOff(null); setDelDate(null); return }
     if (mfa !== '') return
     let on = true
     void amIDeactivated(uid).then((d) => on && setOff(d))
+    void myDeletionDate().then((d) => on && setDelDate(d))
     return () => { on = false }
   }, [uid, mfa])
 
@@ -92,6 +94,18 @@ export function ProtectedRoute() {
   if (session && needEmail) return <EmailChallenge key={emailDone} email={session.user.email as string} onDone={() => setEmailDone((n) => n + 1)} />
   if (session && mfa === null) return <Splash />
   if (session && mfa) return <MfaChallenge factorId={mfa} onDone={() => setMfa('')} />
+  if (session && delDate) {
+    return (
+      <div className="auth">
+        <GlassPanel className="auth__card" role="alert">
+          <h1>Your account is scheduled for deletion</h1>
+          <p className="muted">It will be permanently deleted on <strong>{new Date(delDate).toLocaleDateString()}</strong>. Until then your profile is hidden. Cancel to keep your account.</p>
+          <Button variant="primary" onClick={() => void cancelAccountDeletion().then(() => { setDelDate(null); setOff(false) }).catch(() => undefined)}>Cancel deletion and keep my account</Button>
+          <Button variant="ghost" onClick={() => void signOut()}>Sign out</Button>
+        </GlassPanel>
+      </div>
+    )
+  }
   if (session && off) {
     return (
       <div className="auth">

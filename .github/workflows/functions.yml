@@ -24,3 +24,5 @@ jobs:
           version: latest
       - name: Deploy send-push (called by database triggers, checked by a shared secret)
         run: supabase functions deploy send-push --no-verify-jwt --yes --project-ref "${{ inputs.project_ref }}"
+      - name: Deploy purge-accounts (daily clean-up of accounts past their 30-day deletion wait)
+        run: supabase functions deploy purge-accounts --no-verify-jwt --yes --project-ref "${{ inputs.project_ref }}"

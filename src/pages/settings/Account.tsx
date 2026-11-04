@@ -53,7 +53,7 @@ export default function AccountPage() {
     setDeleteBusy(true)
     setDeleteError(null)
     try {
-      await deleteMyAccount(me.id)
+      await deleteMyAccount()
       navigate('/login', { replace: true })
     } catch (err) {
       setDeleteError(errorMessage(err))
@@ -102,8 +102,8 @@ export default function AccountPage() {
         <h2 className="section-title">Delete account</h2>
         <GlassPanel padded className="col danger-zone">
           <p className="small muted">
-            Permanently deletes your account, profile, posts, comments, messages you sent and uploaded photos. Other people will
-            no longer see them. This can't be undone.
+            Your profile is hidden right away. After 30 days your account, profile, posts, comments, messages you sent and
+            uploaded files are permanently deleted. Sign in within 30 days to cancel.
           </p>
           <div><Button variant="danger" icon={<Trash2 size={16} />} onClick={() => setDeleteOpen(true)}>Delete my account</Button></div>
         </GlassPanel>
@@ -112,7 +112,7 @@ export default function AccountPage() {
       <Dialog open={deleteOpen} title="Delete your account?" onClose={closeDelete}>
         <div className="col">
           <p className="muted">
-            Type your username, <strong>{me.username}</strong>, to confirm. Everything you've shared will be removed for good.
+            Type your username, <strong>{me.username}</strong>, to confirm. Your profile is hidden now and everything is permanently removed after 30 days. Sign in before then to cancel.
           </p>
           {deleteError ? <ErrorBanner>{deleteError}</ErrorBanner> : null}
           <TextField
@@ -127,7 +127,7 @@ export default function AccountPage() {
           <div className="dialog-actions">
             <Button variant="ghost" onClick={closeDelete} disabled={deleteBusy}>Cancel</Button>
             <Button variant="danger" loading={deleteBusy} disabled={!confirmMatches} onClick={() => void deleteAccount()}>
-              Delete forever
+              Delete in 30 days
             </Button>
           </div>
         </div>
