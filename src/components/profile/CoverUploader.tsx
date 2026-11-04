@@ -3,6 +3,7 @@ import { Camera, Loader2, Trash2 } from 'lucide-react'
 import type { Profile } from '@/types/db'
 import { useToast } from '@/components/ui/Toast'
 import { changeCover } from '@/services/profiles'
+import { ImageCropper } from './ImageCropper'
 import { errorMessage } from '@/lib/supabase'
 
 interface CoverUploaderProps {
@@ -16,7 +17,10 @@ export function CoverUploader({ profile, onUpdated }: CoverUploaderProps) {
   const input = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
 
+  const [picked, setPicked] = useState<File | null>(null)
+
   const run = async (file: File | null) => {
+    setPicked(null)
     setBusy(true)
     try {
       onUpdated(await changeCover(profile.id, file, profile.cover_url))
@@ -50,8 +54,9 @@ export function CoverUploader({ profile, onUpdated }: CoverUploaderProps) {
         accept="image/jpeg,image/png,image/webp"
         tabIndex={-1}
         aria-hidden
-        onChange={(e) => { const f = e.target.files?.[0]; if (f) void run(f) }}
+        onChange={(e) => { const f = e.target.files?.[0]; if (f) setPicked(f); if (input.current) input.current.value = '' }}
       />
+      {picked ? <ImageCropper file={picked} aspect={16 / 9} title="Adjust cover photo" outWidth={1600} onCancel={() => setPicked(null)} onDone={(f) => void run(f)} /> : null}
     </div>
   )
 }

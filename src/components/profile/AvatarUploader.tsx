@@ -4,6 +4,7 @@ import type { Profile } from '@/types/db'
 import { Avatar } from '@/components/ui/Avatar'
 import { useToast } from '@/components/ui/Toast'
 import { changeAvatar } from '@/services/profiles'
+import { ImageCropper } from './ImageCropper'
 import { errorMessage } from '@/lib/supabase'
 
 interface AvatarUploaderProps {
@@ -17,8 +18,11 @@ export function AvatarUploader({ profile, onUpdated }: AvatarUploaderProps) {
   const input = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
 
+  const [picked, setPicked] = useState<File | null>(null)
+
   const onFile = async (file: File | undefined) => {
     if (!file) return
+    setPicked(null)
     setBusy(true)
     try {
       onUpdated(await changeAvatar(profile.id, file, profile.avatar_url))
@@ -52,8 +56,9 @@ export function AvatarUploader({ profile, onUpdated }: AvatarUploaderProps) {
         accept="image/jpeg,image/png,image/webp"
         tabIndex={-1}
         aria-hidden
-        onChange={(e) => void onFile(e.target.files?.[0])}
+        onChange={(e) => { const f = e.target.files?.[0]; if (f) setPicked(f); if (input.current) input.current.value = '' }}
       />
+      {picked ? <ImageCropper file={picked} aspect={1} round title="Adjust profile photo" outWidth={800} onCancel={() => setPicked(null)} onDone={(f) => void onFile(f)} /> : null}
     </div>
   )
 }

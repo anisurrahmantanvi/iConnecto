@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { PhotoViewer } from '@/components/ui/PhotoViewer'
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge'
 import { Lock, MessageCircle, Pencil, Plus } from 'lucide-react'
 import type { Profile } from '@/types/db'
@@ -28,6 +30,9 @@ interface ProfileHeaderProps {
 
 export function ProfileHeader({ profile, isMe, friendState, onFriendStateChange, friendsCount, isPrivate, onMessage, messaging, menu, onAddStory }: ProfileHeaderProps) {
   const base = `/u/${profile.username}`
+  const photos = [profile.avatar_url, profile.cover_url].filter((u): u is string => !!u)
+  const [viewer, setViewer] = useState<number | null>(null)
+  const open = (url: string | null) => { const i = url ? photos.indexOf(url) : -1; if (i >= 0) setViewer(i) }
   const presenceMap = usePresence(isMe ? [] : [profile.id])
   const presence = isMe ? null : describePresence(presenceMap.get(profile.id))
   return (
@@ -36,12 +41,15 @@ export function ProfileHeader({ profile, isMe, friendState, onFriendStateChange,
         {profile.cover_url ? <img src={profile.cover_url} alt="" decoding="async" /> : null}
       </div>
       <div className="profile-top">
+        {profile.cover_url ? <button type="button" className="profile-cover__hit" aria-label="View cover photo" onClick={() => open(profile.cover_url)} /> : null}
         <div className="profile-id">
           <h1>{profile.display_name || profile.username}<VerifiedBadge badge={profile.badge} size={20} /></h1>
           <div className="muted">@{profile.username}{isPrivate ? <Lock size={13} aria-label="Private account" style={{ marginLeft: 6, verticalAlign: '-0.1em' }} /> : null}</div>
         </div>
         <span className="profile-ring">
-          <PresenceAvatar online={!!presence?.online} src={profile.avatar_url} name={profile.display_name ?? profile.username} size="xl" />
+          <button type="button" aria-label="View profile photo" disabled={!profile.avatar_url} onClick={() => open(profile.avatar_url)} style={{ background: 'none', border: 0, padding: 0, borderRadius: '50%', display: 'block' }}>
+            <PresenceAvatar online={!!presence?.online} src={profile.avatar_url} name={profile.display_name ?? profile.username} size="xl" />
+          </button>
         </span>
       </div>
       {profile.bio ? <p className="profile-bio"><RichText text={profile.bio} /></p> : null}
@@ -65,6 +73,7 @@ export function ProfileHeader({ profile, isMe, friendState, onFriendStateChange,
         )}
         <ActionMenu items={menu} label="Profile options" />
       </div>
+      <PhotoViewer urls={photos} index={viewer} onIndexChange={setViewer} onClose={() => setViewer(null)} />
     </section>
   )
 }

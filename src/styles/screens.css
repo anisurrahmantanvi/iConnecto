@@ -323,3 +323,7 @@ html { overflow-x: hidden; max-width: 100%; }
 .shell__main--bleed .page-header + .skeleton-list,
 .shell__main--bleed .page-header + .empty { margin-top: var(--space-4); }
 .profile-head { overflow-x: clip; max-width: 100vw; }
+
+/* Tap the empty cover area above the name to open the cover photo. */
+.profile-cover__hit { position: absolute; left: 0; right: 0; top: 0; height: 90px; background: transparent; border: 0; padding: 0; z-index: 1; cursor: pointer; }
+.profile-top .profile-id, .profile-top .profile-ring { position: relative; z-index: 2; }
