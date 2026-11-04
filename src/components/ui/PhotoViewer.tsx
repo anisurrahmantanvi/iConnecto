@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef, useState, type TouchList } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { ChevronLeft, ChevronRight, Minus, Plus, X } from 'lucide-react'
+import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 
 interface PhotoViewerProps {
   urls: string[]
@@ -11,33 +11,95 @@ interface PhotoViewerProps {
 }
 
 const MIN = 1
-const MAX = 5
+const MAX = 6
 
 /**
- * Full-screen photo viewer. Pinch with two fingers, double-tap, or use the + / − buttons to zoom; drag to move around a zoomed photo.
- * With several photos, the arrows switch between them.
+ * Full-screen photo viewer. Pinch with two fingers to zoom in and out, drag to move a zoomed photo, double-tap to zoom,
+ * and swipe sideways (when not zoomed) to change photo.
  */
 export function PhotoViewer({ urls, index, onIndexChange, onClose }: PhotoViewerProps) {
-  const [zoom, setZoom] = useState(1)
+  const [view, setView] = useState({ s: 1, x: 0, y: 0 })
   const stage = useRef<HTMLDivElement>(null)
-  const pinch = useRef<{ dist: number; zoom: number } | null>(null)
-  const lastTap = useRef(0)
+  const ptrs = useRef(new Map<number, { x: number; y: number }>())
+  const pinch = useRef<{ d: number; s: number; x: number; y: number } | null>(null)
+  const drag = useRef<{ x: number; y: number; moved: number; sx: number } | null>(null)
+  const lastTap = useRef({ t: 0, x: 0, y: 0 })
   const open = index !== null
 
-  const setClamped = useCallback((z: number) => setZoom(Math.min(MAX, Math.max(MIN, z))), [])
-
-  // Start every photo un-zoomed and scrolled to the top-left.
-  useEffect(() => {
-    setZoom(1)
-    stage.current?.scrollTo(0, 0)
-  }, [index])
-
-  // After zooming, keep the view centred on the middle of the photo instead of jumping to a corner.
-  useEffect(() => {
+  const limit = (s: number, x: number, y: number) => {
     const el = stage.current
-    if (!el) return
-    el.scrollTo((el.scrollWidth - el.clientWidth) / 2, (el.scrollHeight - el.clientHeight) / 2)
-  }, [zoom])
+    const w = el?.clientWidth ?? 0
+    const h = el?.clientHeight ?? 0
+    const mx = ((s - 1) * w) / 2
+    const my = ((s - 1) * h) / 2
+    return { s, x: Math.max(-mx, Math.min(mx, x)), y: Math.max(-my, Math.min(my, y)) }
+  }
+
+  // Every photo starts un-zoomed.
+  useEffect(() => { setView({ s: 1, x: 0, y: 0 }) }, [index])
+
+  const centre = () => {
+    const r = stage.current?.getBoundingClientRect()
+    return r ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : { x: 0, y: 0 }
+  }
+
+  // Zoom to s1 while the point under the finger stays where it is.
+  const zoomAt = (s1: number, fx: number, fy: number, from = view) => {
+    const c = centre()
+    const f = { x: fx - c.x, y: fy - c.y }
+    const s = Math.min(MAX, Math.max(MIN, s1))
+    const k = s / from.s
+    return limit(s, f.x - k * (f.x - from.x), f.y - k * (f.y - from.y))
+  }
+
+  const onDown = (e: React.PointerEvent) => {
+    ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+    ptrs.current.set(e.pointerId, { x: e.clientX, y: e.clientY })
+    if (ptrs.current.size === 2) {
+      const [a, b] = [...ptrs.current.values()]
+      pinch.current = { d: Math.hypot(a.x - b.x, a.y - b.y), s: view.s, x: view.x, y: view.y }
+      drag.current = null
+    } else {
+      drag.current = { x: e.clientX, y: e.clientY, moved: 0, sx: e.clientX }
+    }
+  }
+  const onMove = (e: React.PointerEvent) => {
+    if (!ptrs.current.has(e.pointerId)) return
+    const prev = ptrs.current.get(e.pointerId)!
+    ptrs.current.set(e.pointerId, { x: e.clientX, y: e.clientY })
+    if (ptrs.current.size >= 2 && pinch.current) {
+      const [a, b] = [...ptrs.current.values()]
+      const d = Math.hypot(a.x - b.x, a.y - b.y)
+      setView(zoomAt(pinch.current.s * (d / pinch.current.d), (a.x + b.x) / 2, (a.y + b.y) / 2, { s: pinch.current.s, x: pinch.current.x, y: pinch.current.y }))
+    } else if (drag.current) {
+      const dx = e.clientX - prev.x
+      const dy = e.clientY - prev.y
+      drag.current.moved += Math.abs(dx) + Math.abs(dy)
+      if (view.s > 1) setView((v) => limit(v.s, v.x + dx, v.y + dy))
+    }
+  }
+  const onUp = (e: React.PointerEvent) => {
+    const wasSingle = ptrs.current.size === 1
+    ptrs.current.delete(e.pointerId)
+    if (ptrs.current.size < 2) pinch.current = null
+    const d = drag.current
+    if (!wasSingle || !d) return
+    drag.current = null
+    const swipe = e.clientX - d.sx
+    if (view.s <= 1.02 && Math.abs(swipe) > 70 && d.moved > 70 && index !== null) {
+      if (swipe < 0 && index < urls.length - 1) onIndexChange(index + 1)
+      else if (swipe > 0 && index > 0) onIndexChange(index - 1)
+      return
+    }
+    if (d.moved < 12) {
+      const now = Date.now()
+      const t = lastTap.current
+      if (now - t.t < 300 && Math.hypot(e.clientX - t.x, e.clientY - t.y) < 40) {
+        setView(view.s > 1.05 ? { s: 1, x: 0, y: 0 } : zoomAt(2.5, e.clientX, e.clientY))
+        lastTap.current = { t: 0, x: 0, y: 0 }
+      } else lastTap.current = { t: now, x: e.clientX, y: e.clientY }
+    }
+  }
 
   useEffect(() => {
     if (!open) return
@@ -57,8 +119,6 @@ export function PhotoViewer({ urls, index, onIndexChange, onClose }: PhotoViewer
 
   if (index === null || !urls[index]) return null
 
-  const dist = (t: TouchList) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY)
-
   return createPortal(
     <div className="viewer" role="dialog" aria-modal="true" aria-label="Photo viewer">
       <div className="viewer__bar">
@@ -70,27 +130,18 @@ export function PhotoViewer({ urls, index, onIndexChange, onClose }: PhotoViewer
       <div
         ref={stage}
         className="viewer__stage"
-        onTouchStart={(e) => {
-          if (e.touches.length === 2) pinch.current = { dist: dist(e.touches), zoom }
-        }}
-        onTouchMove={(e) => {
-          if (e.touches.length === 2 && pinch.current) setClamped(pinch.current.zoom * (dist(e.touches) / pinch.current.dist))
-        }}
-        onTouchEnd={(e) => {
-          if (e.touches.length < 2) pinch.current = null
-        }}
-        onClick={() => {
-          const now = Date.now()
-          if (now - lastTap.current < 300) setZoom((z) => (z > 1 ? 1 : 2.5))
-          lastTap.current = now
-        }}
+        style={{ overflow: 'hidden', touchAction: 'none', display: 'grid', placeItems: 'center' }}
+        onPointerDown={onDown}
+        onPointerMove={onMove}
+        onPointerUp={onUp}
+        onPointerCancel={onUp}
       >
         <img
           className="viewer__img"
           src={urls[index]}
           alt={`Photo ${index + 1} of ${urls.length}`}
           draggable={false}
-          style={{ width: `${zoom * 100}vw`, height: `${zoom * 100}dvh` }}
+          style={{ width: '100%', height: '100%', objectFit: 'contain', maxWidth: 'none', transform: `translate(${view.x}px, ${view.y}px) scale(${view.s})`, transition: pinch.current || drag.current ? 'none' : 'transform .18s ease', userSelect: 'none', pointerEvents: 'none' }}
         />
       </div>
 
@@ -101,10 +152,6 @@ export function PhotoViewer({ urls, index, onIndexChange, onClose }: PhotoViewer
         <button type="button" className="viewer__btn viewer__nav viewer__nav--next" aria-label="Next photo" onClick={() => onIndexChange(index + 1)}><ChevronRight size={26} /></button>
       ) : null}
 
-      <div className="viewer__zoom">
-        <button type="button" className="viewer__btn" aria-label="Zoom out" disabled={zoom <= MIN} onClick={() => setClamped(zoom - 0.75)}><Minus size={22} /></button>
-        <button type="button" className="viewer__btn" aria-label="Zoom in" disabled={zoom >= MAX} onClick={() => setClamped(zoom + 0.75)}><Plus size={22} /></button>
-      </div>
     </div>,
     document.body,
   )
