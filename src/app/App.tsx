@@ -56,6 +56,7 @@ const YourDataPage = lazy(() => import('@/pages/settings/YourData'))
 const DeactivatePage = lazy(() => import('@/pages/settings/Deactivate'))
 const MyMediaPage = lazy(() => import('@/pages/settings/MyMedia'))
 const CopyTextPage = lazy(() => import('@/pages/settings/CopyText'))
+const DisplayPrefsPage = lazy(() => import('@/pages/settings/DisplayPrefsPage'))
 const MarketHomePage = lazy(() => import('@/pages/market/MarketHome'))
 const TwoFactorPage = lazy(() => import('@/pages/settings/TwoFactor'))
 const TrustedDevicesPage = lazy(() => import('@/pages/settings/TrustedDevices'))
@@ -144,6 +145,7 @@ export function App() {
                 <Route path="/settings/deactivate" element={<DeactivatePage />} />
                 <Route path="/settings/media" element={<MyMediaPage />} />
                 <Route path="/settings/copy-text" element={<CopyTextPage />} />
+                <Route path="/settings/display" element={<DisplayPrefsPage />} />
                 <Route path="/settings/help" element={<HelpCenterPage />} />
                 <Route path="/settings/about" element={<AboutPage />} />
                 <Route path="/settings/support/status" element={<SupportStatusPage />} />

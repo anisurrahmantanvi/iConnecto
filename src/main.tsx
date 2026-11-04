@@ -9,10 +9,12 @@ import { I18nProvider } from './lib/i18n'
 import { ToastProvider } from './components/ui/Toast'
 import { registerServiceWorker } from './lib/pwa'
 import { ROUTER_BASENAME } from './lib/base'
+import { applyDisplayPrefs } from './lib/displayPrefs'
 
 const rootEl = document.getElementById('root')
 if (!rootEl) throw new Error('Missing #root element in index.html')
 
+applyDisplayPrefs()
 try { if (localStorage.getItem('iconnecto.allowCopy') === '1') document.documentElement.classList.add('allow-copy') } catch { /* ignore */ }
 
 // Long-press on an in-app link/button should not open the browser's link menu/preview.

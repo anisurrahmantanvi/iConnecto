@@ -23,7 +23,7 @@ export function ReelStrip({ authorId = null, title = 'Reels' }: { authorId?: str
       <div style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '0 14px', scrollSnapType: 'x proximity' }}>
         {items.map((r) => (
           <Link key={r.id} to={`/reels/${r.id}`} aria-label={r.caption || 'Open reel'} style={{ position: 'relative', flex: 'none', width: 108, aspectRatio: '9 / 16', borderRadius: 12, overflow: 'hidden', background: '#000', scrollSnapAlign: 'start' }}>
-            <video src={`${r.video_url}#t=0.1`} preload="metadata" muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none' }} />
+            <video src={`${r.video_url}#t=0.1`} preload={document.documentElement.classList.contains('data-saver') ? 'none' : 'metadata'} muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none' }} />
             <span style={{ position: 'absolute', left: 6, bottom: 6, color: '#fff', fontSize: 12, display: 'flex', alignItems: 'center', gap: 3, textShadow: '0 1px 3px rgba(0,0,0,.8)' }}><Play size={12} fill="#fff" /> {r.view_count}</span>
           </Link>
         ))}

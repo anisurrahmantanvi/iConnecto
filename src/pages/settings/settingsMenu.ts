@@ -26,7 +26,7 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
     title: 'Preferences',
     inline: 'language',
     items: [
-      { title: 'Media: Data Saver ON/OFF' },
+      { title: 'Accessibility & Media', to: '/settings/display' },
       { title: 'Copy Text', to: '/settings/copy-text' },
     ],
   },

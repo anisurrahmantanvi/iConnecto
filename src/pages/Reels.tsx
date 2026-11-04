@@ -14,6 +14,7 @@ import { usePaged } from '@/hooks/common'
 import { appUrl } from '@/lib/base'
 import { compactNumber, timeAgo } from '@/lib/format'
 import { errorMessage } from '@/lib/supabase'
+import { getDisplayPrefs } from '@/lib/displayPrefs'
 import {
   addReelComment, countView, deleteReel, deleteReelComment, fetchReels, listReelComments, setReelLike,
   fetchReel, type Reel, type ReelComment,
@@ -78,7 +79,7 @@ export function ReelItem({ reel, muted, onToggleMute, patch, onDeleted }: { reel
       const v = vid.current
       if (!v) return
       if (e.isIntersecting && e.intersectionRatio >= 0.6) {
-        void v.play().catch(() => undefined)
+        if (getDisplayPrefs().reelsAutoplay) void v.play().catch(() => undefined)
         if (!counted.current) { counted.current = true; countView(reel.id) }
       } else v.pause()
     }, { threshold: [0, 0.6, 1] })
@@ -101,7 +102,7 @@ export function ReelItem({ reel, muted, onToggleMute, patch, onDeleted }: { reel
 
   return (
     <section ref={box} className="reel" aria-label={`Reel by ${a?.display_name ?? a?.username ?? 'unknown'}`}>
-      <video ref={vid} className="reel__video" src={reel.video_url} loop muted={muted} playsInline preload="metadata" onClick={onToggleMute} />
+      <video ref={vid} className="reel__video" src={reel.video_url} loop muted={muted} playsInline preload={getDisplayPrefs().dataSaver ? 'none' : 'metadata'} onClick={() => { const v = vid.current; if (v && v.paused) void v.play().catch(() => undefined); else onToggleMute() }} />
       <div className="reel__side">
         <button type="button" className={`reel__btn ${reel.liked ? 'is-on' : ''}`} aria-label={reel.liked ? 'Unlike' : 'Like'} aria-pressed={reel.liked} onClick={() => void like()}><Heart size={28} fill={reel.liked ? 'currentColor' : 'none'} /><span>{compactNumber(reel.like_count)}</span></button>
         <button type="button" className="reel__btn" aria-label="Comments" onClick={() => setOpenComments(true)}><MessageCircle size={28} /><span>{compactNumber(reel.comment_count)}</span></button>

@@ -124,3 +124,12 @@ img {
 }
 
 a, button, img { -webkit-touch-callout: none; }
+
+/* Accessibility & Media preferences (set from Settings → Accessibility & Media) */
+body { font-size: calc(15px * var(--fs, 1)); }
+.small { font-size: calc(13px * var(--fs, 1)); }
+html.reduce-motion *, html.reduce-motion *::before, html.reduce-motion *::after {
+  animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important;
+}
+html.high-contrast { --text-muted: var(--text); --text-faint: var(--text); }
+html.high-contrast .glass, html.high-contrast .card { border-color: currentColor; }
