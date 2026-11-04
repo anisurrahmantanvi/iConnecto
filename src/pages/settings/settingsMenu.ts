@@ -27,6 +27,7 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
     inline: 'language',
     items: [
       { title: 'Media: Data Saver ON/OFF' },
+      { title: 'Copy Text', to: '/settings/copy-text' },
     ],
   },
   {

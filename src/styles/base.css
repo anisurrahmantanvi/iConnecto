@@ -28,8 +28,13 @@ body {
 /* Only text fields (so people can type) and post captions can be selected or copied. Everything else is locked. */
 input,
 textarea,
-[contenteditable='true'],
-.post__body {
+[contenteditable='true'] {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
+/* Post captions can be copied only when the person turns on Settings → Copy Text. */
+html.allow-copy .post__body {
   -webkit-user-select: text;
   user-select: text;
   -webkit-touch-callout: default;
