@@ -46,9 +46,9 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
   {
     title: 'Activity',
     items: [
-      { title: 'Activity Log' },
-      { title: 'Your Posts' },
-      { title: 'Comments and Reactions' },
+      { title: 'Activity Log', to: '/settings/activity' },
+      { title: 'Your Posts', to: '/settings/activity' },
+      { title: 'Comments and Reactions', to: '/settings/activity' },
       { title: 'Search History' },
       { title: 'Recently Deleted' },
     ],
