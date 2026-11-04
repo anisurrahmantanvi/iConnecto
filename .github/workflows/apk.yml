@@ -36,16 +36,19 @@ jobs:
           {"appId":"com.iconnecto.app","appName":"iConnecto","webDir":"dist","server":{"url":"${{ inputs.site_url }}","androidScheme":"https"}}
           JSON
           npx cap add android
-          cp mobile/MainActivity.java mobile/CallService.java mobile/CallKeeperPlugin.java android/app/src/main/java/com/iconnecto/app/
+          cp mobile/MainActivity.java mobile/CallService.java mobile/CallKeeperPlugin.java mobile/CallRinger.java mobile/AppMessagingService.java android/app/src/main/java/com/iconnecto/app/
           python3 - <<'PY'
           p='android/app/src/main/AndroidManifest.xml'
           s=open(p).read()
-          perms=''.join('<uses-permission android:name="android.permission.%s" />\n'%x for x in ['CAMERA','RECORD_AUDIO','MODIFY_AUDIO_SETTINGS','POST_NOTIFICATIONS','FOREGROUND_SERVICE','FOREGROUND_SERVICE_MICROPHONE','FOREGROUND_SERVICE_CAMERA','WAKE_LOCK'])
+          perms=''.join('<uses-permission android:name="android.permission.%s" />\n'%x for x in ['CAMERA','RECORD_AUDIO','MODIFY_AUDIO_SETTINGS','POST_NOTIFICATIONS','FOREGROUND_SERVICE','FOREGROUND_SERVICE_MICROPHONE','FOREGROUND_SERVICE_CAMERA','WAKE_LOCK','USE_FULL_SCREEN_INTENT','VIBRATE'])
           s=s.replace('</manifest>',perms+'</manifest>')
           # Notification icon: Android needs a one-colour silhouette, not the coloured app icon (which shows as a blank square).
           meta='<meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/ic_stat_iconnecto" /><meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@color/ic_stat_color" />'
           svc='<service android:name=".CallService" android:foregroundServiceType="microphone|camera" android:exported="false" />'
-          s=s.replace('</application>',meta+svc+'</application>')
+          if 'xmlns:tools' not in s:
+              s=s.replace('<manifest ','<manifest xmlns:tools="http://schemas.android.com/tools" ',1)
+          msg='<service android:name="com.capacitorjs.plugins.pushnotifications.MessagingService" tools:node="remove" /><service android:name=".AppMessagingService" android:exported="false"><intent-filter><action android:name="com.google.firebase.MESSAGING_EVENT" /></intent-filter></service>'
+          s=s.replace('</application>',meta+svc+msg+'</application>')
           open(p,'w').write(s)
           PY
           mkdir -p assets && cp design/logo-source.png assets/icon-only.png && cp design/logo-source.png assets/icon-foreground.png

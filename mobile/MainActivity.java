@@ -29,6 +29,9 @@ public class MainActivity extends BridgeActivity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     registerPlugin(CallKeeperPlugin.class);
+    if (getIntent() != null && getIntent().getBooleanExtra("fromCall", false)) {
+      if (Build.VERSION.SDK_INT >= 27) { setShowWhenLocked(true); setTurnScreenOn(true); }
+    }
     super.onCreate(savedInstanceState);
 
     WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
@@ -70,6 +73,7 @@ public class MainActivity extends BridgeActivity {
   @Override
   public void onResume() {
     super.onResume();
+    CallRinger.stop(this);
     inject();
   }
 

@@ -185,12 +185,19 @@ async function handle(req: Request): Promise<Response> {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        message: {
-          token,
-          notification: { title: push.title, body: push.body },
-          data: { url: push.url },
-          android: { priority: 'HIGH', ttl: push.ttl, notification: { channel_id: push.channel, tag: push.tag } },
-        },
+        message: push.channel === 'calls_ring_v2'
+          ? {
+              // Calls are data-only so the app's own service can ring (looping) and show the full-screen call screen.
+              token,
+              data: { kind: 'call', title: push.title, body: push.body, url: push.url },
+              android: { priority: 'HIGH', ttl: push.ttl },
+            }
+          : {
+              token,
+              notification: { title: push.title, body: push.body },
+              data: { url: push.url },
+              android: { priority: 'HIGH', ttl: push.ttl, notification: { channel_id: push.channel, tag: push.tag } },
+            },
       }),
     })
     if (res.ok) {
