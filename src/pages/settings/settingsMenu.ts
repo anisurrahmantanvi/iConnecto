@@ -106,7 +106,7 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
       { title: 'Blocked Users', to: '/settings/blocked' },
       { title: 'Restricted Users' },
       { title: 'Who Can See My Content' },
-      { title: 'Manage Personal Information' },
+      { title: 'Manage Personal Information', to: '/settings/your-data' },
     ],
   },
   {
@@ -129,7 +129,7 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
       { title: 'Online Status ON/OFF', to: '/message-settings/privacy' },
       { title: 'Who Can Message You', to: '/settings/privacy' },
       { title: 'Group Invitation Settings' },
-      { title: 'Media Auto-Download' },
+      { title: 'Media Auto-Download', to: '/settings/display' },
     ],
   },
   {
@@ -158,11 +158,11 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
   {
     title: 'Reels Settings',
     items: [
-      { title: 'Autoplay ON/OFF' },
+      { title: 'Autoplay ON/OFF', to: '/settings/display' },
       { title: 'Video Quality' },
       { title: 'Upload Quality' },
       { title: 'Captions ON/OFF' },
-      { title: 'Data Usage' },
+      { title: 'Data Usage', to: '/settings/display' },
       { title: 'Reels Preferences' },
       { title: 'Allow Remixing' },
       { title: 'Allow Reel Sharing' },
@@ -195,12 +195,12 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
   {
     title: 'Accessibility',
     items: [
-      { title: 'Font Size' },
-      { title: 'Reduced Motion' },
+      { title: 'Font Size', to: '/settings/display' },
+      { title: 'Reduced Motion', to: '/settings/display' },
       { title: 'Screen Reader Support' },
       { title: 'Video Captions' },
-      { title: 'Accessibility Preferences' },
-      { title: 'High Contrast Mode' },
+      { title: 'Accessibility Preferences', to: '/settings/display' },
+      { title: 'High Contrast Mode', to: '/settings/display' },
     ],
   },
   {
@@ -210,9 +210,9 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
       { title: 'Report a Bug', to: '/settings/support/bug' },
       { title: 'Request a Feature', to: '/settings/support/feature' },
       { title: 'Report Status', to: '/settings/support/status' },
-      { title: 'Frequently Asked Questions' },
+      { title: 'Frequently Asked Questions', to: '/settings/help' },
       { title: 'Help Center', to: '/settings/help' },
-      { title: 'Community Guidelines' },
+      { title: 'Community Guidelines', to: '/settings/help' },
     ],
   },
   {
@@ -234,10 +234,10 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
   {
     title: 'Quiet Mode',
     items: [
-      { title: 'Enable / Disable Quiet Mode' },
-      { title: 'Custom Start and End Time' },
-      { title: 'Pause Notifications' },
-      { title: 'Automatic Quiet Mode Schedule' },
+      { title: 'Enable / Disable Quiet Mode', to: '/settings/notification-prefs' },
+      { title: 'Custom Start and End Time', to: '/settings/notification-prefs' },
+      { title: 'Pause Notifications', to: '/settings/notification-prefs' },
+      { title: 'Automatic Quiet Mode Schedule', to: '/settings/notification-prefs' },
     ],
   },
   {
