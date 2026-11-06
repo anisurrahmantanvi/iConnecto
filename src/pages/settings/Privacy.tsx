@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getIsPrivate, setMyPrivate, getWhoCanMessage, setWhoCanMessage, type WhoCanMessage } from '@/services/privateAccount'
+import { getIsPrivate, setMyPrivate, getWhoCanMessage, setWhoCanMessage, getWhoCanComment, setWhoCanComment, type WhoCanComment, type WhoCanMessage } from '@/services/privateAccount'
 import { Link } from 'react-router-dom'
 import { BellOff, ChevronRight, Eye, Lock, MonitorSmartphone, UserX } from 'lucide-react'
 import { useMe } from '@/app/AuthProvider'
@@ -26,6 +26,20 @@ export default function PrivacyPage() {
   useEffect(() => {
     void getWhoCanMessage(me.id).then(setWhoMsg)
   }, [me.id])
+  const [whoCom, setWhoCom] = useState<WhoCanComment | null>(null)
+  useEffect(() => {
+    void getWhoCanComment(me.id).then(setWhoCom)
+  }, [me.id])
+  const changeWhoCom = async (v: WhoCanComment) => {
+    const before = whoCom
+    setWhoCom(v)
+    try {
+      await setWhoCanComment(me.id, v)
+    } catch (err) {
+      setWhoCom(before)
+      toast.error(errorMessage(err))
+    }
+  }
   const changeWhoMsg = async (v: WhoCanMessage) => {
     const before = whoMsg
     setWhoMsg(v)
@@ -119,6 +133,20 @@ export default function PrivacyPage() {
                 <button type="button" className="chip" aria-pressed={whoMsg === 'everyone'} onClick={() => void changeWhoMsg('everyone')}>Everyone</button>
                 <button type="button" className="chip" aria-pressed={whoMsg === 'followers'} onClick={() => void changeWhoMsg('followers')}>My friends</button>
                 <button type="button" className="chip" aria-pressed={whoMsg === 'nobody'} onClick={() => void changeWhoMsg('nobody')}>Nobody</button>
+              </div>
+            </GlassPanel>
+          </>
+        ) : null}
+
+        {whoCom !== null ? (
+          <>
+            <h2 className="section-title">Who can comment on your posts</h2>
+            <GlassPanel padded className="col">
+              <p className="small">Choose who can comment on your posts. You can always comment on your own posts.</p>
+              <div role="group" aria-label="Who can comment on your posts" className="chip-row">
+                <button type="button" className="chip" aria-pressed={whoCom === 'everyone'} onClick={() => void changeWhoCom('everyone')}>Everyone</button>
+                <button type="button" className="chip" aria-pressed={whoCom === 'followers'} onClick={() => void changeWhoCom('followers')}>My friends</button>
+                <button type="button" className="chip" aria-pressed={whoCom === 'nobody'} onClick={() => void changeWhoCom('nobody')}>Nobody</button>
               </div>
             </GlassPanel>
           </>

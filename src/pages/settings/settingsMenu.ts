@@ -135,7 +135,7 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
   {
     title: 'Interaction Settings',
     items: [
-      { title: 'Who Can Comment' },
+      { title: 'Who Can Comment', to: '/settings/privacy' },
       { title: 'Who Can Mention You' },
       { title: 'Who Can Tag You' },
       { title: 'Who Can React to Posts' },

@@ -77,3 +77,17 @@ export async function setWhoCanMessage(userId: string, v: WhoCanMessage): Promis
   const { error } = await supabase.from('profiles').update({ who_can_message: v }).eq('id', userId)
   if (error) throw new Error(error.message)
 }
+
+export type WhoCanComment = 'everyone' | 'followers' | 'nobody'
+
+/** Null when the database has not been updated yet. */
+export async function getWhoCanComment(userId: string): Promise<WhoCanComment | null> {
+  const { data, error } = await supabase.from('profiles').select('who_can_comment').eq('id', userId).maybeSingle()
+  if (error || !data) return null
+  return (data as { who_can_comment: WhoCanComment }).who_can_comment
+}
+
+export async function setWhoCanComment(userId: string, v: WhoCanComment): Promise<void> {
+  const { error } = await supabase.from('profiles').update({ who_can_comment: v }).eq('id', userId)
+  if (error) throw new Error(error.message)
+}
