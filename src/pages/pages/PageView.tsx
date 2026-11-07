@@ -13,6 +13,7 @@ import { appUrl } from '@/lib/base'
 import { compactNumber } from '@/lib/format'
 import { errorMessage } from '@/lib/supabase'
 import { categoryLabel, followPage, getPageBySlug, isFollowingPage, myPageRole, unfollowPage } from '@/services/pages'
+import { setActingAs, useActingAs } from '@/lib/actingAs'
 import { RichText } from '@/components/ui/Emoji'
 
 
@@ -21,6 +22,7 @@ export default function PageViewPage() {
   const me = useMe()
   const toast = useToast()
   const navigate = useNavigate()
+  const acting = useActingAs()
   const { data: page, loading, error, reload } = useAsync(() => getPageBySlug(slug), [slug])
   const [role, setRole] = useState<string | null>(null)
   const [following, setFollowing] = useState(false)
@@ -93,6 +95,9 @@ export default function PageViewPage() {
           <div className="row profile-actions">
             {canPost ? (
               <>
+                {acting === page.slug
+                  ? <Button variant="glass" onClick={() => setActingAs('')}>Switch to personal profile</Button>
+                  : <Button variant="glass" onClick={() => setActingAs(page.slug)}>Switch to this Page</Button>}
                 <Button variant="primary" icon={<PenSquare size={16} />} onClick={() => navigate(`/create?page=${page.slug}`)}>Post</Button>
                 {admin ? <Link to={`/page/${page.slug}/edit`} className="btn btn--glass"><Pencil size={16} aria-hidden /> Manage</Link> : null}
               </>

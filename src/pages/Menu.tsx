@@ -7,7 +7,6 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { GlassPanel } from '@/components/ui/GlassPanel'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { useT } from '@/lib/i18n'
-import { ProfileSwitcher } from '@/components/pages/ProfileSwitcher'
 import { sectionSlug } from '@/pages/settings/settingsMenu'
 
 function Tile({ to, icon, label, color }: { to: string; icon: ReactNode; label: string; color: string }) {
@@ -46,7 +45,6 @@ export default function MenuPage() {
   const { signOut } = useAuth()
   const navigate = useNavigate()
   const [confirmLogout, setConfirmLogout] = useState(false)
-  const [switcher, setSwitcher] = useState(false)
 
   const logOut = async () => {
     await signOut()
@@ -65,9 +63,7 @@ export default function MenuPage() {
               <span className="muted truncate" style={{ display: 'block' }}>Your iConnecto profile</span>
             </span>
           </Link>
-          <button type="button" className="btn btn--block" style={{ marginTop: 12 }} onClick={() => setSwitcher(true)}>Switch profile</button>
         </GlassPanel>
-        <ProfileSwitcher open={switcher} onClose={() => setSwitcher(false)} />
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <Tile to="/messages" icon={<MessageCircle size={28} />} label="iConnect" color="#7a5cff" />

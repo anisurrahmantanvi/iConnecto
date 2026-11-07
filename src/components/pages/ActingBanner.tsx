@@ -4,14 +4,12 @@ import { useMe } from '@/app/AuthProvider'
 import { Avatar } from '@/components/ui/Avatar'
 import { setActingAs, useActingAs } from '@/lib/actingAs'
 import { getPageBySlug, myPageRole, type PageRow } from '@/services/pages'
-import { ProfileSwitcher } from './ProfileSwitcher'
 
 /** Shown on every screen while you are acting as a Page. */
 export function ActingBanner() {
   const me = useMe()
   const slug = useActingAs()
   const [page, setPage] = useState<PageRow | null>(null)
-  const [open, setOpen] = useState(false)
   useEffect(() => {
     setPage(null)
     if (!slug) return
@@ -27,16 +25,12 @@ export function ActingBanner() {
     })()
     return () => { off = true }
   }, [slug, me.id])
-  if (!slug || !page) return <ProfileSwitcher open={open} onClose={() => setOpen(false)} />
+  if (!slug || !page) return null
   return (
-    <>
       <div className="acting-banner" role="status">
         <Avatar src={page.avatar_url} name={page.name} size="sm" />
         <Link to={`/page/${page.slug}`} className="acting-banner__name truncate">Acting as <strong>{page.name}</strong></Link>
-        <button type="button" className="btn btn--sm" onClick={() => setOpen(true)}>Switch</button>
-        <button type="button" className="btn btn--sm" onClick={() => setActingAs('')}>My profile</button>
+        <button type="button" className="btn btn--sm" onClick={() => setActingAs('')}>Switch to personal profile</button>
       </div>
-      <ProfileSwitcher open={open} onClose={() => setOpen(false)} />
-    </>
   )
 }
