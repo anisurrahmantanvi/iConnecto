@@ -336,3 +336,8 @@ html { overflow-x: hidden; max-width: 100%; }
 .callbar__end { width: 40px; height: 40px; border: 0; background: rgba(0,0,0,.25); color: #fff; display: grid; place-items: center; }
 html.has-callbar .shell { padding-top: calc(40px + var(--safe-top)); }
 html.has-callbar .page-header { top: calc(40px + var(--safe-top)); }
+
+/* Acting-as-a-Page banner */
+.acting-banner { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; gap: 10px; padding: calc(8px + var(--sat, 0px)) 14px 8px; background: linear-gradient(90deg, #3b82ff, #7a5cff); color: #fff; }
+.acting-banner__name { flex: 1; min-width: 0; color: #fff; }
+.acting-banner .btn { padding: 6px 12px; font-size: 13px; }

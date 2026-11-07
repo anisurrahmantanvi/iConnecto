@@ -16,6 +16,7 @@ import { validateImage } from '@/lib/image'
 import { errorMessage } from '@/lib/supabase'
 import { myCommunities } from '@/services/communities'
 import { attachPostAudio, listLibrary, removeUploadedAudio, uploadAudio, validateAudio, type AudioDraft, type MusicTrack } from '@/services/music'
+import { useActingAs } from '@/lib/actingAs'
 import { getPageBySlug, linkPagePost, myPageRole, type PageRow } from '@/services/pages'
 import { createPost, MAX_POST_IMAGES, MAX_POST_LENGTH } from '@/services/posts'
 import type { PostVisibility } from '@/types/db'
@@ -28,7 +29,8 @@ export default function CreatePage() {
   const toast = useToast()
   const [params] = useSearchParams()
   const wantedCommunity = params.get('community') ?? ''
-  const wantedPage = params.get('page') ?? ''
+  const acting = useActingAs()
+  const wantedPage = params.get('page') ?? acting
   const [asPage, setAsPage] = useState<PageRow | null>(null)
   useEffect(() => {
     if (!wantedPage) return
