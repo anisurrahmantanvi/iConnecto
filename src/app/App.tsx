@@ -57,6 +57,7 @@ const DeactivatePage = lazy(() => import('@/pages/settings/Deactivate'))
 const MyMediaPage = lazy(() => import('@/pages/settings/MyMedia'))
 const CopyTextPage = lazy(() => import('@/pages/settings/CopyText'))
 const ActivityLogPage = lazy(() => import('@/pages/settings/ActivityLog'))
+const PageNotificationsPage = lazy(() => import('@/pages/pages/PageNotifications'))
 const DisplayPrefsPage = lazy(() => import('@/pages/settings/DisplayPrefsPage'))
 const MarketHomePage = lazy(() => import('@/pages/market/MarketHome'))
 const TwoFactorPage = lazy(() => import('@/pages/settings/TwoFactor'))
@@ -140,6 +141,7 @@ export function App() {
                 <Route path="/pages" element={<PagesHomePage />} />
                 <Route path="/pages/new" element={<PageFormPage mode="create" />} />
                 <Route path="/page/:slug" element={<PageViewPage />} />
+                <Route path="/page/:slug/notifications" element={<PageNotificationsPage />} />
                 <Route path="/page/:slug/edit" element={<PageFormPage mode="edit" />} />
                 <Route path="/settings/notification-prefs" element={<NotificationPrefsPage />} />
                 <Route path="/settings/your-data" element={<YourDataPage />} />

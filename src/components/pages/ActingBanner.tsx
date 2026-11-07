@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useMe } from '@/app/AuthProvider'
 import { Avatar } from '@/components/ui/Avatar'
 import { setActingAs, useActingAs } from '@/lib/actingAs'
+import { pageUnreadCount } from '@/services/pageNotifications'
 import { getPageBySlug, myPageRole, type PageRow } from '@/services/pages'
 
 /** Shown on every screen while you are acting as a Page. */
@@ -10,6 +11,15 @@ export function ActingBanner() {
   const me = useMe()
   const slug = useActingAs()
   const [page, setPage] = useState<PageRow | null>(null)
+  const [unread, setUnread] = useState(0)
+  useEffect(() => {
+    if (!page) return
+    let off = false
+    const load = () => void pageUnreadCount(page.id).then((n) => { if (!off) setUnread(n) })
+    load()
+    const id = window.setInterval(load, 60000)
+    return () => { off = true; window.clearInterval(id) }
+  }, [page])
   useEffect(() => {
     setPage(null)
     if (!slug) return
@@ -30,7 +40,8 @@ export function ActingBanner() {
       <div className="acting-banner" role="status">
         <Avatar src={page.avatar_url} name={page.name} size="sm" />
         <Link to={`/page/${page.slug}`} className="acting-banner__name truncate">Acting as <strong>{page.name}</strong></Link>
-        <button type="button" className="btn btn--sm" onClick={() => setActingAs('')}>Switch to personal profile</button>
+        <Link to={`/page/${page.slug}/notifications`} className="btn btn--sm">Alerts{unread ? ` (${unread})` : ''}</Link>
+        <button type="button" className="btn btn--sm" onClick={() => setActingAs('')}>Personal profile</button>
       </div>
   )
 }
